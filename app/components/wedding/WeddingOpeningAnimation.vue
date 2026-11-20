@@ -33,12 +33,12 @@
       <div class="absolute bottom-2 right-2 text-wedding-secondary text-xl select-none">⚜️</div>
 
       <!-- Top Greeting -->
-      <div class="text-wedding-secondary text-xs font-semibold mb-2" :class="{ 'tracking-widest uppercase': !isKhmer }">
+      <div class="text-wedding-secondary text-xs font-semibold mb-3" :class="{ 'tracking-widest uppercase': !isKhmer }">
         {{ isKhmer ? 'លិខិតអញ្ជើញសិរីមង្គល' : 'WEDDING INVITATION' }}
       </div>
 
       <!-- Wedding Header -->
-      <h1 class="font-khmer-heading text-xl sm:text-2xl text-wedding-primary mb-1 leading-relaxed">
+      <h1 class="font-khmer-heading text-xl sm:text-2xl text-wedding-primary mb-3" style="line-height: 2 !important;">
         សិរីមង្គលអាពាហ៍ពិពាហ៍
       </h1>
       <p class="font-en-heading text-lg text-wedding-secondary font-bold mb-6">
@@ -47,10 +47,10 @@
 
       <!-- Guest Special Card -->
       <div class="my-6 p-4 rounded-2xl bg-white/80 border border-wedding-secondary/40 shadow-inner">
-        <div class="text-xs text-wedding-text/70 font-khmer-body mb-1">
+        <div class="text-xs text-wedding-text/70 font-khmer-body mb-2">
           {{ t('invitation.dear') }}
         </div>
-        <div class="text-xl sm:text-2xl font-bold text-wedding-primary font-khmer-heading leading-relaxed">
+        <div class="text-xl sm:text-2xl font-bold text-wedding-primary font-khmer-heading" style="line-height: 1.9 !important;">
           {{ guestName || 'ភ្ញៀវកិត្តិយស' }}
         </div>
       </div>

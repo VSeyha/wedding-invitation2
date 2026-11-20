@@ -2,10 +2,10 @@
   <section class="py-12 px-4 max-w-4xl mx-auto">
     <div class="text-center mb-10">
       <div class="text-2xl text-wedding-secondary mb-1">🪷</div>
-      <h2 class="font-khmer-heading text-xl sm:text-2xl text-wedding-heading">
+      <h2 class="font-khmer-heading text-xl sm:text-2xl text-wedding-heading" style="line-height: 2 !important;">
         {{ t('common.bride_and_groom') }}
       </h2>
-      <div class="w-24 h-0.5 bg-wedding-secondary mx-auto mt-2"></div>
+      <div class="w-24 h-0.5 bg-wedding-secondary mx-auto mt-4"></div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 items-center">
@@ -25,10 +25,10 @@
             🤵
           </div>
         </div>
-        <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-1">
+        <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-2">
           The Groom
         </div>
-        <h3 class="font-khmer-heading text-lg sm:text-xl text-wedding-primary mb-0.5">
+        <h3 class="font-khmer-heading text-lg sm:text-xl text-wedding-primary mb-1.5" style="line-height: 1.9 !important;">
           {{ wedding?.groom_name_km || 'កូនកំលោះ' }}
         </h3>
         <p class="font-en-heading text-sm font-semibold text-wedding-heading">
@@ -52,10 +52,10 @@
             👰
           </div>
         </div>
-        <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-1">
+        <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-2">
           The Bride
         </div>
-        <h3 class="font-khmer-heading text-lg sm:text-xl text-wedding-primary mb-0.5">
+        <h3 class="font-khmer-heading text-lg sm:text-xl text-wedding-primary mb-1.5" style="line-height: 1.9 !important;">
           {{ wedding?.bride_name_km || 'កូនក្រមុំ' }}
         </h3>
         <p class="font-en-heading text-sm font-semibold text-wedding-heading">

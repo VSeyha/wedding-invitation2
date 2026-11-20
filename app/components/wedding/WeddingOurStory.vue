@@ -2,13 +2,13 @@
   <section class="py-14 px-4 max-w-3xl mx-auto">
     <!-- Header Title -->
     <div class="text-center mb-10">
-      <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-1">
+      <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-3 font-en-heading">
         រឿងរ៉ាវស្នេហា / OUR STORY
       </div>
-      <h2 class="font-khmer-heading text-2xl sm:text-3xl text-wedding-heading">
+      <h2 class="font-khmer-heading text-xl sm:text-2xl text-wedding-heading" style="line-height: 2 !important;">
         ដំណើររឿងរបស់យើងខ្ញុំ
       </h2>
-      <div class="flex items-center justify-center gap-2 mt-3 text-wedding-secondary">
+      <div class="flex items-center justify-center gap-2 mt-4 text-wedding-secondary">
         <span class="w-12 h-px bg-wedding-secondary/40"></span>
         <span class="text-lg">🪷</span>
         <span class="w-12 h-px bg-wedding-secondary/40"></span>

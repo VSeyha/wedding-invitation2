@@ -2,13 +2,13 @@
   <section class="py-14 px-4 max-w-2xl mx-auto" v-if="activeGiftInfo.enabled !== false">
     <!-- Header Title -->
     <div class="text-center mb-8">
-      <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-1">
+      <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-3 font-en-heading">
         ចំណងដៃមង្គលការ / WEDDING GIFT
       </div>
-      <h2 class="font-khmer-heading text-2xl sm:text-3xl text-wedding-heading">
+      <h2 class="font-khmer-heading text-xl sm:text-2xl text-wedding-heading" style="line-height: 2 !important;">
         ចំណងដៃ និងពរជ័យឌីជីថល
       </h2>
-      <div class="flex items-center justify-center gap-2 mt-3 text-wedding-secondary">
+      <div class="flex items-center justify-center gap-2 mt-4 text-wedding-secondary">
         <span class="w-12 h-px bg-wedding-secondary/40"></span>
         <span class="text-lg">🪷</span>
         <span class="w-12 h-px bg-wedding-secondary/40"></span>

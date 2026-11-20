@@ -6,12 +6,12 @@
     </div>
 
     <!-- Subtitle Greeting -->
-    <p class="text-xs sm:text-sm text-wedding-secondary font-bold mb-2" :class="{ 'uppercase tracking-widest font-en-heading': !isKhmer }">
+    <p class="text-xs sm:text-sm text-wedding-secondary font-bold mb-4" :class="{ 'uppercase tracking-widest font-en-heading': !isKhmer }">
       {{ t('hero.greeting') }}
     </p>
 
     <!-- Khmer Wedding Title -->
-    <h1 class="font-khmer-heading text-2xl sm:text-4xl md:text-5xl text-wedding-heading mb-4 leading-relaxed">
+    <h1 class="font-khmer-heading text-2xl sm:text-3xl text-wedding-heading mb-6" style="line-height: 2.1 !important;">
       {{ isKhmer ? (wedding?.venue_name_km ? 'សិរីមង្គលអាពាហ៍ពិពាហ៍' : 'សិរីមង្គលអាពាហ៍ពិពាហ៍') : 'Wedding Celebration' }}
     </h1>
 

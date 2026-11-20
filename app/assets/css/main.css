@@ -38,13 +38,17 @@
   }
 
   .font-khmer-heading {
-    font-family: 'Moul', 'Khmer OS Muol Light', 'Khmer OS Muol', 'Noto Serif Khmer', 'Khmer OS', serif;
-    line-height: 1.65;
+    font-family: 'Moul', 'Khmer OS Muol Light', 'Khmer OS Muol', 'Noto Serif Khmer', 'Khmer OS', serif !important;
+    line-height: 2 !important;
+    padding-top: 0.3em;
+    padding-bottom: 0.2em;
+    letter-spacing: normal !important;
   }
 
   .font-khmer-body {
-    font-family: 'Kantumruy Pro', 'Noto Sans Khmer', 'Khmer OS Battambang', 'Khmer OS', sans-serif;
-    line-height: 1.85;
+    font-family: 'Kantumruy Pro', 'Noto Sans Khmer', 'Khmer OS Battambang', 'Khmer OS', sans-serif !important;
+    line-height: 1.85 !important;
+    letter-spacing: normal !important;
   }
 }
 
