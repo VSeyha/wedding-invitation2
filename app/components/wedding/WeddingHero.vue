@@ -6,7 +6,7 @@
     </div>
 
     <!-- Subtitle Greeting -->
-    <p class="text-xs sm:text-sm uppercase tracking-widest text-wedding-secondary font-bold mb-2">
+    <p class="text-xs sm:text-sm text-wedding-secondary font-bold mb-2" :class="{ 'uppercase tracking-widest font-en-heading': !isKhmer }">
       {{ t('hero.greeting') }}
     </p>
 

@@ -33,8 +33,22 @@ export default {
         }
       },
       fontFamily: {
-        'khmer-heading': ['Moul', 'cursive', 'serif'],
-        'khmer-body': ['"Noto Sans Khmer"', 'sans-serif'],
+        'khmer-heading': [
+          'Moul',
+          '"Khmer OS Muol Light"',
+          '"Khmer OS Muol"',
+          '"Noto Serif Khmer"',
+          '"Khmer OS"',
+          'serif'
+        ],
+        'khmer-body': [
+          '"Kantumruy Pro"',
+          '"Noto Sans Khmer"',
+          '"Khmer OS Battambang"',
+          '"Khmer OS"',
+          '"Khmer Sangam MN"',
+          'sans-serif'
+        ],
         'en-heading': ['"Cormorant Garamond"', 'Georgia', 'serif'],
         'en-body': ['Inter', 'sans-serif']
       },

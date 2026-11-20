@@ -1,7 +1,7 @@
 <template>
   <div
-    class="min-h-screen text-wedding-text bg-wedding-bg selection:bg-wedding-primary selection:text-wedding-bg transition-colors duration-500 relative overflow-x-hidden font-en-body"
-    :class="{ 'font-khmer-body': isKhmer }"
+    class="min-h-screen text-wedding-text bg-wedding-bg selection:bg-wedding-primary selection:text-wedding-bg transition-colors duration-500 relative overflow-x-hidden font-khmer-body"
+    :lang="isKhmer ? 'km' : 'en'"
   >
     <!-- Language Switcher Floating Button -->
     <header class="fixed top-4 right-4 z-40">

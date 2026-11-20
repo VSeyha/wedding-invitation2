@@ -33,7 +33,7 @@
       <div class="absolute bottom-2 right-2 text-wedding-secondary text-xl select-none">⚜️</div>
 
       <!-- Top Greeting -->
-      <div class="text-wedding-secondary text-xs font-semibold tracking-widest uppercase mb-2">
+      <div class="text-wedding-secondary text-xs font-semibold mb-2" :class="{ 'tracking-widest uppercase': !isKhmer }">
         {{ isKhmer ? 'លិខិតអញ្ជើញសិរីមង្គល' : 'WEDDING INVITATION' }}
       </div>
 
@@ -76,7 +76,7 @@
           <span class="text-3xl drop-shadow">🪷</span>
         </button>
 
-        <span class="mt-3 text-xs font-semibold text-wedding-primary tracking-wider uppercase font-khmer-body animate-pulse">
+        <span class="mt-3 text-xs font-semibold text-wedding-primary font-khmer-body animate-pulse">
           {{ t('common.open_invitation') }}
         </span>
       </div>

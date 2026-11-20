@@ -53,7 +53,7 @@
         </div>
 
         <!-- KHQR Footer text -->
-        <div class="mt-4 text-[11px] font-bold text-[#C9A24A] tracking-wider uppercase flex items-center justify-center gap-1.5 font-khmer-body">
+        <div class="mt-4 text-[11px] font-bold text-[#C9A24A] flex items-center justify-center gap-1.5 font-khmer-body">
           <span>✦</span>
           <span>ស្កេនទូទាត់តាម KHQR</span>
           <span>✦</span>
