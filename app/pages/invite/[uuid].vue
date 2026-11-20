@@ -90,10 +90,13 @@
         </div>
 
         <div class="h-px w-20 mx-auto bg-gradient-to-r from-transparent via-pink-300/80 to-transparent my-2.5"></div>
-        <div class="text-[11px] font-bold text-[#881337] font-khmer-body mb-0.5 truncate">
+        <div class="text-[11px] font-bold text-[#881337] font-khmer-heading mb-0.5">
+          {{ formatKhmerDate(wedding?.wedding_date) }}
+        </div>
+        <div class="text-[10px] text-pink-700/80 font-khmer-body truncate">
           {{ wedding?.venue_name_km || 'The Premier Centre Sen Sok' }}
         </div>
-        <div class="text-[10px] text-pink-700/80 font-khmer-body">
+        <div class="text-[9px] text-pink-600/70 font-khmer-body">
           {{ wedding?.venue_address_km || 'រាជធានីភ្នំពេញ' }}
         </div>
       </div>
@@ -169,6 +172,18 @@
           @opening="onEnvelopeOpening"
           @opened="onEnvelopeOpened"
         />
+
+        <!-- Floating Language Switcher for Guest -->
+        <header v-if="hasOpened" class="absolute top-4 right-4 z-30">
+          <button
+            @click="toggleLocale"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-wedding-secondary/50 shadow-md text-xs font-semibold text-wedding-primary hover:bg-white transition-all transform active:scale-95"
+            :title="t('common.language')"
+          >
+            <span class="w-2 h-2 rounded-full bg-wedding-secondary animate-pulse"></span>
+            <span>{{ isKhmer ? 'English' : 'ភាសាខ្មែរ' }}</span>
+          </button>
+        </header>
 
         <!-- 2. Main Invitation Content (Unveiled after seal clicked) with Lively Scroll Reveal -->
         <main
@@ -259,7 +274,7 @@ import type { PublicInvitationData } from '~~/shared/types/invitation'
 import type { WeddingAppearance } from '~~/shared/types/appearance'
 
 const route = useRoute()
-const { t } = useLocale()
+const { isKhmer, toggleLocale, t } = useLocale()
 const { applyThemeColors } = useWeddingAppearance()
 
 const token = computed(() => (route.params.uuid as string) || '')

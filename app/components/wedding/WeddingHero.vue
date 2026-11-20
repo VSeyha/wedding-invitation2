@@ -41,9 +41,14 @@
         </div>
       </div>
 
-      <!-- Wedding Date -->
-      <div class="mt-4 pt-4 border-t border-wedding-secondary/30 text-sm sm:text-base font-semibold text-wedding-heading">
-        {{ formattedDate }}
+      <!-- Wedding Date in Traditional Khmer & English Subtitle -->
+      <div class="mt-4 pt-4 border-t border-wedding-secondary/30 text-center">
+        <div class="font-khmer-heading text-base sm:text-lg font-bold text-wedding-heading tracking-wide leading-relaxed">
+          {{ isKhmer ? formatKhmerDate(wedding?.wedding_date) : formatEnglishDate(wedding?.wedding_date) }}
+        </div>
+        <div class="text-xs sm:text-sm text-wedding-text/60 font-en-heading font-medium mt-1">
+          {{ isKhmer ? formatEnglishDate(wedding?.wedding_date) : formatKhmerDate(wedding?.wedding_date) }}
+        </div>
       </div>
     </div>
 
@@ -78,17 +83,6 @@ const props = defineProps<{
 }>()
 
 const { isKhmer, t } = useLocale()
-
-const formattedDate = computed(() => {
-  if (!props.wedding?.wedding_date) return 'To Be Announced'
-  const d = new Date(props.wedding.wedding_date)
-  return d.toLocaleDateString(isKhmer.value ? 'km-KH' : 'en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-})
 
 const days = ref(0)
 const hours = ref(0)

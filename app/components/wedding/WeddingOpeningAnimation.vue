@@ -81,9 +81,14 @@
         </span>
       </div>
 
-      <!-- Wedding Date Preview -->
-      <div class="mt-6 text-xs text-wedding-text/60 font-medium">
-        {{ formattedDate }}
+      <!-- Wedding Date Preview in Traditional Khmer & English Subtitle -->
+      <div class="mt-6 text-center">
+        <div class="text-xs sm:text-sm font-bold text-wedding-primary font-khmer-heading">
+          {{ isKhmer ? formatKhmerDate(wedding?.wedding_date) : formatEnglishDate(wedding?.wedding_date) }}
+        </div>
+        <div class="text-[10px] sm:text-xs text-wedding-text/60 font-en-heading font-medium mt-0.5">
+          {{ isKhmer ? formatEnglishDate(wedding?.wedding_date) : formatKhmerDate(wedding?.wedding_date) }}
+        </div>
       </div>
     </div>
   </div>
@@ -106,17 +111,6 @@ const emit = defineEmits<{
 const { isKhmer, t } = useLocale()
 const opened = ref(false)
 const isOpening = ref(false)
-
-const formattedDate = computed(() => {
-  if (!props.wedding?.wedding_date) return 'ថ្ងៃសៅរ៍ ទី១៦ ខែមករា ឆ្នាំ២០២៧'
-  const d = new Date(props.wedding.wedding_date)
-  return d.toLocaleDateString(isKhmer.value ? 'km-KH' : 'en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-})
 
 const handleOpen = () => {
   if (isOpening.value) return
