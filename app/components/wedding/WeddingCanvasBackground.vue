@@ -9,11 +9,17 @@
 <script setup lang="ts">
 import type { AnimationConfig } from '~~/shared/types/appearance'
 
-const props = defineProps<{
-  config?: Partial<AnimationConfig>
-  absolute?: boolean
-  scrollVelocity?: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    config?: Partial<AnimationConfig>
+    absolute?: boolean
+    scrollVelocity?: number
+    palette?: 'gold' | 'pink_white'
+  }>(),
+  {
+    palette: 'gold'
+  }
+)
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -74,28 +80,47 @@ const drawPetal = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.rotate(p.rotation)
   ctx.globalAlpha = p.opacity
 
-  // Draw golden lotus petal curve
+  // Draw natural curved lotus petal geometry
   ctx.beginPath()
   ctx.moveTo(0, -p.size)
   ctx.bezierCurveTo(p.size * 0.75, -p.size * 0.4, p.size * 0.6, p.size * 0.8, 0, p.size)
   ctx.bezierCurveTo(-p.size * 0.6, p.size * 0.8, -p.size * 0.75, -p.size * 0.4, 0, -p.size)
   ctx.closePath()
 
-  // Khmer luxury gold gradient
-  const grad = ctx.createLinearGradient(0, -p.size, 0, p.size)
-  grad.addColorStop(0, '#E5C77A')
-  grad.addColorStop(0.5, '#C9A24A')
-  grad.addColorStop(1, '#8F6B1E')
-  ctx.fillStyle = grad
-  ctx.fill()
+  if (props.palette === 'pink_white') {
+    // Dreamy White-to-Rose Pink gradient
+    const grad = ctx.createLinearGradient(0, -p.size, 0, p.size)
+    grad.addColorStop(0, '#FFFFFF') // Pure luminous white tip
+    grad.addColorStop(0.35, '#FCE7F3') // Soft blush pink
+    grad.addColorStop(0.75, '#F472B6') // Romantic blossom rose
+    grad.addColorStop(1, '#DB2777') // Lotus magenta base
+    ctx.fillStyle = grad
+    ctx.fill()
 
-  // Petal center vein
-  ctx.beginPath()
-  ctx.moveTo(0, -p.size * 0.8)
-  ctx.lineTo(0, p.size * 0.7)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'
-  ctx.lineWidth = 1
-  ctx.stroke()
+    // Fine translucent white central vein
+    ctx.beginPath()
+    ctx.moveTo(0, -p.size * 0.8)
+    ctx.lineTo(0, p.size * 0.7)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)'
+    ctx.lineWidth = 1
+    ctx.stroke()
+  } else {
+    // Khmer luxury gold gradient
+    const grad = ctx.createLinearGradient(0, -p.size, 0, p.size)
+    grad.addColorStop(0, '#E5C77A')
+    grad.addColorStop(0.5, '#C9A24A')
+    grad.addColorStop(1, '#8F6B1E')
+    ctx.fillStyle = grad
+    ctx.fill()
+
+    // Petal center vein
+    ctx.beginPath()
+    ctx.moveTo(0, -p.size * 0.8)
+    ctx.lineTo(0, p.size * 0.7)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'
+    ctx.lineWidth = 1
+    ctx.stroke()
+  }
 
   ctx.restore()
 }
@@ -107,9 +132,16 @@ const drawDust = (ctx: CanvasRenderingContext2D, p: Particle) => {
 
   ctx.beginPath()
   ctx.arc(0, 0, p.size * 0.25, 0, Math.PI * 2)
-  ctx.fillStyle = '#E5C77A'
-  ctx.shadowColor = '#C9A24A'
-  ctx.shadowBlur = 8
+
+  if (props.palette === 'pink_white') {
+    ctx.fillStyle = '#FFFFFF'
+    ctx.shadowColor = '#F472B6'
+    ctx.shadowBlur = 10
+  } else {
+    ctx.fillStyle = '#E5C77A'
+    ctx.shadowColor = '#C9A24A'
+    ctx.shadowBlur = 8
+  }
   ctx.fill()
 
   ctx.restore()
@@ -126,7 +158,13 @@ const drawHeart = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.moveTo(0, s * 0.3)
   ctx.bezierCurveTo(-s, -s * 0.6, -s * 1.2, s * 0.4, 0, s * 1.2)
   ctx.bezierCurveTo(s * 1.2, s * 0.4, s, -s * 0.6, 0, s * 0.3)
-  ctx.fillStyle = '#C9A24A'
+  if (props.palette === 'pink_white') {
+    ctx.fillStyle = '#F472B6'
+    ctx.shadowColor = '#FBCFE8'
+    ctx.shadowBlur = 6
+  } else {
+    ctx.fillStyle = '#C9A24A'
+  }
   ctx.fill()
 
   ctx.restore()
@@ -138,9 +176,15 @@ const drawLight = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.globalAlpha = p.opacity * 0.6
 
   const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size)
-  grad.addColorStop(0, 'rgba(229, 199, 122, 0.9)')
-  grad.addColorStop(0.5, 'rgba(201, 162, 74, 0.4)')
-  grad.addColorStop(1, 'rgba(201, 162, 74, 0)')
+  if (props.palette === 'pink_white') {
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
+    grad.addColorStop(0.5, 'rgba(244, 114, 182, 0.45)')
+    grad.addColorStop(1, 'rgba(244, 114, 182, 0)')
+  } else {
+    grad.addColorStop(0, 'rgba(229, 199, 122, 0.9)')
+    grad.addColorStop(0.5, 'rgba(201, 162, 74, 0.4)')
+    grad.addColorStop(1, 'rgba(201, 162, 74, 0)')
+  }
   ctx.fillStyle = grad
   ctx.beginPath()
   ctx.arc(0, 0, p.size, 0, Math.PI * 2)
@@ -148,6 +192,8 @@ const drawLight = (ctx: CanvasRenderingContext2D, p: Particle) => {
 
   ctx.restore()
 }
+
+let currentDrift = 0
 
 const render = () => {
   const canvas = canvasRef.value
@@ -158,6 +204,10 @@ const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   if (animationConfig.value.enabled && animationConfig.value.preset !== 'none') {
+    // Smoothly lerp towards target drift so scroll never causes rapid jumps
+    const targetDrift = Math.min((props.scrollVelocity || 0) * 0.1, 0.28)
+    currentDrift += (targetDrift - currentDrift) * 0.05
+
     for (const p of particles) {
       if (p.type === 'dust') {
         drawDust(ctx, p)
@@ -169,11 +219,10 @@ const render = () => {
         drawPetal(ctx, p)
       }
 
-      // Update physics with scroll momentum reactivity
-      const scrollDrift = (props.scrollVelocity || 0) * 0.4
-      p.y += (p.speedY + scrollDrift)
-      p.x += Math.sin(p.y * 0.01) * 0.5 + p.speedX
-      p.rotation += p.rotationSpeed + scrollDrift * 0.005
+      // Update physics with silky smooth floating momentum
+      p.y += (p.speedY + currentDrift)
+      p.x += Math.sin(p.y * 0.015) * 0.4 + p.speedX
+      p.rotation += p.rotationSpeed + currentDrift * 0.003
 
       // Wrap around edges
       if (p.y > canvas.height + p.size) {

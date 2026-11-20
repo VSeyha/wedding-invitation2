@@ -1,92 +1,99 @@
 <template>
   <div
-    class="relative bg-[#14080D] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body overflow-x-hidden"
+    class="relative bg-[#FFF7F9] flex justify-center selection:bg-pink-200 selection:text-[#881337] font-khmer-body overflow-x-hidden"
     :class="hasOpened ? 'min-h-screen' : 'h-screen max-h-screen overflow-hidden'"
   >
-    <!-- 1. Ambient Panoramic Scenic Desktop Backdrop (Cinematic soft-focus scenery with golden dust, hidden on mobile) -->
+    <!-- 1. Ambient Panoramic Scenic Desktop Backdrop (Romantic White & Blush Pink overlay screen, hidden on mobile) -->
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden sm:block">
-      <!-- Panoramic Artwork with soft cinematic focus and warm color saturation -->
+      <!-- Panoramic Background Artwork with soft dreamy focus -->
       <div
         v-if="bgImageUrl"
-        class="w-full h-full bg-cover bg-center will-change-transform scale-105 transition-all duration-1000 opacity-65"
+        class="w-full h-full bg-cover bg-center will-change-transform scale-105 transition-all duration-1000 opacity-35"
         :style="{
           backgroundImage: `url(${bgImageUrl})`,
-          filter: 'blur(3px) brightness(0.72) saturate(1.25)'
+          filter: 'blur(3px) saturate(1.15) brightness(1.04)'
         }"
       ></div>
-      <!-- Soft Radial Vignette: softly draws focus directly into the mobile invitation -->
+
+      <!-- Side Overlay Screen: Soft white & pastel pink romantic gradient screen -->
       <div
         class="absolute inset-0"
-        style="background: radial-gradient(circle at 50% 45%, rgba(20, 8, 13, 0.25) 0%, rgba(15, 5, 10, 0.65) 65%, rgba(10, 3, 7, 0.92) 100%);"
+        style="background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 245, 248, 0.85) 55%, rgba(254, 226, 236, 0.95) 100%);"
       ></div>
-      <!-- Ambient Golden Dust & Starlight Drift Across Desktop -->
+
+      <!-- Gentle Frosted Glass Overlay Screen with subtle pink veil -->
+      <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-pink-50/60 to-rose-100/80 backdrop-blur-[1.5px]"></div>
+
+      <!-- Ambient White & Blossom Pink Petals / Starlight Drift Across Desktop -->
       <WeddingCanvasBackground
+        palette="pink_white"
         :config="{
           ...appearanceConfig?.animation_config,
-          preset: 'particles',
-          particle_quantity: 24,
-          opacity: 0.35,
-          speed: 0.8
+          preset: 'lotus_petals',
+          particle_quantity: 26,
+          opacity: 0.75,
+          speed: 0.6
         }"
+        :scroll-velocity="smoothScrollVelocity"
       />
     </div>
 
     <!-- 2. Desktop Decorative Side Wings (Left & Right of Mobile Screen, hidden on screens < 1200px) -->
     <div class="fixed inset-0 pointer-events-none z-10 hidden xl:flex justify-between items-center px-6 2xl:px-14 max-w-[1700px] mx-auto">
-      <!-- Left Wing: Royal Monogram & Couple Blessing -->
-      <div class="w-64 2xl:w-72 p-6 rounded-3xl bg-[#2A1017]/75 backdrop-blur-md border border-[#C9A24A]/40 shadow-[0_15px_40px_rgba(0,0,0,0.5)] text-center text-[#F7F0E3] transform -translate-y-4 pointer-events-auto">
-        <div class="text-3xl text-wedding-secondary mb-2 select-none animate-pulse">⚜️</div>
-        <div class="text-[10px] uppercase tracking-widest text-wedding-secondary/90 font-semibold mb-1">
+      <!-- Left Wing: Royal Monogram & Couple Blessing (White & Rose-Gold Glassmorphism) -->
+      <div class="w-64 2xl:w-72 p-6 rounded-3xl bg-white/85 backdrop-blur-xl border border-pink-200/80 shadow-[0_15px_35px_rgba(244,114,182,0.18)] text-center text-[#881337] transform -translate-y-4 pointer-events-auto transition-all duration-300">
+        <div class="text-3xl text-pink-500 mb-2 select-none animate-pulse">🌸</div>
+        <div class="text-[10px] uppercase tracking-widest text-pink-600 font-semibold mb-1">
           WEDDING CELEBRATION
         </div>
-        <div class="font-khmer-heading text-base text-wedding-accent mb-2" style="line-height: 2 !important;">
+        <div class="font-khmer-heading text-base text-[#9F1239] mb-2" style="line-height: 2 !important;">
           សិរីមង្គលអាពាហ៍ពិពាហ៍
         </div>
-        <div class="h-px w-20 mx-auto bg-gradient-to-r from-transparent via-[#C9A24A]/60 to-transparent my-2.5"></div>
-        <div class="font-khmer-heading text-lg text-white mb-0.5">
+        <div class="h-px w-20 mx-auto bg-gradient-to-r from-transparent via-pink-300/80 to-transparent my-2.5"></div>
+        <div class="font-khmer-heading text-lg text-[#881337] font-bold mb-0.5">
           {{ wedding?.groom_name_km || 'វ៉េត សីហា' }}
         </div>
-        <div class="text-xs text-wedding-secondary font-serif italic mb-0.5">&amp;</div>
-        <div class="font-khmer-heading text-lg text-white mb-2">
+        <div class="text-xs text-pink-500 font-serif italic mb-0.5">&amp;</div>
+        <div class="font-khmer-heading text-lg text-[#881337] font-bold mb-2">
           {{ wedding?.bride_name_km || 'ស ណារី' }}
         </div>
-        <div class="text-[11px] text-[#F7F0E3]/70 font-en-heading">
+        <div class="text-[11px] text-pink-700/80 font-en-heading">
           {{ wedding?.groom_name_en || 'Vet Seyha' }} &amp; {{ wedding?.bride_name_en || 'Sar Nary' }}
         </div>
       </div>
 
-      <!-- Right Wing: Celebration Countdown & Venue Info -->
-      <div class="w-64 2xl:w-72 p-6 rounded-3xl bg-[#2A1017]/75 backdrop-blur-md border border-[#C9A24A]/40 shadow-[0_15px_40px_rgba(0,0,0,0.5)] text-center text-[#F7F0E3] transform -translate-y-4 pointer-events-auto">
-        <div class="text-2xl text-wedding-secondary mb-2 select-none">⏳</div>
-        <div class="text-[10px] uppercase tracking-widest text-wedding-secondary/90 font-semibold mb-2">
+      <!-- Right Wing: Celebration Countdown & Venue Info (White & Rose-Gold Glassmorphism) -->
+      <div class="w-64 2xl:w-72 p-6 rounded-3xl bg-white/85 backdrop-blur-xl border border-pink-200/80 shadow-[0_15px_35px_rgba(244,114,182,0.18)] text-center text-[#881337] transform -translate-y-4 pointer-events-auto transition-all duration-300">
+        <div class="text-2xl text-pink-500 mb-2 select-none">⏳</div>
+        <div class="text-[10px] uppercase tracking-widest text-pink-600 font-semibold mb-2">
           COUNTDOWN TO CELEBRATION
         </div>
 
         <!-- 4-Box Digital Countdown -->
         <div class="grid grid-cols-4 gap-1.5 my-2.5">
-          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
-            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.days }}</div>
-            <div class="text-[8px] text-[#F7F0E3]/70">Days</div>
+          <div class="bg-pink-50/80 rounded-xl p-1.5 border border-pink-200/70 shadow-sm">
+            <div class="text-base font-bold text-[#881337] font-mono">{{ countdown.days }}</div>
+            <div class="text-[8px] text-pink-600/80 uppercase font-semibold">Days</div>
           </div>
-          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
-            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.hours }}</div>
-            <div class="text-[8px] text-[#F7F0E3]/70">Hours</div>
+          <div class="bg-pink-50/80 rounded-xl p-1.5 border border-pink-200/70 shadow-sm">
+            <div class="text-base font-bold text-[#881337] font-mono">{{ countdown.hours }}</div>
+            <div class="text-[8px] text-pink-600/80 uppercase font-semibold">Hours</div>
           </div>
-          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
-            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.minutes }}</div>
-            <div class="text-[8px] text-[#F7F0E3]/70">Mins</div>
+          <div class="bg-pink-50/80 rounded-xl p-1.5 border border-pink-200/70 shadow-sm">
+            <div class="text-base font-bold text-[#881337] font-mono">{{ countdown.minutes }}</div>
+            <div class="text-[8px] text-pink-600/80 uppercase font-semibold">Mins</div>
           </div>
-          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
-            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.seconds }}</div>
-            <div class="text-[8px] text-[#F7F0E3]/70">Secs</div>
+          <div class="bg-pink-50/80 rounded-xl p-1.5 border border-pink-200/70 shadow-sm">
+            <div class="text-base font-bold text-[#881337] font-mono">{{ countdown.seconds }}</div>
+            <div class="text-[8px] text-pink-600/80 uppercase font-semibold">Secs</div>
           </div>
         </div>
 
-        <div class="h-px w-20 mx-auto bg-gradient-to-r from-transparent via-[#C9A24A]/60 to-transparent my-2.5"></div>
-        <div class="text-[11px] font-bold text-wedding-accent font-khmer-body mb-0.5 truncate">
+        <div class="h-px w-20 mx-auto bg-gradient-to-r from-transparent via-pink-300/80 to-transparent my-2.5"></div>
+        <div class="text-[11px] font-bold text-[#881337] font-khmer-body mb-0.5 truncate">
           {{ wedding?.venue_name_km || 'The Premier Centre Sen Sok' }}
         </div>
-        <div class="text-[10px] text-[#F7F0E3]/70 font-khmer-body">
+        <div class="text-[10px] text-pink-700/80 font-khmer-body">
           {{ wedding?.venue_address_km || 'រាជធានីភ្នំពេញ' }}
         </div>
       </div>
@@ -106,11 +113,12 @@
           class="absolute inset-0 transition-opacity duration-500"
           :style="backgroundOverlayStyle"
         ></div>
-        <!-- Falling Golden Lotus Petals / Dust Scoped to Mobile Screen Only -->
+        <!-- Falling White & Pink Lotus Petals Scoped to Mobile Screen Only -->
         <WeddingCanvasBackground
           :absolute="true"
+          palette="pink_white"
           :config="appearanceConfig?.animation_config"
-          :scroll-velocity="scrollVelocity"
+          :scroll-velocity="smoothScrollVelocity"
         />
       </div>
     </div>
@@ -148,9 +156,9 @@
       class="relative z-10 w-full flex justify-center"
       :class="hasOpened ? '' : 'h-screen max-h-screen overflow-hidden'"
     >
-      <!-- Centered Mobile Screen Frame with Royal Gold Border & Ambient Shadow -->
+      <!-- Centered Mobile Screen Frame with Soft Rose Border & Ambient Shadow -->
       <div
-        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/90 relative sm:shadow-[0_20px_70px_rgba(0,0,0,0.6),0_0_50px_rgba(201,162,74,0.15)] sm:border-x sm:border-wedding-secondary/40 transition-all duration-300"
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/95 relative sm:shadow-[0_20px_60px_rgba(244,114,182,0.22),0_0_35px_rgba(255,255,255,0.7),0_10px_25px_rgba(0,0,0,0.08)] sm:border-x sm:border-pink-200/60 transition-all duration-300"
         :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden flex items-center justify-center'"
       >
         <!-- 1. Khmer Royal Seal Opening Envelope -->
@@ -312,32 +320,43 @@ const countdown = computed(() => {
   return { days, hours, minutes, seconds }
 })
 
-// Scroll tracking for Zoom in / Zoom out & lively motion
-const scrollProgress = ref(0)
-const scrollVelocity = ref(0)
+// Damped scroll tracking for silky smooth zoom and particle dynamics (no abrupt/fast changes)
+const targetScrollProgress = ref(0)
+const smoothScrollProgress = ref(0)
+const targetScrollVelocity = ref(0)
+const smoothScrollVelocity = ref(0)
 let lastScrollY = 0
 let lastScrollTime = 0
-let scrollRafId: number | null = null
+let dampingRafId: number | null = null
 let observer: IntersectionObserver | null = null
+
+const updateSmoothScroll = () => {
+  // Damped linear interpolation (lerp factor 0.04 = super smooth & silky glide)
+  const dProgress = targetScrollProgress.value - smoothScrollProgress.value
+  smoothScrollProgress.value += dProgress * 0.04
+
+  // Smoothly damp velocity so it accelerates gently and coasts to a stop smoothly
+  const dVel = targetScrollVelocity.value - smoothScrollVelocity.value
+  smoothScrollVelocity.value += dVel * 0.06
+  targetScrollVelocity.value *= 0.92 // gradual momentum decay
+
+  dampingRafId = requestAnimationFrame(updateSmoothScroll)
+}
 
 const handleScroll = () => {
   if (!import.meta.client) return
-  if (scrollRafId) return
 
-  scrollRafId = window.requestAnimationFrame(() => {
-    const y = window.scrollY || document.documentElement.scrollTop
-    const max = Math.max((document.documentElement.scrollHeight - window.innerHeight), 1)
-    scrollProgress.value = Math.min(Math.max(y / max, 0), 1)
+  const y = window.scrollY || document.documentElement.scrollTop
+  const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+  targetScrollProgress.value = Math.min(Math.max(y / max, 0), 1)
 
-    const now = performance.now()
-    const dt = Math.max(now - lastScrollTime, 16)
-    const dy = Math.abs(y - lastScrollY)
-    scrollVelocity.value = Math.min(dy / dt, 5)
+  const nowTime = performance.now()
+  const dt = Math.max(nowTime - lastScrollTime, 16)
+  const dy = Math.abs(y - lastScrollY)
+  targetScrollVelocity.value = Math.min(dy / dt, 2.0)
 
-    lastScrollY = y
-    lastScrollTime = now
-    scrollRafId = null
-  })
+  lastScrollY = y
+  lastScrollTime = nowTime
 }
 
 const setupScrollReveal = () => {
@@ -401,22 +420,19 @@ const dynamicBackgroundStyle = computed(() => {
   let scale = 1.02
   if (scrollZoom) {
     if (effect === 'zoom-in') {
-      // Smoothly zoom in from 1.02 to 1.20 as you scroll down
-      scale = 1.02 + scrollProgress.value * 0.18
+      // Gentle, silky smooth zoom from 1.02 to 1.07 (no abrupt/fast changes)
+      scale = 1.02 + smoothScrollProgress.value * 0.05
     } else if (effect === 'zoom-out') {
-      // Starts at 1.18 and smoothly zooms out to 1.02
-      scale = 1.18 - scrollProgress.value * 0.16
+      scale = 1.07 - smoothScrollProgress.value * 0.05
     } else if (effect === 'breathe') {
-      // Ambient breathing wave with scroll momentum
-      scale = 1.03 + Math.sin(scrollProgress.value * Math.PI) * 0.08
+      scale = 1.02 + Math.sin(smoothScrollProgress.value * Math.PI) * 0.03
     }
   }
 
   return {
     backgroundImage: `url(${bgImageUrl.value})`,
     opacity,
-    transform: `scale(${scale.toFixed(3)})`,
-    transition: 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+    transform: `scale(${scale.toFixed(4)})`
   }
 })
 
@@ -480,6 +496,7 @@ onMounted(() => {
   loadInvitationData()
   if (import.meta.client) {
     window.addEventListener('scroll', handleScroll, { passive: true })
+    dampingRafId = requestAnimationFrame(updateSmoothScroll)
     countdownInterval = setInterval(() => {
       now.value = Date.now()
     }, 1000)
@@ -496,7 +513,7 @@ onUnmounted(() => {
     document.body.style.touchAction = ''
     window.removeEventListener('scroll', handleScroll)
     if (observer) observer.disconnect()
-    if (scrollRafId) cancelAnimationFrame(scrollRafId)
+    if (dampingRafId) cancelAnimationFrame(dampingRafId)
   }
 })
 </script>
