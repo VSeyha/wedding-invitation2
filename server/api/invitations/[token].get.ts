@@ -1,0 +1,32 @@
+// GET /api/invitations/[token] - Public: load invitation by token
+import { validateInvitationToken, markInvitationOpened } from '~~/server/utils/invitation'
+import { uuidSchema } from '~~/server/utils/validation'
+
+export default defineEventHandler(async (event) => {
+  const token = getRouterParam(event, 'token') || ''
+  const parsed = uuidSchema.safeParse(token)
+  if (!parsed.success) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid invitation token' })
+  }
+
+  const invitation = await validateInvitationToken(token)
+
+  // Mark as opened (async, non-blocking)
+  markInvitationOpened(invitation.id).catch(() => {})
+
+  // Return safe public data only
+  return {
+    data: {
+      token: invitation.token,
+      status: invitation.status,
+      guest_name: (invitation.guests as any)?.name || '',
+      opened_at: invitation.opened_at,
+      rsvp: invitation.rsvps
+        ? {
+            status: (invitation.rsvps as any).attendance_status,
+            submitted_at: (invitation.rsvps as any).submitted_at
+          }
+        : null
+    }
+  }
+})
