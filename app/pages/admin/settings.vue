@@ -150,13 +150,13 @@ const uploadCouplePhoto = async (e: Event, role: 'groom' | 'bride') => {
     const formData = new FormData()
     formData.append('file', compressedFile)
 
-    const res = await $fetch<any>('/api/admin/gallery/upload', {
+    const res = await $fetch<any>('/api/admin/couple/upload', {
       method: 'POST',
       headers: { authorization: `Bearer ${token}` },
       body: formData
     })
 
-    const uploadedUrl = res?.data?.[0]?.url
+    const uploadedUrl = res?.data?.url
     if (uploadedUrl) {
       if (role === 'groom') form.value.groom_photo_url = uploadedUrl
       else form.value.bride_photo_url = uploadedUrl
