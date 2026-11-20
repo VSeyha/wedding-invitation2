@@ -1,7 +1,7 @@
 <template>
   <canvas
     ref="canvasRef"
-    class="fixed inset-0 pointer-events-none z-0"
+    :class="[absolute ? 'absolute inset-0 w-full h-full' : 'fixed inset-0 w-full h-full', 'pointer-events-none z-0']"
     :style="{ opacity: animationConfig.opacity || 0.7 }"
   ></canvas>
 </template>
@@ -11,6 +11,7 @@ import type { AnimationConfig } from '~~/shared/types/appearance'
 
 const props = defineProps<{
   config?: Partial<AnimationConfig>
+  absolute?: boolean
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -21,7 +22,8 @@ const animationConfig = computed(() => ({
   speed: props.config?.speed || 1,
   quantity: props.config?.particle_quantity || 30,
   size: props.config?.object_size || 22,
-  opacity: props.config?.opacity || 0.7
+  opacity: props.config?.opacity || 0.7,
+  direction: props.config?.direction || 'down'
 }))
 
 interface Particle {
@@ -33,7 +35,7 @@ interface Particle {
   rotation: number
   rotationSpeed: number
   opacity: number
-  type: 'petal' | 'dust'
+  type: 'petal' | 'dust' | 'heart' | 'light'
 }
 
 let animationId: number | null = null
@@ -41,7 +43,15 @@ let particles: Particle[] = []
 
 const initParticles = (width: number, height: number) => {
   particles = []
-  const count = animationConfig.value.quantity
+  if (!animationConfig.value.enabled || animationConfig.value.preset === 'none') return
+
+  const count = Math.min(Math.max(animationConfig.value.quantity, 5), 100)
+  const preset = animationConfig.value.preset
+  let type: Particle['type'] = 'petal'
+  if (preset === 'particles') type = 'dust'
+  else if (preset === 'hearts') type = 'heart'
+  else if (preset === 'lights') type = 'light'
+
   for (let i = 0; i < count; i++) {
     particles.push({
       x: Math.random() * width,
@@ -52,7 +62,7 @@ const initParticles = (width: number, height: number) => {
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.02 * animationConfig.value.speed,
       opacity: Math.random() * 0.4 + 0.4,
-      type: animationConfig.value.preset === 'particles' ? 'dust' : 'petal'
+      type
     })
   }
 }
@@ -63,7 +73,7 @@ const drawPetal = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.rotate(p.rotation)
   ctx.globalAlpha = p.opacity
 
-  // Draw golden/pinkish lotus petal curve
+  // Draw golden lotus petal curve
   ctx.beginPath()
   ctx.moveTo(0, -p.size)
   ctx.bezierCurveTo(p.size * 0.75, -p.size * 0.4, p.size * 0.6, p.size * 0.8, 0, p.size)
@@ -95,10 +105,44 @@ const drawDust = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.globalAlpha = p.opacity
 
   ctx.beginPath()
-  ctx.arc(0, 0, p.size * 0.2, 0, Math.PI * 2)
+  ctx.arc(0, 0, p.size * 0.25, 0, Math.PI * 2)
   ctx.fillStyle = '#E5C77A'
   ctx.shadowColor = '#C9A24A'
-  ctx.shadowBlur = 6
+  ctx.shadowBlur = 8
+  ctx.fill()
+
+  ctx.restore()
+}
+
+const drawHeart = (ctx: CanvasRenderingContext2D, p: Particle) => {
+  ctx.save()
+  ctx.translate(p.x, p.y)
+  ctx.rotate(p.rotation * 0.3)
+  ctx.globalAlpha = p.opacity
+
+  const s = p.size * 0.5
+  ctx.beginPath()
+  ctx.moveTo(0, s * 0.3)
+  ctx.bezierCurveTo(-s, -s * 0.6, -s * 1.2, s * 0.4, 0, s * 1.2)
+  ctx.bezierCurveTo(s * 1.2, s * 0.4, s, -s * 0.6, 0, s * 0.3)
+  ctx.fillStyle = '#C9A24A'
+  ctx.fill()
+
+  ctx.restore()
+}
+
+const drawLight = (ctx: CanvasRenderingContext2D, p: Particle) => {
+  ctx.save()
+  ctx.translate(p.x, p.y)
+  ctx.globalAlpha = p.opacity * 0.6
+
+  const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size)
+  grad.addColorStop(0, 'rgba(229, 199, 122, 0.9)')
+  grad.addColorStop(0.5, 'rgba(201, 162, 74, 0.4)')
+  grad.addColorStop(1, 'rgba(201, 162, 74, 0)')
+  ctx.fillStyle = grad
+  ctx.beginPath()
+  ctx.arc(0, 0, p.size, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.restore()
@@ -116,6 +160,10 @@ const render = () => {
     for (const p of particles) {
       if (p.type === 'dust') {
         drawDust(ctx, p)
+      } else if (p.type === 'heart') {
+        drawHeart(ctx, p)
+      } else if (p.type === 'light') {
+        drawLight(ctx, p)
       } else {
         drawPetal(ctx, p)
       }
@@ -141,10 +189,31 @@ const render = () => {
 const handleResize = () => {
   const canvas = canvasRef.value
   if (!canvas) return
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
+  if (props.absolute && canvas.parentElement) {
+    canvas.width = canvas.parentElement.clientWidth || 360
+    canvas.height = canvas.parentElement.clientHeight || 640
+  } else {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+  }
   initParticles(canvas.width, canvas.height)
 }
+
+// Watch config changes to update live in real-time
+watch(
+  () => [
+    animationConfig.value.enabled,
+    animationConfig.value.preset,
+    animationConfig.value.quantity,
+    animationConfig.value.size,
+    animationConfig.value.speed
+  ],
+  () => {
+    if (canvasRef.value) {
+      initParticles(canvasRef.value.width, canvasRef.value.height)
+    }
+  }
+)
 
 onMounted(() => {
   if (typeof window === 'undefined') return

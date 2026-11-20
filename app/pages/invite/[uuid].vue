@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen">
+  <div class="relative min-h-screen" :style="pageBackgroundStyle">
     <!-- Falling Golden Lotus Petals Background -->
     <WeddingCanvasBackground :config="appearanceConfig?.animation_config" />
 
@@ -160,6 +160,31 @@ const loadInvitationData = async () => {
     loading.value = false
   }
 }
+
+const pageBackgroundStyle = computed(() => {
+  const bg = appearanceConfig.value?.background_config
+  const c = appearanceConfig.value?.theme_config
+  if (!bg) return {}
+
+  if (bg.type === 'solid') {
+    return { backgroundColor: bg.overlay_color || c?.bg || 'var(--wedding-bg, #F7F0E3)' }
+  }
+  if (bg.type === 'gradient') {
+    const dir = bg.gradient_direction || 'to bottom'
+    const from = c?.bg || '#F7F0E3'
+    const to = c?.primary || '#641D2D'
+    return { background: `linear-gradient(${dir}, ${from}, ${to})` }
+  }
+  if (bg.type === 'image' && bg.image_url) {
+    return {
+      backgroundImage: `url(${bg.image_url})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }
+  }
+  return { backgroundColor: c?.bg || 'var(--wedding-bg, #F7F0E3)' }
+})
 
 const onRSVPUpdated = (status: 'attending' | 'not_attending') => {
   if (invitation.value) {
