@@ -79,6 +79,19 @@
     border: 1px solid rgba(201, 162, 74, 0.4);
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
+
+  /* Lively scroll-driven entrance animation */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Reduced motion preference */

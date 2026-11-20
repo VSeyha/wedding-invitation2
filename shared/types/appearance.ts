@@ -14,6 +14,9 @@ export type BackgroundType = 'none' | 'solid' | 'gradient' | 'image' | 'animated
 export interface BackgroundConfig {
   type: BackgroundType
   image_url?: string
+  preset_name?: string
+  scroll_zoom?: boolean
+  zoom_effect?: 'zoom-in' | 'zoom-out' | 'breathe'
   position?: string
   size?: string
   repeat?: string
@@ -23,6 +26,70 @@ export interface BackgroundConfig {
   gradient_direction?: string
   gradient_from?: string
   gradient_to?: string
+}
+
+export interface BackgroundPresetOption {
+  id: string
+  name: string
+  name_km: string
+  image_url: string
+  type: BackgroundType
+  overlay_color: string
+  overlay_opacity: number
+  opacity: number
+  scroll_zoom: boolean
+  zoom_effect: 'zoom-in' | 'zoom-out' | 'breathe'
+}
+
+export const PRESET_BACKGROUNDS: Record<string, BackgroundPresetOption> = {
+  'angkor-wat': {
+    id: 'angkor-wat',
+    name: 'Angkor Wat Sunrise',
+    name_km: 'ប្រាសាទអង្គរវត្ត ពេលព្រឹកព្រហាម',
+    image_url: '/images/backgrounds/angkor-wat.svg',
+    type: 'image',
+    overlay_color: '#2A1017',
+    overlay_opacity: 0.15,
+    opacity: 0.85,
+    scroll_zoom: true,
+    zoom_effect: 'zoom-in'
+  },
+  'royal-kbach': {
+    id: 'royal-kbach',
+    name: 'Royal Golden Kbach',
+    name_km: 'ក្បាច់ផ្កាចន្ទន៍ រាជានិយម',
+    image_url: '/images/backgrounds/royal-kbach.svg',
+    type: 'image',
+    overlay_color: '#3D121B',
+    overlay_opacity: 0.1,
+    opacity: 0.8,
+    scroll_zoom: true,
+    zoom_effect: 'zoom-in'
+  },
+  'golden-lotus': {
+    id: 'golden-lotus',
+    name: 'Sacred Lotus Waters',
+    name_km: 'សួនផ្កាឈូកមាស',
+    image_url: '/images/backgrounds/golden-lotus.svg',
+    type: 'image',
+    overlay_color: '#1E0A12',
+    overlay_opacity: 0.12,
+    opacity: 0.85,
+    scroll_zoom: true,
+    zoom_effect: 'breathe'
+  },
+  'classic-ivory': {
+    id: 'classic-ivory',
+    name: 'Classic Royal Ivory',
+    name_km: 'រាជានិយម ភ្លុកដំរីបុរាណ',
+    image_url: '',
+    type: 'none',
+    overlay_color: '#F7F0E3',
+    overlay_opacity: 0,
+    opacity: 1,
+    scroll_zoom: false,
+    zoom_effect: 'zoom-in'
+  }
 }
 
 export type AnimationPreset =

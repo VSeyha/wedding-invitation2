@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#3D121B"/>
+      <stop offset="60%" stop-color="#240A10"/>
+      <stop offset="100%" stop-color="#140407"/>
+    </radialGradient>
+
+    <!-- Gold Metallic Gradient -->
+    <linearGradient id="goldKbach" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2D17E"/>
+      <stop offset="30%" stop-color="#C9A24A"/>
+      <stop offset="70%" stop-color="#8F6B1E"/>
+      <stop offset="100%" stop-color="#E5C77A"/>
+    </linearGradient>
+
+    <!-- Kbach Flower Pattern Unit -->
+    <pattern id="kbachPattern" width="160" height="160" patternUnits="userSpaceOnUse">
+      <g opacity="0.32" stroke="url(#goldKbach)" stroke-width="1.2" fill="none">
+        <!-- Center Diamond -->
+        <polygon points="80,40 120,80 80,120 40,80"/>
+        <polygon points="80,50 110,80 80,110 50,80" stroke-width="0.8"/>
+        <!-- 4 Petals (Kbach Chan) -->
+        <path d="M80 40 C70 20, 90 20, 80 40 Z" fill="url(#goldKbach)" fill-opacity="0.15"/>
+        <path d="M120 80 C140 70, 140 90, 120 80 Z" fill="url(#goldKbach)" fill-opacity="0.15"/>
+        <path d="M80 120 C90 140, 70 140, 80 120 Z" fill="url(#goldKbach)" fill-opacity="0.15"/>
+        <path d="M40 80 C20 90, 20 70, 40 80 Z" fill="url(#goldKbach)" fill-opacity="0.15"/>
+        <!-- Curving flourishes -->
+        <path d="M80 50 C65 60, 65 75, 80 80 C95 85, 95 100, 80 110"/>
+        <path d="M50 80 C60 65, 75 65, 80 80 C85 95, 100 95, 110 80"/>
+        <!-- Corner Medallions -->
+        <circle cx="0" cy="0" r="12" fill="url(#goldKbach)" fill-opacity="0.1"/>
+        <circle cx="160" cy="0" r="12" fill="url(#goldKbach)" fill-opacity="0.1"/>
+        <circle cx="0" cy="160" r="12" fill="url(#goldKbach)" fill-opacity="0.1"/>
+        <circle cx="160" cy="160" r="12" fill="url(#goldKbach)" fill-opacity="0.1"/>
+      </g>
+    </pattern>
+  </defs>
+
+  <rect width="800" height="800" fill="url(#bgGrad)"/>
+  <rect width="800" height="800" fill="url(#kbachPattern)"/>
+  <circle cx="400" cy="400" r="300" fill="#E5C77A" opacity="0.04"/>
+</svg>

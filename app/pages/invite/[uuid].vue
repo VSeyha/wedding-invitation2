@@ -1,12 +1,27 @@
 <template>
-  <div class="relative min-h-screen" :style="pageBackgroundStyle">
-    <!-- Falling Golden Lotus Petals Background -->
-    <WeddingCanvasBackground :config="appearanceConfig?.animation_config" />
+  <div class="relative min-h-screen bg-[#2A1017] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg overflow-x-hidden font-khmer-body">
+    <!-- 1. Dedicated Dynamic Background Layer with Parallax Zoom In / Zoom Out on Scroll -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <!-- Scalable Background Artwork (Angkor Wat / Royal Kbach / Custom) -->
+      <div
+        v-if="bgImageUrl"
+        class="w-full h-full bg-cover bg-center will-change-transform"
+        :style="dynamicBackgroundStyle"
+      ></div>
+      <!-- Ambient Gradient / Tint Overlay -->
+      <div
+        class="absolute inset-0 transition-opacity duration-500"
+        :style="backgroundOverlayStyle"
+      ></div>
+    </div>
+
+    <!-- 2. Falling Golden Lotus Petals / Dust reacting to scroll velocity -->
+    <WeddingCanvasBackground :config="appearanceConfig?.animation_config" :scroll-velocity="scrollVelocity" />
 
     <!-- Error State: Invitation Not Found or Revoked -->
     <div
       v-if="errorState"
-      class="min-h-screen flex items-center justify-center p-6 text-center relative z-10"
+      class="min-h-screen flex items-center justify-center p-6 text-center relative z-10 w-full"
     >
       <div class="max-w-md w-full khmer-card p-8 rounded-3xl border-2 border-wedding-secondary shadow-gold-glow">
         <div class="text-4xl mb-3">⚠️</div>
@@ -22,7 +37,7 @@
     <!-- Loading State -->
     <div
       v-else-if="loading"
-      class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10"
+      class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10 w-full"
     >
       <div class="text-4xl mb-4 animate-bounce">💌</div>
       <div class="font-khmer-heading text-lg text-wedding-primary animate-pulse">
@@ -34,51 +49,69 @@
     <div v-else class="relative z-10 w-full flex justify-center">
       <!-- Centered Mobile & Tablet Frame -->
       <div
-        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] min-h-screen bg-wedding-bg relative sm:shadow-2xl sm:border-x sm:border-wedding-secondary/30 transition-all duration-300 overflow-x-hidden"
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] min-h-screen bg-wedding-bg/95 relative sm:shadow-2xl sm:border-x sm:border-wedding-secondary/30 transition-all duration-300 overflow-x-hidden backdrop-blur-[2px]"
       >
         <!-- 1. Khmer Royal Seal Opening Envelope -->
         <WeddingOpeningAnimation
           :guest-name="invitation?.guest_name || ''"
           :wedding="wedding"
-          @opened="hasOpened = true"
+          @opened="onEnvelopeOpened"
         />
 
-        <!-- 2. Main Invitation Content (Unveiled after seal clicked) -->
+        <!-- 2. Main Invitation Content (Unveiled after seal clicked) with Lively Scroll Reveal -->
         <main
           class="transition-opacity duration-1000 pb-20 relative"
           :class="{ 'opacity-100': hasOpened, 'opacity-0 pointer-events-none': !hasOpened }"
         >
           <!-- Hero Section -->
-          <WeddingHero :wedding="wedding" />
+          <div class="scroll-reveal revealed">
+            <WeddingHero :wedding="wedding" />
+          </div>
 
           <!-- Couple Introduction -->
-          <WeddingCouple :wedding="wedding" />
+          <div class="scroll-reveal">
+            <WeddingCouple :wedding="wedding" />
+          </div>
 
           <!-- Our Story Timeline -->
-          <WeddingOurStory :story="wedding?.our_story" />
+          <div class="scroll-reveal">
+            <WeddingOurStory :story="wedding?.our_story" />
+          </div>
 
           <!-- Warm Invitation Letter -->
-          <WeddingMessage :wedding="wedding" />
+          <div class="scroll-reveal">
+            <WeddingMessage :wedding="wedding" />
+          </div>
 
           <!-- Ceremony Programme Timeline -->
-          <WeddingProgramme :programmes="programmes" />
+          <div class="scroll-reveal">
+            <WeddingProgramme :programmes="programmes" />
+          </div>
 
           <!-- Venue Location & Map -->
-          <WeddingLocation :wedding="wedding" />
+          <div class="scroll-reveal">
+            <WeddingLocation :wedding="wedding" />
+          </div>
 
           <!-- Photo Gallery -->
-          <WeddingGallery :photos="photos" />
+          <div class="scroll-reveal">
+            <WeddingGallery :photos="photos" />
+          </div>
 
           <!-- Digital Wedding Gift / KHQR -->
-          <WeddingGift :gift-info="wedding?.gift_info" />
+          <div class="scroll-reveal">
+            <WeddingGift :gift-info="wedding?.gift_info" />
+          </div>
 
           <!-- RSVP Attendance Form -->
-          <WeddingRSVP
-            :token="token"
-            :guest-name="invitation?.guest_name || ''"
-            :initial-status="invitation?.rsvp?.status"
-            @updated="onRSVPUpdated"
-          />
+          <div class="scroll-reveal">
+            <WeddingRSVP
+              :token="token"
+              :guest-name="invitation?.guest_name || ''"
+              :initial-status="invitation?.rsvp?.status"
+              @updated="onRSVPUpdated"
+            />
+          </div>
 
           <!-- Footer -->
           <footer class="mt-16 text-center text-xs text-wedding-text/60 font-en-heading pb-8 px-4">
@@ -106,6 +139,7 @@ import WeddingGallery from '~~/app/components/wedding/WeddingGallery.vue'
 import WeddingGift from '~~/app/components/wedding/WeddingGift.vue'
 import WeddingRSVP from '~~/app/components/wedding/WeddingRSVP.vue'
 
+import { PRESET_BACKGROUNDS } from '~~/shared/types/appearance'
 import type { WeddingSettings } from '~~/shared/types/wedding'
 import type { WeddingProgramme as ProgrammeType, WeddingPhoto } from '~~/shared/types/programme'
 import type { PublicInvitationData } from '~~/shared/types/invitation'
@@ -126,12 +160,122 @@ const programmes = ref<ProgrammeType[]>([])
 const photos = ref<WeddingPhoto[]>([])
 const appearanceConfig = ref<WeddingAppearance | null>(null)
 
+// Scroll tracking for Zoom in / Zoom out & lively motion
+const scrollProgress = ref(0)
+const scrollVelocity = ref(0)
+let lastScrollY = 0
+let lastScrollTime = 0
+let scrollRafId: number | null = null
+let observer: IntersectionObserver | null = null
+
+const handleScroll = () => {
+  if (!import.meta.client) return
+  if (scrollRafId) return
+
+  scrollRafId = window.requestAnimationFrame(() => {
+    const y = window.scrollY || document.documentElement.scrollTop
+    const max = Math.max((document.documentElement.scrollHeight - window.innerHeight), 1)
+    scrollProgress.value = Math.min(Math.max(y / max, 0), 1)
+
+    const now = performance.now()
+    const dt = Math.max(now - lastScrollTime, 16)
+    const dy = Math.abs(y - lastScrollY)
+    scrollVelocity.value = Math.min(dy / dt, 5)
+
+    lastScrollY = y
+    lastScrollTime = now
+    scrollRafId = null
+  })
+}
+
+const setupScrollReveal = () => {
+  if (!import.meta.client || typeof IntersectionObserver === 'undefined') return
+
+  if (observer) observer.disconnect()
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed')
+        }
+      })
+    },
+    {
+      threshold: 0.08,
+      rootMargin: '0px 0px -40px 0px'
+    }
+  )
+
+  nextTick(() => {
+    document.querySelectorAll('.scroll-reveal').forEach((el) => {
+      observer?.observe(el)
+    })
+  })
+}
+
+const onEnvelopeOpened = () => {
+  hasOpened.value = true
+  nextTick(() => {
+    setupScrollReveal()
+  })
+}
+
+const bgImageUrl = computed(() => {
+  const bg = appearanceConfig.value?.background_config
+  if (!bg) return '/images/backgrounds/angkor-wat.svg'
+  if (bg.type === 'image' && bg.image_url) return bg.image_url
+  if (bg.preset_name && PRESET_BACKGROUNDS[bg.preset_name]?.image_url) {
+    return PRESET_BACKGROUNDS[bg.preset_name].image_url
+  }
+  if (bg.type === 'none') return ''
+  return '/images/backgrounds/angkor-wat.svg'
+})
+
+const dynamicBackgroundStyle = computed(() => {
+  if (!bgImageUrl.value) return {}
+  const bg = appearanceConfig.value?.background_config
+  const opacity = bg?.opacity ?? 0.8
+  const scrollZoom = bg?.scroll_zoom !== false
+  const effect = bg?.zoom_effect || 'zoom-in'
+
+  let scale = 1.04
+  if (scrollZoom) {
+    if (effect === 'zoom-in') {
+      // Smoothly zoom in from 1.04 to 1.25 as you scroll down
+      scale = 1.04 + scrollProgress.value * 0.22
+    } else if (effect === 'zoom-out') {
+      // Starts at 1.22 and smoothly zooms out to 1.04
+      scale = 1.22 - scrollProgress.value * 0.18
+    } else if (effect === 'breathe') {
+      // Ambient breathing wave with scroll momentum
+      scale = 1.06 + Math.sin(scrollProgress.value * Math.PI) * 0.12
+    }
+  }
+
+  return {
+    backgroundImage: `url(${bgImageUrl.value})`,
+    opacity,
+    transform: `scale(${scale.toFixed(3)})`,
+    transition: 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+  }
+})
+
+const backgroundOverlayStyle = computed(() => {
+  const bg = appearanceConfig.value?.background_config
+  const color = bg?.overlay_color || '#2A1017'
+  const opacity = bg?.overlay_opacity ?? 0.25
+  return {
+    backgroundColor: color,
+    opacity
+  }
+})
+
 const loadInvitationData = async () => {
   loading.value = true
   errorState.value = null
 
   try {
-    // Parallel fetch invitation, wedding settings, programmes, gallery, and appearance
     const [invRes, wedRes, progRes, galRes, appRes] = await Promise.all([
       $fetch<any>(`/api/invitations/${token.value}`).catch((e) => {
         errorState.value = e.statusCode || 404
@@ -143,18 +287,10 @@ const loadInvitationData = async () => {
       $fetch<any>('/api/appearance').catch(() => null)
     ])
 
-    if (invRes?.data) {
-      invitation.value = invRes.data
-    }
-    if (wedRes?.data) {
-      wedding.value = wedRes.data
-    }
-    if (progRes?.data) {
-      programmes.value = progRes.data
-    }
-    if (galRes?.data) {
-      photos.value = galRes.data
-    }
+    if (invRes?.data) invitation.value = invRes.data
+    if (wedRes?.data) wedding.value = wedRes.data
+    if (progRes?.data) programmes.value = progRes.data
+    if (galRes?.data) photos.value = galRes.data
     if (appRes?.data) {
       appearanceConfig.value = appRes.data
       if (appRes.data.theme_config) {
@@ -166,33 +302,11 @@ const loadInvitationData = async () => {
     errorState.value = 500
   } finally {
     loading.value = false
+    nextTick(() => {
+      setupScrollReveal()
+    })
   }
 }
-
-const pageBackgroundStyle = computed(() => {
-  const bg = appearanceConfig.value?.background_config
-  const c = appearanceConfig.value?.theme_config
-  if (!bg) return {}
-
-  if (bg.type === 'solid') {
-    return { backgroundColor: bg.overlay_color || c?.bg || 'var(--wedding-bg, #F7F0E3)' }
-  }
-  if (bg.type === 'gradient') {
-    const dir = bg.gradient_direction || 'to bottom'
-    const from = c?.bg || '#F7F0E3'
-    const to = c?.primary || '#641D2D'
-    return { background: `linear-gradient(${dir}, ${from}, ${to})` }
-  }
-  if (bg.type === 'image' && bg.image_url) {
-    return {
-      backgroundImage: `url(${bg.image_url})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed'
-    }
-  }
-  return { backgroundColor: c?.bg || 'var(--wedding-bg, #F7F0E3)' }
-})
 
 const onRSVPUpdated = (status: 'attending' | 'not_attending') => {
   if (invitation.value) {
@@ -203,5 +317,18 @@ const onRSVPUpdated = (status: 'attending' | 'not_attending') => {
   }
 }
 
-onMounted(loadInvitationData)
+onMounted(() => {
+  loadInvitationData()
+  if (import.meta.client) {
+    window.addEventListener('scroll', handleScroll, { passive: true })
+  }
+})
+
+onUnmounted(() => {
+  if (import.meta.client) {
+    window.removeEventListener('scroll', handleScroll)
+    if (observer) observer.disconnect()
+    if (scrollRafId) cancelAnimationFrame(scrollRafId)
+  }
+})
 </script>

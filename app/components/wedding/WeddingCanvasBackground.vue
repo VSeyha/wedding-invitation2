@@ -12,6 +12,7 @@ import type { AnimationConfig } from '~~/shared/types/appearance'
 const props = defineProps<{
   config?: Partial<AnimationConfig>
   absolute?: boolean
+  scrollVelocity?: number
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -168,10 +169,11 @@ const render = () => {
         drawPetal(ctx, p)
       }
 
-      // Update physics
-      p.y += p.speedY
+      // Update physics with scroll momentum reactivity
+      const scrollDrift = (props.scrollVelocity || 0) * 0.4
+      p.y += (p.speedY + scrollDrift)
       p.x += Math.sin(p.y * 0.01) * 0.5 + p.speedX
-      p.rotation += p.rotationSpeed
+      p.rotation += p.rotationSpeed + scrollDrift * 0.005
 
       // Wrap around edges
       if (p.y > canvas.height + p.size) {

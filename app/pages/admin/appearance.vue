@@ -119,6 +119,90 @@
               </div>
             </div>
 
+            <!-- Background Artwork & Scene Presets -->
+            <div>
+              <label class="form-label mb-2">Khmer Background Scenes & Presets (ផ្ទាំងរូបភាពប្រពៃណីខ្មែរ)</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <button
+                  type="button"
+                  @click="selectBackgroundPreset('angkor-wat')"
+                  class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
+                  :class="config.background_config.preset_name === 'angkor-wat' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
+                >
+                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/angkor-wat.svg');"></div>
+                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Angkor Wat</div>
+                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">ប្រាសាទអង្គរវត្ត</div>
+                </button>
+
+                <button
+                  type="button"
+                  @click="selectBackgroundPreset('royal-kbach')"
+                  class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
+                  :class="config.background_config.preset_name === 'royal-kbach' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
+                >
+                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/royal-kbach.svg');"></div>
+                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Royal Kbach</div>
+                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">ក្បាច់ផ្កាចន្ទន៍</div>
+                </button>
+
+                <button
+                  type="button"
+                  @click="selectBackgroundPreset('golden-lotus')"
+                  class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
+                  :class="config.background_config.preset_name === 'golden-lotus' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
+                >
+                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/golden-lotus.svg');"></div>
+                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Sacred Lotus</div>
+                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">សួនផ្កាឈូកមាស</div>
+                </button>
+
+                <button
+                  type="button"
+                  @click="selectBackgroundPreset('classic-ivory')"
+                  class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
+                  :class="config.background_config.type === 'none' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
+                >
+                  <div class="w-full h-14 rounded-lg bg-[#F7F0E3] flex items-center justify-center mb-1.5 border border-gray-200 text-xs text-[#641D2D] font-bold">
+                    Classic
+                  </div>
+                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Classic Ivory</div>
+                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">ភ្លុកដំរីបុរាណ</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Scroll Zoom & Motion Controls -->
+            <div class="p-4 rounded-xl border border-[#C9A24A]/30 bg-[#FFFDF9] space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-bold text-[#641D2D] flex items-center gap-1.5">
+                    <span>💫</span>
+                    <span>Scroll Zoom In / Zoom Out (ចលនាពង្រីក-បង្រួមពេល Scroll)</span>
+                  </div>
+                  <p class="text-[11px] text-[#3C2925]/70">Smoothly scales the background when guests scroll down the invitation</p>
+                </div>
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="config.background_config.scroll_zoom" class="sr-only peer" />
+                  <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#641D2D]"></div>
+                </label>
+              </div>
+
+              <div v-if="config.background_config.scroll_zoom !== false" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-gray-100">
+                <div>
+                  <label class="form-label">Zoom Effect Style</label>
+                  <select v-model="config.background_config.zoom_effect" class="input-field text-xs">
+                    <option value="zoom-in">Zoom In (ពង្រីកចូលពេល Scroll ចុះ)</option>
+                    <option value="zoom-out">Zoom Out (បង្រួមចេញពេល Scroll ចុះ)</option>
+                    <option value="breathe">Ken Burns Breathe (រំញោចចលនាដកដង្ហើម)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Background Opacity ({{ Math.round((config.background_config.opacity ?? 0.8) * 100) }}%)</label>
+                  <input type="range" min="0.1" max="1" step="0.05" v-model.number="config.background_config.opacity" class="w-full accent-[#641D2D] mt-2" />
+                </div>
+              </div>
+            </div>
+
             <!-- Gradient settings -->
             <div v-if="config.background_config.type === 'gradient'" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div>
@@ -598,6 +682,7 @@ import {
 } from 'lucide-vue-next'
 import {
   PRESET_THEMES,
+  PRESET_BACKGROUNDS,
   DEFAULT_THEME_COLORS,
   type WeddingAppearance,
   type ThemeColors
@@ -706,15 +791,34 @@ const previewBackgroundStyle = computed(() => {
       background: `linear-gradient(${dir}, ${c.bg}, ${c.primary})`
     }
   }
-  if (bg.type === 'image' && bg.image_url) {
+  let imgUrl = bg.image_url
+  if (!imgUrl && bg.preset_name && PRESET_BACKGROUNDS[bg.preset_name]) {
+    imgUrl = PRESET_BACKGROUNDS[bg.preset_name].image_url
+  }
+  if (imgUrl) {
     return {
-      backgroundImage: `url(${bg.image_url})`,
+      backgroundImage: `url(${imgUrl})`,
       backgroundSize: 'cover',
-      backgroundPosition: 'center'
+      backgroundPosition: 'center',
+      opacity: bg.opacity ?? 0.85
     }
   }
   return { backgroundColor: c.bg }
 })
+
+const selectBackgroundPreset = (presetKey: string) => {
+  const preset = PRESET_BACKGROUNDS[presetKey]
+  if (!preset) return
+  config.value.background_config.preset_name = preset.id
+  config.value.background_config.type = preset.type
+  config.value.background_config.image_url = preset.image_url
+  config.value.background_config.overlay_color = preset.overlay_color
+  config.value.background_config.overlay_opacity = preset.overlay_opacity
+  config.value.background_config.opacity = preset.opacity
+  config.value.background_config.scroll_zoom = preset.scroll_zoom
+  config.value.background_config.zoom_effect = preset.zoom_effect
+  showToast(`Applied background: ${preset.name}`)
+}
 
 // Live Countdown timer
 const now = ref(Date.now())
