@@ -1,18 +1,33 @@
 <template>
   <div
-    class="relative bg-[#121214] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
+    class="relative bg-[#0F080B] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
     :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden'"
   >
-    <!-- 1. Dedicated Dynamic Background Layer & Particles Confined Strictly to Mobile Screen Width (Zero Side Background) -->
+    <!-- 1. Ambient Frosted Desktop Backdrop (Dreamy blurred warm halo, hidden on mobile) -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden sm:block">
+      <!-- Soft Blurred Ambience from Angkor Wat Artwork -->
+      <div
+        v-if="bgImageUrl"
+        class="w-full h-full bg-cover bg-center scale-110 blur-3xl brightness-[0.55] saturate-[1.4] opacity-90 transition-all duration-1000"
+        :style="{ backgroundImage: `url(${bgImageUrl})` }"
+      ></div>
+      <!-- Radial Vignette: softly draws focus directly into the mobile invitation -->
+      <div
+        class="absolute inset-0"
+        style="background: radial-gradient(circle at 50% 45%, transparent 20%, rgba(15, 8, 11, 0.6) 65%, rgba(10, 4, 7, 0.95) 100%);"
+      ></div>
+    </div>
+
+    <!-- 2. Crisp Mobile Screen Background & Particles (Strictly Scoped to Mobile Screen Width) -->
     <div class="fixed inset-0 pointer-events-none z-0 flex justify-center overflow-hidden">
       <div class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] h-full relative overflow-hidden">
-        <!-- Scalable Background Artwork (Angkor Wat / Royal Kbach / Custom) -->
+        <!-- Scalable Crisp Background Artwork (Angkor Wat / Royal Kbach / Custom) -->
         <div
           v-if="bgImageUrl"
           class="w-full h-full bg-cover bg-center will-change-transform"
           :style="dynamicBackgroundStyle"
         ></div>
-        <!-- Ambient Gradient / Tint Overlay -->
+        <!-- Ambient Warm Tint Overlay -->
         <div
           class="absolute inset-0 transition-opacity duration-500"
           :style="backgroundOverlayStyle"
@@ -59,9 +74,9 @@
       class="relative z-10 w-full flex justify-center"
       :class="hasOpened ? '' : 'h-screen max-h-screen overflow-hidden'"
     >
-      <!-- Centered Mobile Screen Frame -->
+      <!-- Centered Mobile Screen Frame with Royal Gold Border & Ambient Shadow -->
       <div
-        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/90 relative sm:shadow-[0_0_60px_rgba(0,0,0,0.6)] sm:border-x sm:border-wedding-secondary/40 transition-all duration-300"
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/90 relative sm:shadow-[0_20px_70px_rgba(0,0,0,0.6),0_0_50px_rgba(201,162,74,0.15)] sm:border-x sm:border-wedding-secondary/40 transition-all duration-300"
         :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden flex items-center justify-center'"
       >
         <!-- 1. Khmer Royal Seal Opening Envelope -->
