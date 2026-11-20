@@ -5,7 +5,10 @@
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.programmes') }}</h1>
         <p class="text-sm text-[#3C2925]/60 mt-1">Manage the ceremony programme timeline.</p>
       </div>
-      <button @click="openCreateModal" class="btn-primary self-start">+ Add Event</button>
+      <button @click="openCreateModal" class="btn-primary self-start inline-flex items-center gap-1.5">
+        <Plus class="w-4 h-4" />
+        <span>Add Event</span>
+      </button>
     </div>
 
     <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading...</div>
@@ -25,8 +28,12 @@
           <div class="text-xs text-[#3C2925]/60 mt-1" v-if="item.description_en">{{ item.description_en }}</div>
         </div>
         <div class="flex gap-2 self-end sm:self-center">
-          <button @click="openEditModal(item)" class="btn-icon">✏️</button>
-          <button @click="confirmDelete(item)" class="btn-icon text-red-500">🗑️</button>
+          <button @click="openEditModal(item)" class="btn-icon text-neutral-600 hover:text-[#641D2D]" title="Edit">
+            <Pencil class="w-4 h-4" />
+          </button>
+          <button @click="confirmDelete(item)" class="btn-icon text-red-500 hover:text-red-700" title="Delete">
+            <Trash2 class="w-4 h-4" />
+          </button>
         </div>
       </div>
       <div v-if="!sorted.length" class="text-center py-8 text-[#3C2925]/50">No programme events yet.</div>
@@ -73,6 +80,8 @@
 </template>
 
 <script setup lang="ts">
+import { Plus, Pencil, Trash2 } from 'lucide-vue-next'
+
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
 const supabase = useSupabase()

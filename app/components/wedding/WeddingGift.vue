@@ -34,46 +34,29 @@
         </p>
       </div>
 
-      <!-- KHQR Display Card -->
-      <div class="max-w-xs mx-auto mb-8 bg-white rounded-3xl border-2 border-[#E5C77A]/40 shadow-lg overflow-hidden transition-transform hover:scale-[1.02]">
-        <!-- Top KHQR Red Header Banner -->
-        <div class="bg-[#E1251B] py-3 px-4 text-center">
-          <div class="inline-flex items-center justify-center font-bold text-white text-lg tracking-wider font-mono">
-            KHQR
+      <!-- KHQR Display Card (Uploaded file already contains KHQR header, name, and QR) -->
+      <div class="max-w-[320px] mx-auto mb-8 bg-white/95 rounded-3xl border-2 border-[#E5C77A]/40 shadow-lg p-4 sm:p-5 transition-transform hover:scale-[1.01]">
+        <!-- The uploaded KHQR Card Image -->
+        <div class="w-full rounded-2xl overflow-hidden bg-white shadow-inner border border-gray-100 flex items-center justify-center">
+          <img
+            v-if="activeGiftInfo.qr_code_url"
+            :src="activeGiftInfo.qr_code_url"
+            alt="KHQR Payment"
+            class="w-full h-auto object-contain block"
+          />
+          <!-- Fallback decorative placeholder when no custom QR uploaded yet -->
+          <div v-else class="text-center py-10 px-4">
+            <div class="text-4xl mb-2 text-[#E1251B]">📱</div>
+            <div class="text-xs font-bold text-[#641D2D]">KHQR Code</div>
+            <div class="text-[10px] text-gray-500 mt-1">Upload QR in Admin Settings</div>
           </div>
         </div>
 
-        <div class="p-6 text-center">
-          <!-- Account Name on KHQR -->
-          <div class="text-xs font-bold uppercase tracking-wider text-[#3C2925] mb-4 font-mono">
-            {{ activeGiftInfo.account_name_en || 'SEYHA VET' }}
-          </div>
-
-          <!-- Dashed Separator -->
-          <div class="border-b border-dashed border-gray-300 mb-6"></div>
-
-          <!-- QR Code Image -->
-          <div class="w-56 h-56 mx-auto rounded-xl overflow-hidden bg-white flex items-center justify-center border border-gray-100 shadow-inner p-2 relative">
-            <img
-              v-if="activeGiftInfo.qr_code_url"
-              :src="activeGiftInfo.qr_code_url"
-              alt="KHQR Payment"
-              class="w-full h-full object-contain"
-            />
-            <!-- Fallback decorative placeholder when no custom QR uploaded yet -->
-            <div v-else class="text-center p-4">
-              <div class="text-4xl mb-2 text-[#E1251B]">📱</div>
-              <div class="text-xs font-bold text-[#641D2D]">KHQR Code</div>
-              <div class="text-[10px] text-gray-500 mt-1">Upload QR in Admin Settings</div>
-            </div>
-          </div>
-
-          <!-- KHQR Footer text -->
-          <div class="mt-5 text-[11px] font-bold text-[#C9A24A] tracking-wider uppercase flex items-center justify-center gap-1.5 font-khmer-body">
-            <span>✦</span>
-            <span>ស្កេនទូទាត់តាម KHQR</span>
-            <span>✦</span>
-          </div>
+        <!-- KHQR Footer text -->
+        <div class="mt-4 text-[11px] font-bold text-[#C9A24A] tracking-wider uppercase flex items-center justify-center gap-1.5 font-khmer-body">
+          <span>✦</span>
+          <span>ស្កេនទូទាត់តាម KHQR</span>
+          <span>✦</span>
         </div>
       </div>
 
@@ -86,7 +69,7 @@
 
         <!-- Bank & Account Name -->
         <div class="font-khmer-heading text-lg sm:text-xl text-wedding-primary">
-          {{ activeGiftInfo.bank_name || 'ABA Bank' }} ({{ activeGiftInfo.account_name_km || 'វ៉េត សីហា & ស ណារី' }})
+          {{ activeGiftInfo.bank_name || 'ABA Bank' }} ({{ activeGiftInfo.account_name_km || 'វ៉ែត សីហា & ស ណារី' }})
         </div>
 
         <!-- Account Number -->
@@ -129,7 +112,7 @@ const DEFAULT_GIFT_INFO: WeddingGiftInfo = {
   qr_code_url: '/images/khqr-default.jpg',
   account_name_en: 'SEYHA VET',
   bank_name: 'ABA Bank',
-  account_name_km: 'វ៉េត សីហា & ស ណារី',
+  account_name_km: 'វ៉ែត សីហា & ស ណារី',
   account_number: '007 342 922',
   message_km: 'សម្រាប់ឯកឧត្តម លោកជំទាវ លោក លោកស្រី និងភ្ញៀវកិត្តិយសទាំងអស់ ដែលមានបំណងចូលរួមចំណងដៃតាមរយៈការស្កេន KHQR ឬផ្ទេរប្រាក់តាមគណនីធនាគារ',
   message_en: 'For guests who wish to send wedding blessings and digital gifts via KHQR or bank transfer.'

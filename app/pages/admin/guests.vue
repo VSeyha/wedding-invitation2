@@ -6,8 +6,9 @@
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.guests') }}</h1>
         <p class="text-sm text-[#3C2925]/60 mt-1">Manage wedding guests and their invitation links.</p>
       </div>
-      <button @click="openCreateModal" class="btn-primary flex items-center gap-2 self-start">
-        <span>+</span> Add Guest
+      <button @click="openCreateModal" class="btn-primary flex items-center gap-1.5 self-start">
+        <UserPlus class="w-4 h-4" />
+        <span>Add Guest</span>
       </button>
     </div>
 
@@ -54,10 +55,16 @@
                 {{ invitation(guest)?.opened_at ? new Date(invitation(guest).opened_at).toLocaleDateString() : '—' }}
               </td>
               <td class="px-4 py-3 text-right">
-                <div class="flex items-center justify-end gap-2">
-                  <button @click="copyLink(guest)" title="Copy invite link" class="btn-icon">📋</button>
-                  <button @click="openEditModal(guest)" title="Edit guest" class="btn-icon">✏️</button>
-                  <button @click="confirmDelete(guest)" title="Delete guest" class="btn-icon text-red-500">🗑️</button>
+                <div class="flex items-center justify-end gap-1.5">
+                  <button @click="copyLink(guest)" title="Copy invite link" class="btn-icon text-neutral-600 hover:text-[#641D2D]">
+                    <Copy class="w-4 h-4" />
+                  </button>
+                  <button @click="openEditModal(guest)" title="Edit guest" class="btn-icon text-neutral-600 hover:text-[#641D2D]">
+                    <Pencil class="w-4 h-4" />
+                  </button>
+                  <button @click="confirmDelete(guest)" title="Delete guest" class="btn-icon text-red-500 hover:text-red-700">
+                    <Trash2 class="w-4 h-4" />
+                  </button>
                 </div>
               </td>
             </tr>
@@ -110,6 +117,8 @@
 </template>
 
 <script setup lang="ts">
+import { Copy, Pencil, Trash2, UserPlus } from 'lucide-vue-next'
+
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
 const supabase = useSupabase()

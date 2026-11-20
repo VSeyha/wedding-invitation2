@@ -6,7 +6,7 @@
         <p class="text-sm text-[#3C2925]/60 mt-1">Upload and manage wedding photos (auto-optimized for mobile speed).</p>
       </div>
       <label class="btn-primary cursor-pointer self-start flex items-center gap-2">
-        <span>📷</span>
+        <Camera class="w-4 h-4" />
         <span>{{ uploading ? 'Optimizing & Uploading...' : 'Upload Photos' }}</span>
         <input
           type="file"
@@ -20,13 +20,15 @@
     </div>
 
     <div v-if="uploading" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700 animate-pulse flex items-center gap-2">
-      <span>⚡</span>
+      <Zap class="w-4 h-4" />
       <span>{{ uploadProgressMessage || 'Optimizing and uploading photos...' }}</span>
     </div>
 
     <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading gallery...</div>
     <div v-else-if="!photos.length" class="text-center py-16 text-[#3C2925]/50">
-      <div class="text-4xl mb-2">🖼️</div>
+      <div class="mb-2 flex justify-center text-[#C9A24A]/60">
+        <Image class="w-12 h-12 stroke-1" />
+      </div>
       <p class="font-medium">No photos uploaded yet.</p>
       <p class="text-xs text-[#3C2925]/40 mt-1">Click "Upload Photos" above to add pictures to your wedding invitation.</p>
     </div>
@@ -45,10 +47,10 @@
         <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
           <button
             @click="confirmDeletePhoto(photo)"
-            class="w-9 h-9 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-sm transition-colors shadow-lg"
+            class="w-9 h-9 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-sm transition-colors shadow-lg cursor-pointer"
             title="Delete Photo"
           >
-            🗑️
+            <Trash2 class="w-4 h-4" />
           </button>
         </div>
         <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[11px] px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity truncate">
@@ -78,6 +80,7 @@
 </template>
 
 <script setup lang="ts">
+import { Camera, Zap, Image, Trash2 } from 'lucide-vue-next'
 import { compressImage } from '~~/app/utils/imageCompressor'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })

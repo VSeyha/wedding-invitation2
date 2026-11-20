@@ -12,16 +12,20 @@
           Live Website Active
         </span>
         <span v-else class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 mr-2">
-          <span>📝</span> Draft Mode
+          <FileEdit class="w-3.5 h-3.5" />
+          <span>Draft Mode</span>
         </span>
-        <button @click="resetToDefault" class="btn-secondary text-xs">
-          🔄 Restore Default
+        <button @click="resetToDefault" class="btn-secondary text-xs inline-flex items-center gap-1.5 cursor-pointer">
+          <RotateCcw class="w-3.5 h-3.5" />
+          <span>Restore Default</span>
         </button>
-        <button @click="save(false)" :disabled="saving" class="btn-secondary text-xs">
-          {{ saving ? 'Saving...' : '💾 Save Draft' }}
+        <button @click="save(false)" :disabled="saving" class="btn-secondary text-xs inline-flex items-center gap-1.5 cursor-pointer">
+          <Save class="w-3.5 h-3.5" />
+          <span>{{ saving ? 'Saving...' : 'Save Draft' }}</span>
         </button>
-        <button @click="save(true)" :disabled="saving" class="btn-primary text-xs">
-          {{ saving ? 'Publishing...' : '🚀 ' + t('admin.publish') }}
+        <button @click="save(true)" :disabled="saving" class="btn-primary text-xs inline-flex items-center gap-1.5 cursor-pointer">
+          <Send class="w-3.5 h-3.5" />
+          <span>{{ saving ? 'Publishing...' : t('admin.publish') }}</span>
         </button>
       </div>
     </div>
@@ -34,7 +38,8 @@
         <div class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
           <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
-              <span>🎨</span> Preset Khmer Themes
+              <Palette class="w-4 h-4" />
+              <span>Preset Khmer Themes</span>
             </h2>
             <span class="text-xs text-[#3C2925]/60 font-medium">Click any preset to preview instantly</span>
           </div>
@@ -65,7 +70,8 @@
         <div class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
           <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
-              <span>🖌️</span> Custom Palette Colors
+              <Paintbrush class="w-4 h-4" />
+              <span>Custom Palette Colors</span>
             </h2>
             <span class="text-xs text-[#3C2925]/60 font-mono">Real-time Preview</span>
           </div>
@@ -93,7 +99,8 @@
         <!-- 3. Background Settings -->
         <div class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
           <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] mb-3 flex items-center gap-2">
-            <span>🖼️</span> Background Type & Styling
+            <ImageIcon class="w-4 h-4" />
+            <span>Background Type & Styling</span>
           </h2>
           <div class="space-y-4">
             <div>
@@ -157,7 +164,8 @@
           <div class="flex items-center justify-between mb-3">
             <div>
               <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
-                <span>✨</span> Falling Particle Animation
+                <Sparkles class="w-4 h-4" />
+                <span>Falling Particle Animation</span>
               </h2>
               <p class="text-xs text-[#3C2925]/60 mt-0.5">Golden petals and luxury floating dust particles</p>
             </div>
@@ -172,10 +180,10 @@
             <div>
               <label class="form-label">Particle Preset</label>
               <select v-model="config.animation_config.preset" class="input-field">
-                <option value="lotus_petals">🪷 Golden Lotus Petals (Falling petals)</option>
-                <option value="particles">✨ Sparkling Golden Dust (Floating glitter)</option>
-                <option value="hearts">💖 Romantic Hearts (Soft drifting)</option>
-                <option value="lights">💫 Floating Bokeh Lights</option>
+                <option value="lotus_petals">Golden Lotus Petals (Falling petals)</option>
+                <option value="particles">Sparkling Golden Dust (Floating glitter)</option>
+                <option value="hearts">Romantic Hearts (Soft drifting)</option>
+                <option value="lights">Floating Bokeh Lights</option>
                 <option value="none">Static (None)</option>
               </select>
             </div>
@@ -202,16 +210,18 @@
           <div class="flex items-center justify-between mb-3">
             <div>
               <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
-                <span>💌</span> Opening Royal Seal Envelope
+                <Mail class="w-4 h-4" />
+                <span>Opening Royal Seal Envelope</span>
               </h2>
               <p class="text-xs text-[#3C2925]/60 mt-0.5">Custom envelope seal presented to guests upon opening</p>
             </div>
             <button
               type="button"
               @click="testOpeningAnimation"
-              class="px-3 py-1.5 rounded-lg bg-[#FAF0E6] text-[#641D2D] border border-[#C9A24A]/40 text-xs font-bold hover:bg-[#EDE5D4] transition-all"
+              class="px-3 py-1.5 rounded-lg bg-[#FAF0E6] text-[#641D2D] border border-[#C9A24A]/40 text-xs font-bold hover:bg-[#EDE5D4] transition-all inline-flex items-center gap-1.5 cursor-pointer"
             >
-              ▶ Test In Preview
+              <Play class="w-3.5 h-3.5" />
+              <span>Test In Preview</span>
             </button>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -247,17 +257,19 @@
               <div class="flex items-center gap-1 bg-gray-100 p-0.5 rounded-lg text-xs">
                 <button
                   @click="previewDevice = 'mobile'"
-                  class="px-2.5 py-1 rounded-md transition-all cursor-pointer font-medium"
+                  class="px-2.5 py-1 rounded-md transition-all cursor-pointer font-medium inline-flex items-center gap-1.5"
                   :class="previewDevice === 'mobile' ? 'bg-white shadow-sm font-bold text-[#641D2D]' : 'text-gray-500 hover:text-black'"
                 >
-                  📱 Mobile
+                  <Smartphone class="w-3.5 h-3.5" />
+                  <span>Mobile</span>
                 </button>
                 <button
                   @click="previewDevice = 'desktop'"
-                  class="px-2.5 py-1 rounded-md transition-all cursor-pointer font-medium"
+                  class="px-2.5 py-1 rounded-md transition-all cursor-pointer font-medium inline-flex items-center gap-1.5"
                   :class="previewDevice === 'desktop' ? 'bg-white shadow-sm font-bold text-[#641D2D]' : 'text-gray-500 hover:text-black'"
                 >
-                  💻 Desktop
+                  <Monitor class="w-3.5 h-3.5" />
+                  <span>Desktop</span>
                 </button>
               </div>
             </div>
@@ -327,10 +339,10 @@
                     <button
                       type="button"
                       @click="showOpeningTest = false"
-                      class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl shadow-gold-glow animate-pulse"
+                      class="w-16 h-16 rounded-full mx-auto flex items-center justify-center shadow-gold-glow animate-pulse text-[#641D2D]"
                       :style="{ background: 'linear-gradient(135deg, #E5C77A, #C9A24A, #8F6B1E)' }"
                     >
-                      🪷
+                      <Crown class="w-7 h-7" />
                     </button>
                     <div class="mt-3 text-[11px] font-bold" :style="{ color: config.theme_config.primary }">
                       ចុចបើកលិខិតអញ្ជើញ (Click to Open)
@@ -342,7 +354,9 @@
                 <div class="relative z-10 p-4 space-y-6">
                   <!-- Section: Hero & Countdown -->
                   <div v-if="activeSection === 'all' || activeSection === 'hero'" class="text-center pt-2">
-                    <div class="text-2xl mb-1 select-none" :style="{ color: config.theme_config.secondary }">⚜️</div>
+                    <div class="flex justify-center mb-1">
+                      <Crown class="w-6 h-6" :style="{ color: config.theme_config.secondary }" />
+                    </div>
                     <div class="text-[10px] uppercase tracking-widest font-bold mb-1" :style="{ color: config.theme_config.secondary }">
                       THE WEDDING CELEBRATION
                     </div>
@@ -388,7 +402,7 @@
                       <div class="p-3 rounded-2xl bg-white/80 border border-wedding-secondary/30 text-center shadow-sm">
                         <div class="w-16 h-16 rounded-full mx-auto border-2 border-wedding-secondary overflow-hidden bg-gray-100 flex items-center justify-center mb-2 shadow-inner">
                           <img v-if="weddingData.groom_photo_url" :src="weddingData.groom_photo_url" alt="Groom" class="w-full h-full object-cover" />
-                          <span v-else class="text-xl">🤵‍♂️</span>
+                          <User v-else class="w-8 h-8 text-[#C9A24A]" />
                         </div>
                         <div class="font-khmer-heading text-xs font-bold" :style="{ color: config.theme_config.primary }">{{ weddingData.groom_name_km }}</div>
                         <div class="text-[10px] text-gray-500 font-mono">{{ weddingData.groom_name_en }}</div>
@@ -397,7 +411,7 @@
                       <div class="p-3 rounded-2xl bg-white/80 border border-wedding-secondary/30 text-center shadow-sm">
                         <div class="w-16 h-16 rounded-full mx-auto border-2 border-wedding-secondary overflow-hidden bg-gray-100 flex items-center justify-center mb-2 shadow-inner">
                           <img v-if="weddingData.bride_photo_url" :src="weddingData.bride_photo_url" alt="Bride" class="w-full h-full object-cover" />
-                          <span v-else class="text-xl">👰‍♀️</span>
+                          <User v-else class="w-8 h-8 text-[#C9A24A]" />
                         </div>
                         <div class="font-khmer-heading text-xs font-bold" :style="{ color: config.theme_config.primary }">{{ weddingData.bride_name_km }}</div>
                         <div class="text-[10px] text-gray-500 font-mono">{{ weddingData.bride_name_en }}</div>
@@ -413,14 +427,14 @@
                     </div>
                     <div class="p-3 rounded-2xl bg-white/85 border border-wedding-secondary/30 shadow-sm space-y-2">
                       <div class="flex items-start gap-2.5 text-left">
-                        <span class="text-sm">🌸</span>
+                        <Sparkles class="w-3.5 h-3.5 mt-0.5 text-wedding-primary flex-shrink-0" />
                         <div>
                           <div class="font-khmer-heading text-[11px] font-bold" :style="{ color: config.theme_config.primary }">ថ្ងៃដែលយើងបានជួបគ្នា (២០១៩)</div>
                           <div class="text-[10px] text-[#3C2925]/70 font-khmer-body">ការជួបគ្នាដោយចៃដន្យ នៃថ្ងៃប្រឡងបាក់ឌុបឆ្នាំ២០១៩...</div>
                         </div>
                       </div>
                       <div class="border-t border-dashed border-gray-200 pt-2 flex items-start gap-2.5 text-left">
-                        <span class="text-sm">💍</span>
+                        <Crown class="w-3.5 h-3.5 mt-0.5 text-wedding-primary flex-shrink-0" />
                         <div>
                           <div class="font-khmer-heading text-[11px] font-bold" :style="{ color: config.theme_config.primary }">ថ្ងៃជ័យមង្គលអាពាហ៍ពិពាហ៍ (១៦.០១.២០២៧)</div>
                           <div class="text-[10px] text-[#3C2925]/70 font-khmer-body">ថ្ងៃសៅរ៍ ទី១៦ ខែមករា ឆ្នាំ២០២៧ ជាការចាប់ផ្តើមទំព័រជីវិតថ្មី...</div>
@@ -447,13 +461,14 @@
                       </div>
                       <button
                         type="button"
-                        class="mt-2.5 px-4 py-1.5 rounded-full text-[11px] font-medium shadow-sm transition-transform active:scale-95"
+                        class="mt-2.5 px-4 py-1.5 rounded-full text-[11px] font-medium shadow-sm transition-transform active:scale-95 inline-flex items-center justify-center gap-1.5"
                         :style="{
                           backgroundColor: config.theme_config.primary,
                           color: config.theme_config.bg
                         }"
                       >
-                        📋 ចម្លងលេខគណនី ABA
+                        <Copy class="w-3.5 h-3.5" />
+                        <span>ចម្លងលេខគណនី ABA</span>
                       </button>
                     </div>
                   </div>
@@ -480,7 +495,7 @@
                 </div>
                 <div class="flex-1 mx-2">
                   <div class="bg-white rounded-md px-3 py-0.5 text-[10px] text-gray-500 font-mono border border-gray-200 flex items-center gap-1.5 truncate">
-                    <span>🔒</span>
+                    <Lock class="w-3 h-3 text-gray-400" />
                     <span class="text-gray-700">wedding.cambodia/invite/b1d98750-a2b9-4a76...</span>
                   </div>
                 </div>
@@ -502,7 +517,9 @@
                 <div class="max-w-md mx-auto relative z-10 text-center space-y-6">
                   <!-- Header Title -->
                   <div class="pt-4">
-                    <div class="text-3xl mb-1" :style="{ color: config.theme_config.secondary }">⚜️</div>
+                    <div class="flex justify-center mb-1">
+                      <Crown class="w-7 h-7" :style="{ color: config.theme_config.secondary }" />
+                    </div>
                     <div class="text-xs uppercase tracking-widest font-bold" :style="{ color: config.theme_config.secondary }">
                       THE WEDDING CELEBRATION
                     </div>
@@ -562,6 +579,24 @@
 
 <script setup lang="ts">
 import {
+  FileEdit,
+  RotateCcw,
+  Save,
+  Send,
+  Palette,
+  Paintbrush,
+  Image as ImageIcon,
+  Sparkles,
+  Mail,
+  Play,
+  Smartphone,
+  Monitor,
+  Crown,
+  User,
+  Copy,
+  Lock
+} from 'lucide-vue-next'
+import {
   PRESET_THEMES,
   DEFAULT_THEME_COLORS,
   type WeddingAppearance,
@@ -580,11 +615,11 @@ const activeSection = ref<'all' | 'hero' | 'couple' | 'story' | 'gift'>('all')
 const showOpeningTest = ref(false)
 
 const previewSections = [
-  { id: 'all', label: '🌟 Full Page' },
-  { id: 'hero', label: '👑 Hero' },
-  { id: 'couple', label: '👫 Couple' },
-  { id: 'story', label: '📖 Story' },
-  { id: 'gift', label: '🎁 KHQR' }
+  { id: 'all', label: 'Full Page' },
+  { id: 'hero', label: 'Hero' },
+  { id: 'couple', label: 'Couple' },
+  { id: 'story', label: 'Story' },
+  { id: 'gift', label: 'KHQR' }
 ] as const
 
 const weddingData = ref<WeddingSettings>({
@@ -606,7 +641,7 @@ const weddingData = ref<WeddingSettings>({
     qr_code_url: '/images/khqr-default.jpg',
     account_name_en: 'SEYHA VET',
     bank_name: 'ABA Bank',
-    account_name_km: 'វ៉េត សីហា & ស ណារី',
+    account_name_km: 'វ៉ែត សីហា & ស ណារី',
     account_number: '007 342 922'
   }
 })
@@ -772,7 +807,7 @@ const save = async (publish: boolean) => {
       headers: { authorization: `Bearer ${token}` },
       body: config.value
     })
-    showToast(publish ? '🚀 Theme published to live website!' : '💾 Draft appearance saved.')
+    showToast(publish ? 'Theme published to live website!' : 'Draft appearance saved.')
   } catch (err: any) {
     showToast(err?.data?.statusMessage || 'Failed to save appearance.')
   } finally {

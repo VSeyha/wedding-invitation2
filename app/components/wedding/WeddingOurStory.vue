@@ -32,9 +32,14 @@
         >
           <!-- Circular Badge on the line -->
           <div
-            class="absolute -left-[45px] sm:-left-[53px] top-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 shadow-md transition-transform group-hover:scale-110 bg-[#FFFDF9] border-[#C9A24A]"
+            class="absolute -left-[45px] sm:-left-[53px] top-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 shadow-md transition-transform group-hover:scale-110"
+            :class="index === activeStoryItems.length - 1
+              ? 'bg-[#641D2D] border-[#C9A24A] text-[#E5C77A] ring-2 ring-[#C9A24A]/40'
+              : index === 1
+                ? 'bg-[#FFF9FA] border-rose-300/80 text-rose-500'
+                : 'bg-[#FFFDF9] border-[#C9A24A]/80 text-[#C9A24A]'"
           >
-            <span class="text-base sm:text-lg">{{ item.icon || '⚜️' }}</span>
+            <span class="text-base sm:text-lg select-none">{{ item.icon || '⚜️' }}</span>
           </div>
 
           <!-- Story Item Content -->
@@ -88,7 +93,7 @@ const DEFAULT_STORY_ITEMS: StoryMilestone[] = [
     description_en: 'Growing from close companions into true love, understanding, and care.'
   },
   {
-    icon: '💍',
+    icon: '✨',
     title_km: 'ការសន្យារួមដំណើរ',
     subtitle_en: 'THE COMMITMENT',
     description_km: 'ការប្តេជ្ញាកាន់ដៃគ្នាមិនលែងគ្រប់កាលៈទេសៈ ដោយមានពរជ័យពីអ្នកមានគុណទាំងសងខាង។',

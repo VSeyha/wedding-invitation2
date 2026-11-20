@@ -2,7 +2,9 @@
   <div class="min-h-screen bg-[#641D2D] flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-[#FAF5EE] rounded-2xl p-8 border-2 border-[#C9A24A] shadow-gold-glow-lg text-[#3C2925]">
       <div class="text-center mb-6">
-        <div class="text-4xl mb-2">⚜️</div>
+        <div class="w-14 h-14 rounded-2xl mx-auto mb-3 bg-gradient-to-br from-[#E5C77A] via-[#C9A24A] to-[#8F6B1E] flex items-center justify-center text-[#641D2D] shadow-gold-glow">
+          <Crown class="w-7 h-7" />
+        </div>
         <h1 class="text-2xl font-bold font-khmer-heading text-[#641D2D] mb-1">
           ចូលប្រព័ន្ធគ្រប់គ្រង
         </h1>
@@ -55,6 +57,8 @@
 </template>
 
 <script setup lang="ts">
+import { Crown } from 'lucide-vue-next'
+
 definePageMeta({
   layout: false
 })

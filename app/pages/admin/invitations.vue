@@ -52,14 +52,23 @@
                 {{ new Date(inv.created_at).toLocaleDateString() }}
               </td>
               <td class="px-4 py-3 text-right">
-                <div class="flex items-center justify-end gap-1">
-                  <button @click="copyLink(inv)" title="Copy link" class="btn-icon" :disabled="inv.status === 'revoked'">📋</button>
-                  <button @click="shareWhatsApp(inv)" title="WhatsApp" class="btn-icon" :disabled="inv.status === 'revoked'">📱</button>
-                  <button @click="shareTelegram(inv)" title="Telegram" class="btn-icon" :disabled="inv.status === 'revoked'">✈️</button>
-                  <button @click="doAction(inv, inv.status === 'revoked' ? 'activate' : 'revoke')" class="btn-icon" :title="inv.status === 'revoked' ? 'Activate' : 'Revoke'">
-                    {{ inv.status === 'revoked' ? '✅' : '🚫' }}
+                <div class="flex items-center justify-end gap-1.5">
+                  <button @click="copyLink(inv)" title="Copy link" class="btn-icon text-neutral-600 hover:text-[#641D2D]" :disabled="inv.status === 'revoked'">
+                    <Copy class="w-4 h-4" />
                   </button>
-                  <button @click="doAction(inv, 'regenerate')" title="Regenerate link" class="btn-icon">🔄</button>
+                  <button @click="shareWhatsApp(inv)" title="WhatsApp" class="btn-icon text-emerald-600 hover:text-emerald-700" :disabled="inv.status === 'revoked'">
+                    <Smartphone class="w-4 h-4" />
+                  </button>
+                  <button @click="shareTelegram(inv)" title="Telegram" class="btn-icon text-sky-600 hover:text-sky-700" :disabled="inv.status === 'revoked'">
+                    <Send class="w-4 h-4" />
+                  </button>
+                  <button @click="doAction(inv, inv.status === 'revoked' ? 'activate' : 'revoke')" class="btn-icon" :title="inv.status === 'revoked' ? 'Activate' : 'Revoke'">
+                    <CheckCircle2 v-if="inv.status === 'revoked'" class="w-4 h-4 text-green-600" />
+                    <Ban v-else class="w-4 h-4 text-amber-600" />
+                  </button>
+                  <button @click="doAction(inv, 'regenerate')" title="Regenerate link" class="btn-icon text-blue-600 hover:text-blue-800">
+                    <RefreshCw class="w-4 h-4" />
+                  </button>
                 </div>
               </td>
             </tr>
@@ -70,7 +79,10 @@
 
     <!-- Export -->
     <div class="mt-4 flex justify-end">
-      <button @click="exportCSV" class="btn-secondary text-xs">⬇ Export CSV</button>
+      <button @click="exportCSV" class="btn-secondary text-xs inline-flex items-center gap-1.5">
+        <Download class="w-3.5 h-3.5" />
+        <span>Export CSV</span>
+      </button>
     </div>
 
     <div v-if="toast" class="toast">{{ toast }}</div>
@@ -78,6 +90,8 @@
 </template>
 
 <script setup lang="ts">
+import { Copy, Smartphone, Send, CheckCircle2, Ban, RefreshCw, Download } from 'lucide-vue-next'
+
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
 const supabase = useSupabase()

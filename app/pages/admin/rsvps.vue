@@ -5,7 +5,10 @@
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.rsvps') }}</h1>
         <p class="text-sm text-[#3C2925]/60 mt-1">Track guest attendance responses.</p>
       </div>
-      <button @click="exportCSV" class="btn-secondary self-start text-xs">⬇ Export CSV</button>
+      <button @click="exportCSV" class="btn-secondary self-start text-xs inline-flex items-center gap-1.5">
+        <Download class="w-3.5 h-3.5" />
+        <span>Export CSV</span>
+      </button>
     </div>
 
     <!-- Summary Cards -->
@@ -55,9 +58,15 @@
             <tr v-for="row in filtered" :key="row.id || row.guest_name" class="border-b border-[#C9A24A]/10 hover:bg-[#F7F0E3]/50">
               <td class="px-4 py-3 font-medium text-[#3C2925]">{{ row.guest_name }}</td>
               <td class="px-4 py-3">
-                <span v-if="row.status === 'attending'" class="badge-success">✓ Attending</span>
-                <span v-else-if="row.status === 'not_attending'" class="badge-error">✗ Declined</span>
-                <span v-else class="badge-neutral">⏳ Pending</span>
+                <span v-if="row.status === 'attending'" class="badge-success inline-flex items-center gap-1">
+                  <Check class="w-3.5 h-3.5" /> Attending
+                </span>
+                <span v-else-if="row.status === 'not_attending'" class="badge-error inline-flex items-center gap-1">
+                  <X class="w-3.5 h-3.5" /> Declined
+                </span>
+                <span v-else class="badge-neutral inline-flex items-center gap-1">
+                  <Clock class="w-3.5 h-3.5" /> Pending
+                </span>
               </td>
               <td class="px-4 py-3 text-xs text-[#3C2925]/60">
                 {{ row.submitted_at ? new Date(row.submitted_at).toLocaleDateString() : '—' }}
@@ -71,6 +80,8 @@
 </template>
 
 <script setup lang="ts">
+import { Download, Check, X, Clock } from 'lucide-vue-next'
+
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
 const supabase = useSupabase()

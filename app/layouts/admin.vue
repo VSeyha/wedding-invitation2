@@ -3,8 +3,8 @@
     <!-- Mobile Top Navigation Header -->
     <header class="md:hidden flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#4A111E] to-[#641D2D] text-[#F7F0E3] border-b border-[#C9A24A]/40 sticky top-0 z-40 shadow-md">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-full bg-[#C9A24A]/20 border border-[#C9A24A] flex items-center justify-center text-sm shadow-inner">
-          ⚜️
+        <div class="w-8 h-8 rounded-full bg-[#C9A24A]/20 border border-[#C9A24A] flex items-center justify-center text-sm shadow-inner text-[#E5C77A]">
+          <Crown class="w-4 h-4" />
         </div>
         <div>
           <h1 class="font-bold text-xs leading-tight tracking-wide text-[#E5C77A]">{{ t('admin.title') }}</h1>
@@ -65,8 +65,8 @@
         <!-- Sidebar Brand Header -->
         <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#C9A24A]/25">
           <div class="flex items-center gap-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#E5C77A] via-[#C9A24A] to-[#8F6B1E] flex items-center justify-center text-lg shadow-gold-glow flex-shrink-0">
-              ⚜️
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#E5C77A] via-[#C9A24A] to-[#8F6B1E] flex items-center justify-center shadow-gold-glow flex-shrink-0 text-[#641D2D]">
+              <Crown class="w-5 h-5 fill-[#641D2D]/20" />
             </div>
             <div v-if="!isCollapsed" class="min-w-0 transition-opacity duration-200">
               <h2 class="font-bold text-sm leading-tight text-[#E5C77A] truncate font-khmer-heading">
@@ -105,7 +105,7 @@
               v-if="!isCollapsed"
               class="px-2.5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#E5C77A]/60 flex items-center gap-1.5"
             >
-              <span>{{ group.icon }}</span>
+              <component :is="group.headerIcon" class="w-3 h-3 text-[#E5C77A]/70" />
               <span>{{ isKhmer ? group.title_km : group.title_en }}</span>
             </div>
             <div v-else class="w-6 h-px bg-[#C9A24A]/20 mx-auto my-2"></div>
@@ -176,7 +176,7 @@
         <div v-if="!isCollapsed" class="flex items-center justify-between px-2 py-1 text-xs">
           <div class="flex items-center gap-2 min-w-0">
             <div class="w-7 h-7 rounded-full bg-[#C9A24A]/30 border border-[#C9A24A]/50 flex items-center justify-center text-xs font-bold text-[#E5C77A]">
-              👤
+              <User class="w-3.5 h-3.5" />
             </div>
             <div class="truncate">
               <div class="text-[11px] font-bold text-[#F7F0E3] truncate">Admin Officer</div>
@@ -216,6 +216,12 @@
 
 <script setup lang="ts">
 import {
+  Crown,
+  User,
+  BarChart3,
+  Users2,
+  CalendarCheck2,
+  SlidersHorizontal,
   LayoutDashboard,
   Users,
   Mail,
@@ -253,7 +259,7 @@ const navGroups = [
     title: 'Overview',
     title_en: 'Overview',
     title_km: 'ទិដ្ឋភាពរួម',
-    icon: '📊',
+    headerIcon: BarChart3,
     items: [
       { path: '/admin', labelKey: 'admin.dashboard', iconComponent: LayoutDashboard }
     ]
@@ -262,7 +268,7 @@ const navGroups = [
     title: 'Guest Management',
     title_en: 'Guest Management',
     title_km: 'ការគ្រប់គ្រងភ្ញៀវ',
-    icon: '👥',
+    headerIcon: Users2,
     items: [
       { path: '/admin/guests', labelKey: 'admin.guests', iconComponent: Users },
       { path: '/admin/invitations', labelKey: 'admin.invitations', iconComponent: Mail },
@@ -273,7 +279,7 @@ const navGroups = [
     title: 'Wedding Content',
     title_en: 'Wedding Content',
     title_km: 'មាតិកាមង្គលការ',
-    icon: '📅',
+    headerIcon: CalendarCheck2,
     items: [
       { path: '/admin/programmes', labelKey: 'admin.programmes', iconComponent: Calendar },
       { path: '/admin/gallery', labelKey: 'admin.gallery', iconComponent: Images }
@@ -283,7 +289,7 @@ const navGroups = [
     title: 'Settings & Appearance',
     title_en: 'Settings & Appearance',
     title_km: 'ការកំណត់ & រចនា',
-    icon: '⚙️',
+    headerIcon: SlidersHorizontal,
     items: [
       { path: '/admin/appearance', labelKey: 'admin.appearance', iconComponent: Palette },
       { path: '/admin/settings', labelKey: 'admin.settings', iconComponent: Settings }
