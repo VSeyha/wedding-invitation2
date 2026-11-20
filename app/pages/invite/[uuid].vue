@@ -48,7 +48,7 @@
         <WeddingCouple :wedding="wedding" />
 
         <!-- Our Story Timeline -->
-        <WeddingOurStory />
+        <WeddingOurStory :story="wedding?.our_story" />
 
         <!-- Warm Invitation Letter -->
         <WeddingMessage :wedding="wedding" />

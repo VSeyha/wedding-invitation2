@@ -3,6 +3,14 @@ import { z } from 'zod'
 // UUID validation helper
 export const uuidSchema = z.string().uuid({ message: 'Invalid UUID format' })
 
+export const storyMilestoneSchema = z.object({
+  icon:           z.string().default('⚜️'),
+  title_km:       z.string().default(''),
+  subtitle_en:    z.string().default(''),
+  description_km: z.string().default(''),
+  description_en: z.string().default('')
+})
+
 // ============================================================
 // Wedding Settings
 // ============================================================
@@ -20,7 +28,8 @@ export const weddingSettingsUpdateSchema = z.object({
   invitation_message_km: z.string().max(2000).optional(),
   invitation_message_en: z.string().max(2000).optional(),
   groom_photo_url:       z.string().url().optional().nullable().or(z.literal('')),
-  bride_photo_url:       z.string().url().optional().nullable().or(z.literal(''))
+  bride_photo_url:       z.string().url().optional().nullable().or(z.literal('')),
+  our_story:             z.array(storyMilestoneSchema).optional().nullable()
 })
 
 // ============================================================

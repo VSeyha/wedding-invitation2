@@ -3,7 +3,7 @@
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.settings') }}</h1>
-        <p class="text-sm text-[#3C2925]/60 mt-1">Edit wedding details and portraits shown on the public invitation.</p>
+        <p class="text-sm text-[#3C2925]/60 mt-1">Edit wedding details, portraits, and love story milestones.</p>
       </div>
       <button @click="save" :disabled="saving" class="btn-primary self-start">
         {{ saving ? 'Saving...' : '💾 ' + t('admin.save') }}
@@ -11,7 +11,7 @@
     </div>
 
     <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading settings...</div>
-    <form v-else @submit.prevent="save" class="space-y-6 max-w-2xl">
+    <form v-else @submit.prevent="save" class="space-y-6 max-w-3xl">
       <!-- Couple Names & Portraits -->
       <section class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
         <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] mb-4">👰 Couple Names & Portraits</h2>
@@ -68,6 +68,74 @@
         </div>
       </section>
 
+      <!-- Our Story Milestones -->
+      <section class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
+              <span>📖</span> Our Story (ដំណើររឿងរបស់យើងខ្ញុំ)
+            </h2>
+            <p class="text-xs text-[#3C2925]/60 mt-0.5">Edit love story milestones displayed on the invitation.</p>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" @click="loadDefaultStory" class="btn-secondary text-[11px] py-1 px-2.5">
+              🔄 Load Template
+            </button>
+            <button type="button" @click="addStoryMilestone" class="btn-primary text-[11px] py-1 px-2.5">
+              + Add Milestone
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div
+            v-for="(item, idx) in form.our_story"
+            :key="idx"
+            class="p-4 rounded-xl border border-[#C9A24A]/30 bg-[#F7F0E3]/20 relative"
+          >
+            <div class="flex items-center justify-between mb-3 border-b border-[#C9A24A]/20 pb-2">
+              <span class="text-xs font-bold text-[#641D2D]">Milestone #{{ idx + 1 }}</span>
+              <div class="flex items-center gap-1">
+                <button v-if="idx > 0" type="button" @click="moveStory(idx, -1)" class="p-1 text-xs hover:bg-gray-200 rounded" title="Move Up">▲</button>
+                <button v-if="idx < form.our_story.length - 1" type="button" @click="moveStory(idx, 1)" class="p-1 text-xs hover:bg-gray-200 rounded" title="Move Down">▼</button>
+                <button type="button" @click="removeStory(idx)" class="p-1 text-xs text-red-600 hover:bg-red-50 rounded" title="Delete Milestone">🗑️</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
+              <div class="sm:col-span-1">
+                <label class="form-label">Icon / Emoji</label>
+                <input v-model="item.icon" class="input-field text-center text-lg" placeholder="⚜️" />
+              </div>
+              <div class="sm:col-span-3">
+                <label class="form-label">Khmer Title</label>
+                <input v-model="item.title_km" class="input-field font-khmer-body" placeholder="ថ្ងៃដែលយើងបានជួបគ្នា (២០១៩)" />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">English Subtitle</label>
+              <input v-model="item.subtitle_en" class="input-field font-en-heading uppercase text-xs" placeholder="THE FIRST MEETING (2019)" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="form-label">Khmer Story Text</label>
+                <textarea v-model="item.description_km" rows="2" class="input-field font-khmer-body text-xs" placeholder="ការជួបគ្នាដោយចៃដន្យ..." />
+              </div>
+              <div>
+                <label class="form-label">English Story Text</label>
+                <textarea v-model="item.description_en" rows="2" class="input-field text-xs italic" placeholder="A chance encounter..." />
+              </div>
+            </div>
+          </div>
+
+          <div v-if="!form.our_story || !form.our_story.length" class="text-center py-6 text-xs text-[#3C2925]/50 border border-dashed border-[#C9A24A]/40 rounded-xl">
+            No custom milestones yet. Click "+ Add Milestone" or "🔄 Load Template" to customize your love story timeline.
+          </div>
+        </div>
+      </section>
+
       <!-- Invitation Message -->
       <section class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
         <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] mb-4">💌 Invitation Message</h2>
@@ -93,6 +161,7 @@
 
 <script setup lang="ts">
 import { compressImage } from '~~/app/utils/imageCompressor'
+import type { StoryMilestone } from '~~/shared/types/wedding'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
@@ -105,7 +174,54 @@ const uploadingBride = ref(false)
 const successMsg = ref('')
 const errorMsg = ref('')
 
-const form = ref({
+const DEFAULT_STORY_TEMPLATE: StoryMilestone[] = [
+  {
+    icon: '⚜️',
+    title_km: 'ថ្ងៃដែលយើងបានជួបគ្នា (២០១៩)',
+    subtitle_en: 'THE FIRST MEETING (2019)',
+    description_km: 'ការជួបគ្នាដោយចៃដន្យនាថ្ងៃប្រឡងបាក់ឌុបឆ្នាំ២០១៩ ដែលក្លាយជាចំណុចចាប់ផ្តើមនៃរឿងរ៉ាវទាំងអស់។',
+    description_en: 'A chance encounter during the 2019 national exams that sparked a lifetime.'
+  },
+  {
+    icon: '🌸',
+    title_km: 'ការចាប់ផ្តើមស្នេហា',
+    subtitle_en: 'THE LOVE BEGINS',
+    description_km: 'ពីភាពស្និទ្ធស្នាល ប្រែជាសេចក្តីស្រឡាញ់ ការយល់ចិត្ត និងការមើលថែគ្នាទៅវិញទៅមក។',
+    description_en: 'Growing from close companions into true love, understanding, and care.'
+  },
+  {
+    icon: '💍',
+    title_km: 'ការសន្យារួមដំណើរ',
+    subtitle_en: 'THE COMMITMENT',
+    description_km: 'ការប្តេជ្ញាកាន់ដៃគ្នាមិនលែងគ្រប់កាលៈទេសៈ ដោយមានពរជ័យពីអ្នកមានគុណទាំងសងខាង។',
+    description_en: 'A promise to walk hand in hand through every season, blessed by our families.'
+  },
+  {
+    icon: '👑',
+    title_km: 'ថ្ងៃជ័យមង្គលអាពាហ៍ពិពាហ៍ (១៦.០១.២០២៧)',
+    subtitle_en: 'THE WEDDING CELEBRATION (16.01.2027)',
+    description_km: 'ថ្ងៃសៅរ៍ ទី១៦ ខែមករា ឆ្នាំ២០២៧ ជាការចាប់ផ្តើមទំព័រជីវិតថ្មីក្រោមសក្ខីភាពនៃក្តីស្រឡាញ់។',
+    description_en: 'Saturday, January 16, 2027: Beginning our forever, surrounded by love and family.'
+  }
+]
+
+const form = ref<{
+  bride_name_km: string
+  bride_name_en: string
+  groom_name_km: string
+  groom_name_en: string
+  groom_photo_url: string
+  bride_photo_url: string
+  wedding_date: string
+  venue_name_km: string
+  venue_name_en: string
+  venue_address_km: string
+  venue_address_en: string
+  google_maps_url: string
+  invitation_message_km: string
+  invitation_message_en: string
+  our_story: StoryMilestone[]
+}>({
   bride_name_km: '',
   bride_name_en: '',
   groom_name_km: '',
@@ -119,8 +235,36 @@ const form = ref({
   venue_address_en: '',
   google_maps_url: '',
   invitation_message_km: '',
-  invitation_message_en: ''
+  invitation_message_en: '',
+  our_story: []
 })
+
+const addStoryMilestone = () => {
+  if (!form.value.our_story) form.value.our_story = []
+  form.value.our_story.push({
+    icon: '⚜️',
+    title_km: '',
+    subtitle_en: '',
+    description_km: '',
+    description_en: ''
+  })
+}
+
+const loadDefaultStory = () => {
+  form.value.our_story = JSON.parse(JSON.stringify(DEFAULT_STORY_TEMPLATE))
+}
+
+const removeStory = (idx: number) => {
+  form.value.our_story.splice(idx, 1)
+}
+
+const moveStory = (idx: number, delta: number) => {
+  const target = idx + delta
+  if (target < 0 || target >= form.value.our_story.length) return
+  const temp = form.value.our_story[idx]
+  form.value.our_story[idx] = form.value.our_story[target]
+  form.value.our_story[target] = temp
+}
 
 const getToken = async () => {
   if (!supabase) return ''
@@ -139,7 +283,6 @@ const uploadCouplePhoto = async (e: Event, role: 'groom' | 'bride') => {
   const token = await getToken()
 
   try {
-    // Compress portrait client-side: max 1000x1000, high quality WebP
     const compressedFile = await compressImage(file, {
       maxWidth: 1000,
       maxHeight: 1000,
@@ -179,8 +322,11 @@ onMounted(async () => {
       ...data,
       wedding_date: data.wedding_date ? new Date(data.wedding_date).toISOString().slice(0, 16) : '',
       groom_photo_url: data.groom_photo_url || '',
-      bride_photo_url: data.bride_photo_url || ''
+      bride_photo_url: data.bride_photo_url || '',
+      our_story: (data.our_story && data.our_story.length > 0) ? data.our_story : JSON.parse(JSON.stringify(DEFAULT_STORY_TEMPLATE))
     })
+  } else {
+    form.value.our_story = JSON.parse(JSON.stringify(DEFAULT_STORY_TEMPLATE))
   }
   loading.value = false
 })
@@ -189,9 +335,12 @@ const save = async () => {
   saving.value = true; successMsg.value = ''; errorMsg.value = ''
   const token = await getToken()
   try {
-    const payload = { ...form.value, wedding_date: form.value.wedding_date ? new Date(form.value.wedding_date).toISOString() : null }
+    const payload = {
+      ...form.value,
+      wedding_date: form.value.wedding_date ? new Date(form.value.wedding_date).toISOString() : null
+    }
     await $fetch('/api/wedding', { method: 'PUT', headers: { authorization: `Bearer ${token}` }, body: payload })
-    successMsg.value = '✓ Wedding settings and photos saved successfully.'
+    successMsg.value = '✓ Wedding settings and Our Story milestones saved successfully.'
   } catch (e: any) { errorMsg.value = e?.data?.statusMessage || 'Error saving settings.' }
   saving.value = false
 }

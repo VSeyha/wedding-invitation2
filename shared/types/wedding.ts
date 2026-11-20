@@ -1,3 +1,11 @@
+export interface StoryMilestone {
+  icon: string
+  title_km: string
+  subtitle_en: string
+  description_km: string
+  description_en: string
+}
+
 export interface WeddingSettings {
   id: string
   bride_name_km: string
@@ -14,6 +22,7 @@ export interface WeddingSettings {
   invitation_message_en: string
   groom_photo_url?: string | null
   bride_photo_url?: string | null
+  our_story?: StoryMilestone[] | null
   created_at?: string
   updated_at?: string
 }
