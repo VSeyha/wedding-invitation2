@@ -47,6 +47,9 @@
         <!-- Couple Introduction -->
         <WeddingCouple :wedding="wedding" />
 
+        <!-- Our Story Timeline -->
+        <WeddingOurStory />
+
         <!-- Warm Invitation Letter -->
         <WeddingMessage :wedding="wedding" />
 
@@ -84,6 +87,7 @@ import WeddingCanvasBackground from '~~/app/components/wedding/WeddingCanvasBack
 import WeddingOpeningAnimation from '~~/app/components/wedding/WeddingOpeningAnimation.vue'
 import WeddingHero from '~~/app/components/wedding/WeddingHero.vue'
 import WeddingCouple from '~~/app/components/wedding/WeddingCouple.vue'
+import WeddingOurStory from '~~/app/components/wedding/WeddingOurStory.vue'
 import WeddingMessage from '~~/app/components/wedding/WeddingMessage.vue'
 import WeddingProgramme from '~~/app/components/wedding/WeddingProgramme.vue'
 import WeddingLocation from '~~/app/components/wedding/WeddingLocation.vue'

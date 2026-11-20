@@ -1,0 +1,121 @@
+<template>
+  <section class="py-14 px-4 max-w-3xl mx-auto">
+    <!-- Header Title -->
+    <div class="text-center mb-10">
+      <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-1">
+        រឿងរ៉ាវស្នេហា / OUR STORY
+      </div>
+      <h2 class="font-khmer-heading text-2xl sm:text-3xl text-wedding-heading">
+        ដំណើររឿងរបស់យើងខ្ញុំ
+      </h2>
+      <div class="flex items-center justify-center gap-2 mt-3 text-wedding-secondary">
+        <span class="w-12 h-px bg-wedding-secondary/40"></span>
+        <span class="text-lg">🪷</span>
+        <span class="w-12 h-px bg-wedding-secondary/40"></span>
+      </div>
+    </div>
+
+    <!-- Story Card Frame -->
+    <div class="khmer-card rounded-3xl p-6 sm:p-10 border-2 border-wedding-secondary/40 shadow-gold-glow relative overflow-hidden">
+      <!-- Traditional Corner Ornaments -->
+      <div class="absolute top-2 left-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
+      <div class="absolute top-2 right-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
+      <div class="absolute bottom-2 left-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
+      <div class="absolute bottom-2 right-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
+
+      <!-- Vertical Timeline Track -->
+      <div class="relative border-l-2 border-[#E5C77A]/50 ml-5 sm:ml-7 space-y-10 pl-6 sm:pl-8 py-2">
+        <div
+          v-for="(item, index) in storyItems"
+          :key="index"
+          class="relative group"
+        >
+          <!-- Circular Badge on the line -->
+          <div
+            class="absolute -left-[45px] sm:-left-[53px] top-0 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 shadow-md transition-transform group-hover:scale-110"
+            :style="{
+              backgroundColor: item.badgeBg || '#FAF2E8',
+              borderColor: item.badgeBorder || '#C9A24A'
+            }"
+          >
+            <span class="text-base sm:text-lg">{{ item.icon }}</span>
+          </div>
+
+          <!-- Story Item Content -->
+          <div>
+            <!-- Khmer Title -->
+            <h3 class="font-khmer-heading text-base sm:text-lg text-wedding-primary leading-relaxed">
+              {{ item.titleKm }}
+            </h3>
+
+            <!-- English Subtitle -->
+            <div class="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-wedding-secondary mb-2 font-en-heading">
+              {{ item.subtitleEn }}
+            </div>
+
+            <!-- Khmer Description -->
+            <p class="font-khmer-body text-xs sm:text-sm text-wedding-text/90 leading-relaxed">
+              {{ item.descKm }}
+            </p>
+
+            <!-- English Italic Description -->
+            <p class="font-en-body text-[11px] sm:text-xs text-wedding-text/70 italic mt-1 font-light leading-relaxed">
+              {{ item.descEn }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+interface StoryItem {
+  icon: string
+  titleKm: string
+  subtitleEn: string
+  descKm: string
+  descEn: string
+  badgeBg?: string
+  badgeBorder?: string
+}
+
+const storyItems: StoryItem[] = [
+  {
+    icon: '⚜️',
+    titleKm: 'ថ្ងៃដែលយើងបានជួបគ្នា (២០១៩)',
+    subtitleEn: 'THE FIRST MEETING (2019)',
+    descKm: 'ការជួបគ្នាដោយចៃដន្យនាថ្ងៃប្រឡងបាក់ឌុបឆ្នាំ២០១៩ ដែលក្លាយជាចំណុចចាប់ផ្តើមនៃរឿងរ៉ាវទាំងអស់។',
+    descEn: 'A chance encounter during the 2019 national exams that sparked a lifetime.',
+    badgeBg: '#FFFDF9',
+    badgeBorder: '#C9A24A'
+  },
+  {
+    icon: '🌸',
+    titleKm: 'ការចាប់ផ្តើមស្នេហា',
+    subtitleEn: 'THE LOVE BEGINS',
+    descKm: 'ពីភាពស្និទ្ធស្នាល ប្រែជាសេចក្តីស្រឡាញ់ ការយល់ចិត្ត និងការមើលថែគ្នាទៅវិញទៅមក។',
+    descEn: 'Growing from close companions into true love, understanding, and care.',
+    badgeBg: '#FFF5F5',
+    badgeBorder: '#E5A3B3'
+  },
+  {
+    icon: '💍',
+    titleKm: 'ការសន្យារួមដំណើរ',
+    subtitleEn: 'THE COMMITMENT',
+    descKm: 'ការប្តេជ្ញាកាន់ដៃគ្នាមិនលែងគ្រប់កាលៈទេសៈ ដោយមានពរជ័យពីអ្នកមានគុណទាំងសងខាង។',
+    descEn: 'A promise to walk hand in hand through every season, blessed by our families.',
+    badgeBg: '#FFFDF9',
+    badgeBorder: '#E5C77A'
+  },
+  {
+    icon: '👑',
+    titleKm: 'ថ្ងៃជ័យមង្គលអាពាហ៍ពិពាហ៍ (១៦.០១.២០២៧)',
+    subtitleEn: 'THE WEDDING CELEBRATION (16.01.2027)',
+    descKm: 'ថ្ងៃសៅរ៍ ទី១៦ ខែមករា ឆ្នាំ២០២៧ ជាការចាប់ផ្តើមទំព័រជីវិតថ្មីក្រោមសក្ខីភាពនៃក្តីស្រឡាញ់។',
+    descEn: 'Saturday, January 16, 2027: Beginning our forever, surrounded by love and family.',
+    badgeBg: '#641D2D',
+    badgeBorder: '#C9A24A'
+  }
+]
+</script>
