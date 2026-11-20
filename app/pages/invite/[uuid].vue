@@ -1,25 +1,30 @@
 <template>
   <div
-    class="relative bg-[#FDF6EB] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
+    class="relative bg-[#121214] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
     :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden'"
   >
-    <!-- 1. Dedicated Dynamic Background Layer with Parallax Zoom In / Zoom Out on Scroll -->
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      <!-- Scalable Background Artwork (Angkor Wat / Royal Kbach / Custom) -->
-      <div
-        v-if="bgImageUrl"
-        class="w-full h-full bg-cover bg-center will-change-transform"
-        :style="dynamicBackgroundStyle"
-      ></div>
-      <!-- Ambient Gradient / Tint Overlay -->
-      <div
-        class="absolute inset-0 transition-opacity duration-500"
-        :style="backgroundOverlayStyle"
-      ></div>
+    <!-- 1. Dedicated Dynamic Background Layer & Particles Confined Strictly to Mobile Screen Width (Zero Side Background) -->
+    <div class="fixed inset-0 pointer-events-none z-0 flex justify-center overflow-hidden">
+      <div class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] h-full relative overflow-hidden">
+        <!-- Scalable Background Artwork (Angkor Wat / Royal Kbach / Custom) -->
+        <div
+          v-if="bgImageUrl"
+          class="w-full h-full bg-cover bg-center will-change-transform"
+          :style="dynamicBackgroundStyle"
+        ></div>
+        <!-- Ambient Gradient / Tint Overlay -->
+        <div
+          class="absolute inset-0 transition-opacity duration-500"
+          :style="backgroundOverlayStyle"
+        ></div>
+        <!-- Falling Golden Lotus Petals / Dust Scoped to Mobile Screen Only -->
+        <WeddingCanvasBackground
+          :absolute="true"
+          :config="appearanceConfig?.animation_config"
+          :scroll-velocity="scrollVelocity"
+        />
+      </div>
     </div>
-
-    <!-- 2. Falling Golden Lotus Petals / Dust reacting to scroll velocity -->
-    <WeddingCanvasBackground :config="appearanceConfig?.animation_config" :scroll-velocity="scrollVelocity" />
 
     <!-- Error State: Invitation Not Found or Revoked -->
     <div
@@ -48,15 +53,15 @@
       </div>
     </div>
 
-    <!-- Active Valid Invitation (Focused on Tablet & Mobile) -->
+    <!-- Active Valid Invitation (Focused on Mobile Screen Only) -->
     <div
       v-else
       class="relative z-10 w-full flex justify-center"
       :class="hasOpened ? '' : 'h-screen max-h-screen overflow-hidden'"
     >
-      <!-- Centered Mobile & Tablet Frame -->
+      <!-- Centered Mobile Screen Frame -->
       <div
-        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/95 relative sm:shadow-[0_0_50px_rgba(0,0,0,0.5)] sm:border-x sm:border-wedding-secondary/30 transition-all duration-300"
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/90 relative sm:shadow-[0_0_60px_rgba(0,0,0,0.6)] sm:border-x sm:border-wedding-secondary/40 transition-all duration-300"
         :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden flex items-center justify-center'"
       >
         <!-- 1. Khmer Royal Seal Opening Envelope -->
