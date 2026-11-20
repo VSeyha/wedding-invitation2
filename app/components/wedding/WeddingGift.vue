@@ -15,13 +15,38 @@
       </div>
     </div>
 
-    <!-- Outer Khmer Card Frame -->
-    <div class="khmer-card rounded-3xl p-6 sm:p-10 border-2 border-wedding-secondary/40 shadow-gold-glow relative text-center">
-      <!-- Traditional Corner Filigree -->
-      <div class="absolute top-2 left-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
-      <div class="absolute top-2 right-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
-      <div class="absolute bottom-2 left-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
-      <div class="absolute bottom-2 right-2 text-wedding-secondary/50 text-xl select-none">⚜️</div>
+    <!-- Outer Khmer Card Frame with Double Gold Border -->
+    <div class="rounded-3xl p-1.5 sm:p-2 bg-gradient-to-b from-[#FAF4EB] via-[#FFFDF9] to-[#F5ECE0] border border-[#C9A24A]/30 shadow-gold-glow relative">
+      <div class="rounded-[22px] p-6 sm:p-8 bg-[#FFFDF9]/95 border border-[#C9A24A]/40 relative overflow-hidden backdrop-blur-sm text-center">
+        <!-- Traditional Corner Fleur-de-lis Accents -->
+        <div class="absolute top-2.5 left-2.5 text-[#C9A24A] select-none pointer-events-none transform -rotate-45 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
+            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
+            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
+          </svg>
+        </div>
+        <div class="absolute top-2.5 right-2.5 text-[#C9A24A] select-none pointer-events-none transform rotate-45 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
+            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
+            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
+          </svg>
+        </div>
+        <div class="absolute bottom-2.5 left-2.5 text-[#C9A24A] select-none pointer-events-none transform -rotate-135 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
+            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
+            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
+          </svg>
+        </div>
+        <div class="absolute bottom-2.5 right-2.5 text-[#C9A24A] select-none pointer-events-none transform rotate-135 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
+            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
+            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
+          </svg>
+        </div>
 
       <!-- Intro Envelope Badge & Message -->
       <div class="mb-8 max-w-lg mx-auto">
@@ -95,7 +120,8 @@
         </p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 </template>
 
 <script setup lang="ts">

@@ -300,7 +300,7 @@ const DEFAULT_STORY_TEMPLATE: StoryMilestone[] = [
     description_en: 'Growing from close companions into true love, understanding, and care.'
   },
   {
-    icon: '✨',
+    icon: '💍',
     title_km: 'ការសន្យារួមដំណើរ',
     subtitle_en: 'THE COMMITMENT',
     description_km: 'ការប្តេជ្ញាកាន់ដៃគ្នាមិនលែងគ្រប់កាលៈទេសៈ ដោយមានពរជ័យពីអ្នកមានគុណទាំងសងខាង។',
