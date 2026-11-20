@@ -4,8 +4,9 @@
 --              invitation system
 -- ============================================================
 
--- Enable UUID extension
-create extension if not exists "pgcrypto";
+-- NOTE: gen_random_uuid() is built-in to Supabase (PostgreSQL 14+)
+-- No extension needed. Do NOT run "create extension pgcrypto" as it
+-- requires superuser privileges and will fail in Supabase.
 
 -- ============================================================
 -- TABLE: wedding_settings
@@ -128,7 +129,7 @@ create table if not exists public.wedding_appearance (
 create index if not exists wedding_appearance_published_idx on public.wedding_appearance (is_published);
 
 -- ============================================================
--- Auto-update updated_at timestamps
+-- Auto-update updated_at timestamps (trigger function)
 -- ============================================================
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
@@ -137,6 +138,13 @@ begin
   return new;
 end;
 $$;
+
+-- Drop triggers before recreating (safe re-run guard)
+drop trigger if exists set_updated_at_wedding_settings  on public.wedding_settings;
+drop trigger if exists set_updated_at_guests            on public.guests;
+drop trigger if exists set_updated_at_rsvps             on public.rsvps;
+drop trigger if exists set_updated_at_wedding_programmes on public.wedding_programmes;
+drop trigger if exists set_updated_at_wedding_appearance on public.wedding_appearance;
 
 create trigger set_updated_at_wedding_settings
   before update on public.wedding_settings
