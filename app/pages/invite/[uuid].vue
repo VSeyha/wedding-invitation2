@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative bg-[#2A1017] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
+    class="relative bg-[#180A0E] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
     :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden'"
   >
     <!-- 1. Dedicated Dynamic Background Layer with Parallax Zoom In / Zoom Out on Scroll -->
@@ -56,7 +56,7 @@
     >
       <!-- Centered Mobile & Tablet Frame -->
       <div
-        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/95 relative sm:shadow-2xl sm:border-x sm:border-wedding-secondary/30 transition-all duration-300"
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/95 relative sm:shadow-[0_0_50px_rgba(0,0,0,0.5)] sm:border-x sm:border-wedding-secondary/30 transition-all duration-300"
         :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden flex items-center justify-center'"
       >
         <!-- 1. Khmer Royal Seal Opening Envelope -->
@@ -272,11 +272,14 @@ const onEnvelopeOpened = () => {
 const bgImageUrl = computed(() => {
   const bg = appearanceConfig.value?.background_config
   if (!bg) return '/images/backgrounds/angkor-wat.svg'
+  if (bg.type === 'none') return ''
   if (bg.type === 'image' && bg.image_url) return bg.image_url
   if (bg.preset_name && PRESET_BACKGROUNDS[bg.preset_name]?.image_url) {
     return PRESET_BACKGROUNDS[bg.preset_name].image_url
   }
-  if (bg.type === 'none') return ''
+  if (bg.type === 'preset') {
+    return PRESET_BACKGROUNDS['angkor-wat']?.image_url || '/images/backgrounds/angkor-wat.svg'
+  }
   return '/images/backgrounds/angkor-wat.svg'
 })
 

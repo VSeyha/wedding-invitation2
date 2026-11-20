@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   telemetry: false,
   srcDir: 'app',
   serverDir: 'server',
+  dir: {
+    public: '../public'
+  },
 
   modules: [
     '@nuxtjs/tailwindcss'

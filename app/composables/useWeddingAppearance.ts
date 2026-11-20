@@ -13,10 +13,14 @@ export function useWeddingAppearance() {
     theme_name: 'Khmer Royal Burgundy & Gold',
     theme_config: { ...DEFAULT_THEME_COLORS },
     background_config: {
-      type: 'none',
-      opacity: 0.15,
-      overlay_color: '#641D2D',
-      overlay_opacity: 0.05
+      type: 'preset',
+      preset_name: 'angkor-wat',
+      image_url: '/images/backgrounds/angkor-wat.svg',
+      opacity: 0.85,
+      overlay_color: '#2A1017',
+      overlay_opacity: 0.15,
+      scroll_zoom: true,
+      zoom_effect: 'zoom-in'
     },
     animation_config: {
       enabled: true,
