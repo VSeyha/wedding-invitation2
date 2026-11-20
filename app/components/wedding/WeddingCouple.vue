@@ -11,8 +11,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
       <!-- Groom Card -->
       <div class="khmer-card rounded-3xl p-6 sm:p-8 text-center border border-wedding-secondary/40 shadow-sm relative overflow-hidden group">
-        <div class="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow">
-          <div class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-4xl">
+        <div class="w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-4 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow bg-white">
+          <img
+            v-if="wedding?.groom_photo_url"
+            :src="wedding.groom_photo_url"
+            :alt="wedding.groom_name_en || 'Groom'"
+            class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-105"
+          />
+          <div
+            v-else
+            class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-5xl"
+          >
             🤵
           </div>
         </div>
@@ -29,8 +38,17 @@
 
       <!-- Bride Card -->
       <div class="khmer-card rounded-3xl p-6 sm:p-8 text-center border border-wedding-secondary/40 shadow-sm relative overflow-hidden group">
-        <div class="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow">
-          <div class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-4xl">
+        <div class="w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-4 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow bg-white">
+          <img
+            v-if="wedding?.bride_photo_url"
+            :src="wedding.bride_photo_url"
+            :alt="wedding.bride_name_en || 'Bride'"
+            class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-105"
+          />
+          <div
+            v-else
+            class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-5xl"
+          >
             👰
           </div>
         </div>

@@ -18,7 +18,9 @@ export const weddingSettingsUpdateSchema = z.object({
   venue_address_en:      z.string().max(500).optional(),
   google_maps_url:       z.string().url().optional().or(z.literal('')),
   invitation_message_km: z.string().max(2000).optional(),
-  invitation_message_en: z.string().max(2000).optional()
+  invitation_message_en: z.string().max(2000).optional(),
+  groom_photo_url:       z.string().url().optional().nullable().or(z.literal('')),
+  bride_photo_url:       z.string().url().optional().nullable().or(z.literal(''))
 })
 
 // ============================================================

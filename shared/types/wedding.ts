@@ -12,6 +12,8 @@ export interface WeddingSettings {
   google_maps_url: string
   invitation_message_km: string
   invitation_message_en: string
+  groom_photo_url?: string | null
+  bride_photo_url?: string | null
   created_at?: string
   updated_at?: string
 }
