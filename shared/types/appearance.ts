@@ -54,17 +54,53 @@ export const PRESET_BACKGROUNDS: Record<string, BackgroundPresetOption> = {
     scroll_zoom: true,
     zoom_effect: 'zoom-in'
   },
-  'royal-kbach': {
-    id: 'royal-kbach',
-    name: 'Royal Golden Kbach',
-    name_km: 'ក្បាច់ផ្កាចន្ទន៍ រាជានិយម',
-    image_url: '/images/backgrounds/royal-kbach.jpg',
+  'angkor-wat2': {
+    id: 'angkor-wat2',
+    name: 'Angkor Wat Grand',
+    name_km: 'ប្រាសាទអង្គរវត្ត មហាអស្ចារ្យ',
+    image_url: '/images/backgrounds/angkor-wat2.png',
+    type: 'image',
+    overlay_color: '#FDF8EE',
+    overlay_opacity: 0,
+    opacity: 1,
+    scroll_zoom: true,
+    zoom_effect: 'zoom-in'
+  },
+  'kbaj-khmer': {
+    id: 'kbaj-khmer',
+    name: 'Khmer Traditional Kbach',
+    name_km: 'ក្បាច់បូរាណខ្មែរ រចនាបទ',
+    image_url: '/images/backgrounds/kbaj-khmer.jpg',
     type: 'image',
     overlay_color: '#FDF8EE',
     overlay_opacity: 0.05,
-    opacity: 0.9,
+    opacity: 0.95,
     scroll_zoom: true,
     zoom_effect: 'zoom-in'
+  },
+  'khmer-pattern': {
+    id: 'khmer-pattern',
+    name: 'Royal Floral Pattern',
+    name_km: 'ក្បាច់ផ្កាមាស រាជវាំង',
+    image_url: '/images/backgrounds/khmer-pattern.jpeg',
+    type: 'image',
+    overlay_color: '#FDF8EE',
+    overlay_opacity: 0.05,
+    opacity: 0.95,
+    scroll_zoom: true,
+    zoom_effect: 'zoom-in'
+  },
+  'pattern': {
+    id: 'pattern',
+    name: 'Classic Khmer Motif',
+    name_km: 'ក្បាច់លម្អ បុរាណ',
+    image_url: '/images/backgrounds/pattern.jpeg',
+    type: 'image',
+    overlay_color: '#FDF8EE',
+    overlay_opacity: 0.05,
+    opacity: 0.92,
+    scroll_zoom: true,
+    zoom_effect: 'breathe'
   },
   'golden-lotus': {
     id: 'golden-lotus',

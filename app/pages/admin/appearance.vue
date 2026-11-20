@@ -122,51 +122,30 @@
             <!-- Background Artwork & Scene Presets -->
             <div>
               <label class="form-label mb-2">Khmer Background Scenes & Presets (ផ្ទាំងរូបភាពប្រពៃណីខ្មែរ)</label>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
                 <button
+                  v-for="(preset, key) in PRESET_BACKGROUNDS"
+                  :key="key"
                   type="button"
-                  @click="selectBackgroundPreset('angkor-wat')"
+                  @click="selectBackgroundPreset(key as string)"
                   class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
-                  :class="config.background_config.preset_name === 'angkor-wat' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
+                  :class="(preset.type === 'none' ? config.background_config.type === 'none' : config.background_config.preset_name === key)
+                    ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40'
+                    : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
                 >
-                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/angkor-wat.png');"></div>
-                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Angkor Wat</div>
-                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">ប្រាសាទអង្គរវត្ត</div>
-                </button>
-
-                <button
-                  type="button"
-                  @click="selectBackgroundPreset('royal-kbach')"
-                  class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
-                  :class="config.background_config.preset_name === 'royal-kbach' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
-                >
-                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/royal-kbach.jpg');"></div>
-                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Royal Kbach</div>
-                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">ក្បាច់ផ្កាចន្ទន៍</div>
-                </button>
-
-                <button
-                  type="button"
-                  @click="selectBackgroundPreset('golden-lotus')"
-                  class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
-                  :class="config.background_config.preset_name === 'golden-lotus' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
-                >
-                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/golden-lotus.svg');"></div>
-                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Sacred Lotus</div>
-                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">សួនផ្កាឈូកមាស</div>
-                </button>
-
-                <button
-                  type="button"
-                  @click="selectBackgroundPreset('classic-ivory')"
-                  class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
-                  :class="config.background_config.type === 'none' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
-                >
-                  <div class="w-full h-14 rounded-lg bg-[#F7F0E3] flex items-center justify-center mb-1.5 border border-gray-200 text-xs text-[#641D2D] font-bold">
+                  <div
+                    v-if="preset.image_url"
+                    class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner group-hover:scale-105 transition-transform duration-300"
+                    :style="{ backgroundImage: `url(${preset.image_url})` }"
+                  ></div>
+                  <div
+                    v-else
+                    class="w-full h-14 rounded-lg bg-[#F7F0E3] flex items-center justify-center mb-1.5 border border-gray-200 text-xs text-[#641D2D] font-bold"
+                  >
                     Classic
                   </div>
-                  <div class="text-[11px] font-bold text-[#641D2D] truncate">Classic Ivory</div>
-                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">ភ្លុកដំរីបុរាណ</div>
+                  <div class="text-[11px] font-bold text-[#641D2D] truncate">{{ preset.name }}</div>
+                  <div class="text-[10px] text-gray-500 font-khmer-body truncate">{{ preset.name_km }}</div>
                 </button>
               </div>
             </div>
