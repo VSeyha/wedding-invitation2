@@ -16,7 +16,7 @@ export default defineEventHandler(async () => {
         background_config: {
           type: 'preset',
           preset_name: 'angkor-wat',
-          image_url: '/images/backgrounds/angkor-wat.svg',
+          image_url: '/images/backgrounds/angkor-wat.png',
           opacity: 0.85,
           overlay_color: '#2A1017',
           overlay_opacity: 0.15,

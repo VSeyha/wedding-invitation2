@@ -271,16 +271,16 @@ const onEnvelopeOpened = () => {
 
 const bgImageUrl = computed(() => {
   const bg = appearanceConfig.value?.background_config
-  if (!bg) return '/images/backgrounds/angkor-wat.svg'
+  if (!bg) return '/images/backgrounds/angkor-wat.png'
   if (bg.type === 'none') return ''
   if (bg.type === 'image' && bg.image_url) return bg.image_url
   if (bg.preset_name && PRESET_BACKGROUNDS[bg.preset_name]?.image_url) {
     return PRESET_BACKGROUNDS[bg.preset_name].image_url
   }
   if (bg.type === 'preset') {
-    return PRESET_BACKGROUNDS['angkor-wat']?.image_url || '/images/backgrounds/angkor-wat.svg'
+    return PRESET_BACKGROUNDS['angkor-wat']?.image_url || '/images/backgrounds/angkor-wat.png'
   }
-  return '/images/backgrounds/angkor-wat.svg'
+  return '/images/backgrounds/angkor-wat.png'
 })
 
 const dynamicBackgroundStyle = computed(() => {

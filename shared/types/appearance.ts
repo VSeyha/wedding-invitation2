@@ -46,7 +46,7 @@ export const PRESET_BACKGROUNDS: Record<string, BackgroundPresetOption> = {
     id: 'angkor-wat',
     name: 'Angkor Wat Sunrise',
     name_km: 'ប្រាសាទអង្គរវត្ត ពេលព្រឹកព្រហាម',
-    image_url: '/images/backgrounds/angkor-wat.svg',
+    image_url: '/images/backgrounds/angkor-wat.png',
     type: 'image',
     overlay_color: '#2A1017',
     overlay_opacity: 0.15,

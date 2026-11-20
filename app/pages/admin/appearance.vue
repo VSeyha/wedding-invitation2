@@ -129,7 +129,7 @@
                   class="p-2.5 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group"
                   :class="config.background_config.preset_name === 'angkor-wat' ? 'border-[#C9A24A] bg-[#FFF9EE] ring-2 ring-[#C9A24A]/40' : 'border-gray-200 bg-white hover:border-[#C9A24A]/50'"
                 >
-                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/angkor-wat.svg');"></div>
+                  <div class="w-full h-14 rounded-lg bg-cover bg-center mb-1.5 border border-gray-100 shadow-inner" style="background-image: url('/images/backgrounds/angkor-wat.png');"></div>
                   <div class="text-[11px] font-bold text-[#641D2D] truncate">Angkor Wat</div>
                   <div class="text-[10px] text-gray-500 font-khmer-body truncate">ប្រាសាទអង្គរវត្ត</div>
                 </button>
