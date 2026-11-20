@@ -3,10 +3,10 @@
     v-if="!opened"
     :class="[
       absolute ? 'absolute inset-0 z-30' : 'fixed inset-0 z-50',
-      'flex items-center justify-center p-4 bg-wedding-primary transition-all duration-1000 overflow-hidden'
+      'flex items-center justify-center p-4 bg-wedding-primary transition-all duration-1000 overflow-hidden',
+      isOpening ? 'opacity-0 pointer-events-none scale-105' : ''
     ]"
     :style="{ backgroundColor: 'var(--wedding-primary, #641D2D)' }"
-    :class-extra="{ 'opacity-0 pointer-events-none scale-105': isOpening }"
   >
     <!-- Background Khmer Pattern Texture -->
     <div
@@ -99,6 +99,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  (e: 'opening'): void
   (e: 'opened'): void
 }>()
 
@@ -118,7 +119,9 @@ const formattedDate = computed(() => {
 })
 
 const handleOpen = () => {
+  if (isOpening.value) return
   isOpening.value = true
+  emit('opening')
   setTimeout(() => {
     opened.value = true
     emit('opened')

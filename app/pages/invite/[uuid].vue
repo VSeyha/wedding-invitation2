@@ -1,5 +1,8 @@
 <template>
-  <div class="relative min-h-screen bg-[#2A1017] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg overflow-x-hidden font-khmer-body">
+  <div
+    class="relative bg-[#2A1017] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
+    :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden'"
+  >
     <!-- 1. Dedicated Dynamic Background Layer with Parallax Zoom In / Zoom Out on Scroll -->
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       <!-- Scalable Background Artwork (Angkor Wat / Royal Kbach / Custom) -->
@@ -46,20 +49,28 @@
     </div>
 
     <!-- Active Valid Invitation (Focused on Tablet & Mobile) -->
-    <div v-else class="relative z-10 w-full flex justify-center">
+    <div
+      v-else
+      class="relative z-10 w-full flex justify-center"
+      :class="hasOpened ? '' : 'h-screen max-h-screen overflow-hidden'"
+    >
       <!-- Centered Mobile & Tablet Frame -->
       <div
-        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] min-h-screen bg-wedding-bg/95 relative sm:shadow-2xl sm:border-x sm:border-wedding-secondary/30 transition-all duration-300 overflow-x-hidden backdrop-blur-[2px]"
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/95 relative sm:shadow-2xl sm:border-x sm:border-wedding-secondary/30 transition-all duration-300"
+        :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden flex items-center justify-center'"
       >
         <!-- 1. Khmer Royal Seal Opening Envelope -->
         <WeddingOpeningAnimation
           :guest-name="invitation?.guest_name || ''"
           :wedding="wedding"
+          :absolute="true"
+          @opening="onEnvelopeOpening"
           @opened="onEnvelopeOpened"
         />
 
         <!-- 2. Main Invitation Content (Unveiled after seal clicked) with Lively Scroll Reveal -->
         <main
+          v-if="isOpening || hasOpened"
           class="transition-opacity duration-1000 pb-20 relative"
           :class="{ 'opacity-100': hasOpened, 'opacity-0 pointer-events-none': !hasOpened }"
         >
@@ -152,7 +163,40 @@ const { applyThemeColors } = useWeddingAppearance()
 const token = computed(() => (route.params.uuid as string) || '')
 const loading = ref(true)
 const errorState = ref<number | null>(null)
+const isOpening = ref(false)
 const hasOpened = ref(false)
+
+// Lock html & body scrolling strictly while the envelope is unopened
+useHead({
+  bodyAttrs: {
+    class: computed(() => (!hasOpened.value ? 'overflow-hidden h-screen touch-none select-none' : ''))
+  },
+  htmlAttrs: {
+    class: computed(() => (!hasOpened.value ? 'overflow-hidden h-screen' : ''))
+  }
+})
+
+// Direct DOM style lock for foolproof cross-browser scroll prevention (iOS Safari / Mobile Chrome)
+watch(
+  hasOpened,
+  (opened) => {
+    if (!import.meta.client) return
+    if (opened) {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+      document.body.style.height = ''
+      document.documentElement.style.height = ''
+      document.body.style.touchAction = ''
+    } else {
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
+      document.body.style.height = '100%'
+      document.documentElement.style.height = '100%'
+      document.body.style.touchAction = 'none'
+    }
+  },
+  { immediate: true }
+)
 
 const invitation = ref<PublicInvitationData | null>(null)
 const wedding = ref<WeddingSettings | null>(null)
@@ -212,6 +256,10 @@ const setupScrollReveal = () => {
       observer?.observe(el)
     })
   })
+}
+
+const onEnvelopeOpening = () => {
+  isOpening.value = true
 }
 
 const onEnvelopeOpened = () => {
@@ -326,6 +374,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (import.meta.client) {
+    document.body.style.overflow = ''
+    document.documentElement.style.overflow = ''
+    document.body.style.height = ''
+    document.documentElement.style.height = ''
+    document.body.style.touchAction = ''
     window.removeEventListener('scroll', handleScroll)
     if (observer) observer.disconnect()
     if (scrollRafId) cancelAnimationFrame(scrollRafId)
