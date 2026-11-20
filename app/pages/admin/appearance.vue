@@ -736,10 +736,14 @@ const config = ref<WeddingAppearance>({
   theme_name: 'Khmer Royal Burgundy & Gold',
   theme_config: { ...DEFAULT_THEME_COLORS },
   background_config: {
-    type: 'none',
-    opacity: 0.15,
-    overlay_color: '#641D2D',
-    overlay_opacity: 0.15
+    type: 'preset',
+    preset_name: 'angkor-wat',
+    image_url: '/images/backgrounds/angkor-wat.png',
+    opacity: 1,
+    overlay_color: '#FDF8EE',
+    overlay_opacity: 0,
+    scroll_zoom: true,
+    zoom_effect: 'zoom-in'
   },
   animation_config: {
     enabled: true,

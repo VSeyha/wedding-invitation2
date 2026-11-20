@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative bg-[#180A0E] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
+    class="relative bg-[#FDF6EB] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
     :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden'"
   >
     <!-- 1. Dedicated Dynamic Background Layer with Parallax Zoom In / Zoom Out on Scroll -->
@@ -286,21 +286,21 @@ const bgImageUrl = computed(() => {
 const dynamicBackgroundStyle = computed(() => {
   if (!bgImageUrl.value) return {}
   const bg = appearanceConfig.value?.background_config
-  const opacity = bg?.opacity ?? 0.8
+  const opacity = bg?.opacity ?? 1
   const scrollZoom = bg?.scroll_zoom !== false
   const effect = bg?.zoom_effect || 'zoom-in'
 
-  let scale = 1.04
+  let scale = 1.02
   if (scrollZoom) {
     if (effect === 'zoom-in') {
-      // Smoothly zoom in from 1.04 to 1.25 as you scroll down
-      scale = 1.04 + scrollProgress.value * 0.22
+      // Smoothly zoom in from 1.02 to 1.20 as you scroll down
+      scale = 1.02 + scrollProgress.value * 0.18
     } else if (effect === 'zoom-out') {
-      // Starts at 1.22 and smoothly zooms out to 1.04
-      scale = 1.22 - scrollProgress.value * 0.18
+      // Starts at 1.18 and smoothly zooms out to 1.02
+      scale = 1.18 - scrollProgress.value * 0.16
     } else if (effect === 'breathe') {
       // Ambient breathing wave with scroll momentum
-      scale = 1.06 + Math.sin(scrollProgress.value * Math.PI) * 0.12
+      scale = 1.03 + Math.sin(scrollProgress.value * Math.PI) * 0.08
     }
   }
 
@@ -314,8 +314,8 @@ const dynamicBackgroundStyle = computed(() => {
 
 const backgroundOverlayStyle = computed(() => {
   const bg = appearanceConfig.value?.background_config
-  const color = bg?.overlay_color || '#2A1017'
-  const opacity = bg?.overlay_opacity ?? 0.25
+  const color = bg?.overlay_color || '#FDF8EE'
+  const opacity = bg?.overlay_opacity ?? 0
   return {
     backgroundColor: color,
     opacity

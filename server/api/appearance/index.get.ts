@@ -17,9 +17,9 @@ export default defineEventHandler(async () => {
           type: 'preset',
           preset_name: 'angkor-wat',
           image_url: '/images/backgrounds/angkor-wat.png',
-          opacity: 0.85,
-          overlay_color: '#2A1017',
-          overlay_opacity: 0.15,
+          opacity: 1,
+          overlay_color: '#FDF8EE',
+          overlay_opacity: 0,
           scroll_zoom: true,
           zoom_effect: 'zoom-in'
         },
