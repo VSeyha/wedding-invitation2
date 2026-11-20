@@ -1,0 +1,72 @@
+{
+  "common": {
+    "wedding_invitation": "Wedding Invitation",
+    "save_the_date": "Save the Date",
+    "bride_and_groom": "Bride & Groom",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "venue": "Wedding Venue",
+    "date": "Wedding Date",
+    "programme": "Wedding Programme",
+    "gallery": "Photo Gallery",
+    "location": "Ceremony Location",
+    "open_map": "Open in Google Maps",
+    "rsvp": "RSVP",
+    "loading": "Loading...",
+    "language": "Language",
+    "open_invitation": "Open Invitation",
+    "switch_to_en": "English",
+    "switch_to_km": "Khmer"
+  },
+  "hero": {
+    "greeting": "Together with our families",
+    "invitation_title": "Wedding Celebration",
+    "and": "&"
+  },
+  "invitation": {
+    "dear": "Cordially Invited",
+    "honored_guest": "Honored Guest",
+    "warm_message": "We would be deeply honored by your presence to celebrate our wedding ceremony and witness our union.",
+    "not_found_title": "Invitation Not Found",
+    "not_found_desc": "This invitation link is invalid or has expired. Please contact the hosts.",
+    "revoked_title": "Invitation Revoked",
+    "revoked_desc": "This invitation link is no longer active."
+  },
+  "rsvp": {
+    "title": "RSVP Response",
+    "subtitle": "Please kindly let us know if you will be joining us on our special day.",
+    "attending": "Joyfully Attending",
+    "not_attending": "Regretfully Declining",
+    "pending": "Pending",
+    "confirm_btn": "Submit RSVP",
+    "update_btn": "Update Response",
+    "thank_you": "Thank You!",
+    "status_confirmed_attending": "You have confirmed that you will attend. We look forward to celebrating together!",
+    "status_confirmed_not_attending": "Thank you for letting us know. Your warm wishes mean a lot to us!",
+    "error_submitting": "Error submitting response. Please try again."
+  },
+  "admin": {
+    "title": "Wedding Management Portal",
+    "dashboard": "Dashboard",
+    "guests": "Guests",
+    "invitations": "Invitations",
+    "rsvps": "RSVPs",
+    "programmes": "Programme",
+    "gallery": "Gallery",
+    "settings": "Settings",
+    "appearance": "Appearance & Theme",
+    "logout": "Sign Out",
+    "login": "Sign In",
+    "total_guests": "Total Guests",
+    "opened_invitations": "Invitations Opened",
+    "attending_count": "Attending",
+    "not_attending_count": "Not Attending",
+    "pending_count": "Pending RSVP",
+    "save": "Save Changes",
+    "saved": "Successfully saved",
+    "publish": "Publish to Public",
+    "published": "Theme Published"
+  }
+}

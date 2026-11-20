@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --wedding-primary: #641D2D;
+  --wedding-secondary: #C9A24A;
+  --wedding-bg: #F7F0E3;
+  --wedding-text: #3C2925;
+  --wedding-heading: #641D2D;
+  --wedding-border: #C9A24A;
+  --wedding-accent: #E5C77A;
+  --wedding-highlight: #E5C77A;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--wedding-text);
+    background-color: var(--wedding-bg);
+  }
+
+  /* Improved Khmer typography handling for subscripts and diacritics */
+  [lang="km"], .font-khmer-body, .font-khmer-heading {
+    line-height: 1.85;
+    letter-spacing: 0.01em;
+  }
+}
+
+@layer components {
+  /* Khmer traditional luxury gold text gradient */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #E5C77A 0%, #C9A24A 50%, #8F6B1E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Khmer traditional luxury gold border gradient */
+  .border-gold-gradient {
+    border-image: linear-gradient(135deg, #E5C77A, #C9A24A, #8F6B1E) 1;
+  }
+
+  /* Subtle parchment / luxury card styling */
+  .khmer-card {
+    background: rgba(255, 253, 249, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(201, 162, 74, 0.35);
+    box-shadow: 0 10px 30px -10px rgba(100, 29, 45, 0.15);
+  }
+
+  .khmer-card-dark {
+    background: rgba(100, 29, 45, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(201, 162, 74, 0.4);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
