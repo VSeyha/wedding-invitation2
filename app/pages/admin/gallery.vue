@@ -3,11 +3,11 @@
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.gallery') }}</h1>
-        <p class="text-sm text-[#3C2925]/60 mt-1">Upload and manage wedding photos.</p>
+        <p class="text-sm text-[#3C2925]/60 mt-1">Upload and manage wedding photos (auto-optimized for mobile speed).</p>
       </div>
       <label class="btn-primary cursor-pointer self-start flex items-center gap-2">
         <span>📷</span>
-        <span>{{ uploading ? 'Uploading...' : 'Upload Photos' }}</span>
+        <span>{{ uploading ? 'Optimizing & Uploading...' : 'Upload Photos' }}</span>
         <input
           type="file"
           accept="image/*"
@@ -19,8 +19,9 @@
       </label>
     </div>
 
-    <div v-if="uploading" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700 animate-pulse">
-      ⏳ Uploading photos to gallery, please wait...
+    <div v-if="uploading" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700 animate-pulse flex items-center gap-2">
+      <span>⚡</span>
+      <span>{{ uploadProgressMessage || 'Optimizing and uploading photos...' }}</span>
     </div>
 
     <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading gallery...</div>
@@ -77,6 +78,8 @@
 </template>
 
 <script setup lang="ts">
+import { compressImage } from '~~/app/utils/imageCompressor'
+
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
 const supabase = useSupabase()
@@ -84,6 +87,7 @@ const supabase = useSupabase()
 const photos = ref<any[]>([])
 const loading = ref(true)
 const uploading = ref(false)
+const uploadProgressMessage = ref('')
 const submitting = ref(false)
 const deletingPhoto = ref<any>(null)
 const toast = ref('')
@@ -96,7 +100,7 @@ const getToken = async () => {
 
 const showToast = (msg: string) => {
   toast.value = msg
-  setTimeout(() => { toast.value = '' }, 3500)
+  setTimeout(() => { toast.value = '' }, 4000)
 }
 
 const fetchPhotos = async () => {
@@ -124,9 +128,28 @@ const uploadPhotos = async (e: Event) => {
 
   try {
     const formData = new FormData()
+    let originalTotalSize = 0
+    let compressedTotalSize = 0
+
     for (let i = 0; i < fileList.length; i++) {
-      formData.append('files', fileList[i])
+      const file = fileList[i]
+      originalTotalSize += file.size
+
+      uploadProgressMessage.value = `Optimizing photo ${i + 1} of ${fileList.length}...`
+
+      // Compress client-side: max 1920x1920, quality 0.82 WebP
+      const compressedFile = await compressImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.82,
+        mimeType: 'image/webp'
+      })
+
+      compressedTotalSize += compressedFile.size
+      formData.append('files', compressedFile)
     }
+
+    uploadProgressMessage.value = `Uploading optimized photos to storage...`
 
     const res = await $fetch<any>('/api/admin/gallery/upload', {
       method: 'POST',
@@ -135,7 +158,10 @@ const uploadPhotos = async (e: Event) => {
     })
 
     const count = res?.data?.length || fileList.length
-    showToast(`✓ Successfully uploaded ${count} photo(s)!`)
+    const originalMb = (originalTotalSize / (1024 * 1024)).toFixed(1)
+    const compressedMb = (compressedTotalSize / (1024 * 1024)).toFixed(1)
+
+    showToast(`✓ Uploaded ${count} photo(s) (${originalMb}MB → ${compressedMb}MB, ultra-fast mobile loading!)`)
     input.value = ''
     await fetchPhotos()
   } catch (err: any) {
@@ -143,6 +169,7 @@ const uploadPhotos = async (e: Event) => {
     showToast(err?.data?.statusMessage || 'Upload failed. Please try again.')
   } finally {
     uploading.value = false
+    uploadProgressMessage.value = ''
   }
 }
 

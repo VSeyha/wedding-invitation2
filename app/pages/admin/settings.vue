@@ -92,6 +92,8 @@
 </template>
 
 <script setup lang="ts">
+import { compressImage } from '~~/app/utils/imageCompressor'
+
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
 const supabase = useSupabase()
@@ -137,8 +139,16 @@ const uploadCouplePhoto = async (e: Event, role: 'groom' | 'bride') => {
   const token = await getToken()
 
   try {
+    // Compress portrait client-side: max 1000x1000, high quality WebP
+    const compressedFile = await compressImage(file, {
+      maxWidth: 1000,
+      maxHeight: 1000,
+      quality: 0.85,
+      mimeType: 'image/webp'
+    })
+
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('file', compressedFile)
 
     const res = await $fetch<any>('/api/admin/gallery/upload', {
       method: 'POST',
