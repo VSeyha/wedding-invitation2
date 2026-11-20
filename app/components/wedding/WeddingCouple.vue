@@ -8,10 +8,10 @@
       <div class="w-24 h-0.5 bg-wedding-secondary mx-auto mt-2"></div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 items-center">
       <!-- Groom Card -->
-      <div class="khmer-card rounded-3xl p-6 sm:p-8 text-center border border-wedding-secondary/40 shadow-sm relative overflow-hidden group">
-        <div class="w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-4 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow bg-white">
+      <div class="khmer-card rounded-3xl p-5 sm:p-6 text-center border border-wedding-secondary/40 shadow-sm relative overflow-hidden group">
+        <div class="w-32 h-32 sm:w-36 sm:h-36 mx-auto mb-3 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow bg-white">
           <img
             v-if="wedding?.groom_photo_url"
             :src="wedding.groom_photo_url"
@@ -20,7 +20,7 @@
           />
           <div
             v-else
-            class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-5xl"
+            class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-4xl"
           >
             🤵
           </div>
@@ -28,17 +28,17 @@
         <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-1">
           The Groom
         </div>
-        <h3 class="font-khmer-heading text-xl text-wedding-primary mb-1">
+        <h3 class="font-khmer-heading text-lg sm:text-xl text-wedding-primary mb-0.5">
           {{ wedding?.groom_name_km || 'កូនកំលោះ' }}
         </h3>
-        <p class="font-en-heading text-base font-semibold text-wedding-heading">
+        <p class="font-en-heading text-sm font-semibold text-wedding-heading">
           {{ wedding?.groom_name_en || 'Groom Name' }}
         </p>
       </div>
 
       <!-- Bride Card -->
-      <div class="khmer-card rounded-3xl p-6 sm:p-8 text-center border border-wedding-secondary/40 shadow-sm relative overflow-hidden group">
-        <div class="w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-4 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow bg-white">
+      <div class="khmer-card rounded-3xl p-5 sm:p-6 text-center border border-wedding-secondary/40 shadow-sm relative overflow-hidden group">
+        <div class="w-32 h-32 sm:w-36 sm:h-36 mx-auto mb-3 rounded-full border-4 border-wedding-secondary p-1 overflow-hidden shadow-gold-glow bg-white">
           <img
             v-if="wedding?.bride_photo_url"
             :src="wedding.bride_photo_url"
@@ -47,7 +47,7 @@
           />
           <div
             v-else
-            class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-5xl"
+            class="w-full h-full rounded-full bg-gradient-to-tr from-wedding-primary/20 to-wedding-secondary/30 flex items-center justify-center text-4xl"
           >
             👰
           </div>
@@ -55,10 +55,10 @@
         <div class="text-xs uppercase tracking-widest text-wedding-secondary font-bold mb-1">
           The Bride
         </div>
-        <h3 class="font-khmer-heading text-xl text-wedding-primary mb-1">
+        <h3 class="font-khmer-heading text-lg sm:text-xl text-wedding-primary mb-0.5">
           {{ wedding?.bride_name_km || 'កូនក្រមុំ' }}
         </h3>
-        <p class="font-en-heading text-base font-semibold text-wedding-heading">
+        <p class="font-en-heading text-sm font-semibold text-wedding-heading">
           {{ wedding?.bride_name_en || 'Bride Name' }}
         </p>
       </div>

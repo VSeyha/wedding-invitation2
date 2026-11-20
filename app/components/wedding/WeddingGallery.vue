@@ -9,7 +9,7 @@
     </div>
 
     <!-- Gallery Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
       <div
         v-for="(photo, index) in photos"
         :key="photo.id"

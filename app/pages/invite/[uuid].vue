@@ -30,57 +30,65 @@
       </div>
     </div>
 
-    <!-- Active Valid Invitation -->
-    <div v-else class="relative z-10">
-      <!-- 1. Khmer Royal Seal Opening Envelope -->
-      <WeddingOpeningAnimation
-        :guest-name="invitation?.guest_name || ''"
-        :wedding="wedding"
-        @opened="hasOpened = true"
-      />
-
-      <!-- 2. Main Invitation Content (Unveiled after seal clicked) -->
-      <main class="transition-opacity duration-1000 pb-20" :class="{ 'opacity-100': hasOpened, 'opacity-0': !hasOpened }">
-        <!-- Hero Section -->
-        <WeddingHero :wedding="wedding" />
-
-        <!-- Couple Introduction -->
-        <WeddingCouple :wedding="wedding" />
-
-        <!-- Our Story Timeline -->
-        <WeddingOurStory :story="wedding?.our_story" />
-
-        <!-- Warm Invitation Letter -->
-        <WeddingMessage :wedding="wedding" />
-
-        <!-- Ceremony Programme Timeline -->
-        <WeddingProgramme :programmes="programmes" />
-
-        <!-- Venue Location & Map -->
-        <WeddingLocation :wedding="wedding" />
-
-        <!-- Photo Gallery -->
-        <WeddingGallery :photos="photos" />
-
-        <!-- Digital Wedding Gift / KHQR -->
-        <WeddingGift :gift-info="wedding?.gift_info" />
-
-        <!-- RSVP Attendance Form -->
-        <WeddingRSVP
-          :token="token"
+    <!-- Active Valid Invitation (Focused on Tablet & Mobile) -->
+    <div v-else class="relative z-10 w-full flex justify-center">
+      <!-- Centered Mobile & Tablet Frame -->
+      <div
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] min-h-screen bg-wedding-bg relative sm:shadow-2xl sm:border-x sm:border-wedding-secondary/30 transition-all duration-300 overflow-x-hidden"
+      >
+        <!-- 1. Khmer Royal Seal Opening Envelope -->
+        <WeddingOpeningAnimation
           :guest-name="invitation?.guest_name || ''"
-          :initial-status="invitation?.rsvp?.status"
-          @updated="onRSVPUpdated"
+          :wedding="wedding"
+          @opened="hasOpened = true"
         />
 
-        <!-- Footer -->
-        <footer class="mt-16 text-center text-xs text-wedding-text/60 font-en-heading pb-8">
-          <p class="mb-1">With Love & Gratitude</p>
-          <p class="font-bold text-wedding-primary">
-            {{ wedding?.groom_name_en }} & {{ wedding?.bride_name_en }}
-          </p>
-        </footer>
-      </main>
+        <!-- 2. Main Invitation Content (Unveiled after seal clicked) -->
+        <main
+          class="transition-opacity duration-1000 pb-20 relative"
+          :class="{ 'opacity-100': hasOpened, 'opacity-0 pointer-events-none': !hasOpened }"
+        >
+          <!-- Hero Section -->
+          <WeddingHero :wedding="wedding" />
+
+          <!-- Couple Introduction -->
+          <WeddingCouple :wedding="wedding" />
+
+          <!-- Our Story Timeline -->
+          <WeddingOurStory :story="wedding?.our_story" />
+
+          <!-- Warm Invitation Letter -->
+          <WeddingMessage :wedding="wedding" />
+
+          <!-- Ceremony Programme Timeline -->
+          <WeddingProgramme :programmes="programmes" />
+
+          <!-- Venue Location & Map -->
+          <WeddingLocation :wedding="wedding" />
+
+          <!-- Photo Gallery -->
+          <WeddingGallery :photos="photos" />
+
+          <!-- Digital Wedding Gift / KHQR -->
+          <WeddingGift :gift-info="wedding?.gift_info" />
+
+          <!-- RSVP Attendance Form -->
+          <WeddingRSVP
+            :token="token"
+            :guest-name="invitation?.guest_name || ''"
+            :initial-status="invitation?.rsvp?.status"
+            @updated="onRSVPUpdated"
+          />
+
+          <!-- Footer -->
+          <footer class="mt-16 text-center text-xs text-wedding-text/60 font-en-heading pb-8 px-4">
+            <p class="mb-1">With Love & Gratitude</p>
+            <p class="font-bold text-wedding-primary">
+              {{ wedding?.groom_name_en }} & {{ wedding?.bride_name_en }}
+            </p>
+          </footer>
+        </main>
+      </div>
     </div>
   </div>
 </template>

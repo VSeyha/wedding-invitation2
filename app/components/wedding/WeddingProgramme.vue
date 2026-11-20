@@ -9,23 +9,18 @@
     </div>
 
     <!-- Timeline Wrapper -->
-    <div class="relative border-l-2 border-wedding-secondary/40 ml-4 sm:ml-32 space-y-8 pl-6 sm:pl-8">
+    <div class="relative border-l-2 border-wedding-secondary/40 ml-4 sm:ml-6 space-y-6 pl-6 sm:pl-7">
       <div
         v-for="prog in sorted"
         :key="prog.id"
         class="relative group"
       >
-        <!-- Time marker floating on left for desktop -->
-        <div class="hidden sm:block absolute -left-40 top-0 w-28 text-right font-mono font-bold text-sm text-wedding-primary">
-          {{ formatTime(prog.event_time) }}
-        </div>
-
         <!-- Dot Indicator on line -->
-        <span class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-wedding-secondary border-2 border-wedding-bg shadow-sm"></span>
+        <span class="absolute -left-[31px] sm:-left-[35px] top-3.5 w-3.5 h-3.5 rounded-full bg-wedding-secondary border-2 border-wedding-bg shadow-sm"></span>
 
         <!-- Event Content Box -->
-        <div class="khmer-card rounded-2xl p-5 border border-wedding-secondary/30 shadow-sm transition-transform hover:-translate-y-0.5">
-          <div class="sm:hidden font-mono font-bold text-xs text-wedding-primary mb-1">
+        <div class="khmer-card rounded-2xl p-4 sm:p-5 border border-wedding-secondary/30 shadow-sm transition-transform hover:-translate-y-0.5">
+          <div class="inline-block px-2.5 py-0.5 rounded-full bg-wedding-primary/10 text-wedding-primary font-mono font-bold text-xs mb-1.5 border border-wedding-secondary/20">
             {{ formatTime(prog.event_time) }}
           </div>
           <h3 class="font-khmer-heading text-base sm:text-lg text-wedding-heading">
