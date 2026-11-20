@@ -5,49 +5,68 @@
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.gallery') }}</h1>
         <p class="text-sm text-[#3C2925]/60 mt-1">Upload and manage wedding photos.</p>
       </div>
-      <label class="btn-primary cursor-pointer self-start">
-        📷 Upload Photos
-        <input type="file" accept="image/*" multiple class="hidden" @change="uploadPhotos" :disabled="uploading" />
+      <label class="btn-primary cursor-pointer self-start flex items-center gap-2">
+        <span>📷</span>
+        <span>{{ uploading ? 'Uploading...' : 'Upload Photos' }}</span>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          class="hidden"
+          @change="uploadPhotos"
+          :disabled="uploading"
+        />
       </label>
     </div>
 
-    <div v-if="uploading" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
-      Uploading {{ uploadProgress }}...
+    <div v-if="uploading" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700 animate-pulse">
+      ⏳ Uploading photos to gallery, please wait...
     </div>
 
-    <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading...</div>
+    <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading gallery...</div>
     <div v-else-if="!photos.length" class="text-center py-16 text-[#3C2925]/50">
       <div class="text-4xl mb-2">🖼️</div>
-      <p>No photos uploaded yet. Click "Upload Photos" to get started.</p>
+      <p class="font-medium">No photos uploaded yet.</p>
+      <p class="text-xs text-[#3C2925]/40 mt-1">Click "Upload Photos" above to add pictures to your wedding invitation.</p>
     </div>
     <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       <div
         v-for="photo in photos"
         :key="photo.id"
-        class="relative group rounded-xl overflow-hidden border border-[#C9A24A]/20 shadow-sm aspect-square"
+        class="relative group rounded-xl overflow-hidden border border-[#C9A24A]/30 shadow-sm aspect-square bg-gray-100"
       >
         <img
           :src="photo.url"
           :alt="photo.alt_text_en || 'Wedding photo'"
-          class="w-full h-full object-cover"
+          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
         />
         <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-          <button @click="confirmDeletePhoto(photo)" class="w-9 h-9 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-lg transition-colors" title="Delete">🗑️</button>
+          <button
+            @click="confirmDeletePhoto(photo)"
+            class="w-9 h-9 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-sm transition-colors shadow-lg"
+            title="Delete Photo"
+          >
+            🗑️
+          </button>
         </div>
-        <div class="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity truncate">
+        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[11px] px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity truncate">
           {{ photo.alt_text_en || `Photo ${photo.display_order + 1}` }}
         </div>
       </div>
     </div>
 
-    <!-- Delete Confirm -->
+    <!-- Delete Confirm Modal -->
     <div v-if="deletingPhoto" class="modal-overlay" @click.self="deletingPhoto = null">
       <div class="modal-box">
         <h2 class="text-lg font-bold text-red-700 mb-2">Delete Photo?</h2>
-        <p class="text-sm text-[#3C2925]/80 mb-4">This will permanently remove the photo.</p>
+        <p class="text-sm text-[#3C2925]/80 mb-4">
+          Are you sure you want to delete this photo? It will be permanently removed.
+        </p>
         <div class="flex gap-3">
-          <button @click="deletePhoto" :disabled="submitting" class="btn-danger">{{ submitting ? 'Deleting...' : 'Yes, Delete' }}</button>
+          <button @click="deletePhoto" :disabled="submitting" class="btn-danger">
+            {{ submitting ? 'Deleting...' : 'Yes, Delete' }}
+          </button>
           <button @click="deletingPhoto = null" class="btn-secondary">Cancel</button>
         </div>
       </div>
@@ -65,7 +84,6 @@ const supabase = useSupabase()
 const photos = ref<any[]>([])
 const loading = ref(true)
 const uploading = ref(false)
-const uploadProgress = ref('')
 const submitting = ref(false)
 const deletingPhoto = ref<any>(null)
 const toast = ref('')
@@ -76,52 +94,80 @@ const getToken = async () => {
   return data.session?.access_token || ''
 }
 
+const showToast = (msg: string) => {
+  toast.value = msg
+  setTimeout(() => { toast.value = '' }, 3500)
+}
+
 const fetchPhotos = async () => {
   loading.value = true
   const token = await getToken()
-  const { data } = await $fetch<any>('/api/admin/gallery', { headers: { authorization: `Bearer ${token}` } }).catch(() => ({ data: [] }))
-  photos.value = data || []
-  loading.value = false
+  try {
+    const res = await $fetch<any>('/api/admin/gallery', {
+      headers: { authorization: `Bearer ${token}` }
+    })
+    photos.value = res?.data || []
+  } catch (err: any) {
+    console.error('Failed to load gallery:', err)
+  } finally {
+    loading.value = false
+  }
 }
 
-const showToast = (msg: string) => { toast.value = msg; setTimeout(() => { toast.value = '' }, 3000) }
-
 const uploadPhotos = async (e: Event) => {
-  const files = Array.from((e.target as HTMLInputElement).files || [])
-  if (!files.length || !supabase) return
+  const input = e.target as HTMLInputElement
+  const fileList = input.files
+  if (!fileList || fileList.length === 0) return
+
   uploading.value = true
   const token = await getToken()
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i]
-    uploadProgress.value = `${i + 1} / ${files.length}`
-    const path = `photos/${Date.now()}_${file.name.replace(/\s+/g, '_')}`
+  try {
+    const formData = new FormData()
+    for (let i = 0; i < fileList.length; i++) {
+      formData.append('files', fileList[i])
+    }
 
-    const { error } = await supabase.storage.from('wedding-photos').upload(path, file, { cacheControl: '3600', upsert: false })
-    if (error) { showToast(`Upload failed: ${error.message}`); continue }
-
-    // Save record via API
-    await $fetch('/api/admin/gallery', {
+    const res = await $fetch<any>('/api/admin/gallery/upload', {
       method: 'POST',
       headers: { authorization: `Bearer ${token}` },
-      body: { storage_path: path, display_order: photos.value.length + i }
-    }).catch(() => {})
-  }
+      body: formData
+    })
 
-  uploading.value = false; uploadProgress.value = ''
-  showToast(`${files.length} photo(s) uploaded!`)
-  await fetchPhotos()
+    const count = res?.data?.length || fileList.length
+    showToast(`✓ Successfully uploaded ${count} photo(s)!`)
+    input.value = ''
+    await fetchPhotos()
+  } catch (err: any) {
+    console.error('Upload error:', err)
+    showToast(err?.data?.statusMessage || 'Upload failed. Please try again.')
+  } finally {
+    uploading.value = false
+  }
 }
 
-const confirmDeletePhoto = (photo: any) => { deletingPhoto.value = photo }
+const confirmDeletePhoto = (photo: any) => {
+  deletingPhoto.value = photo
+}
+
 const deletePhoto = async () => {
-  if (!deletingPhoto.value || !supabase) return
+  if (!deletingPhoto.value) return
   submitting.value = true
   const token = await getToken()
-  await supabase.storage.from('wedding-photos').remove([deletingPhoto.value.storage_path])
-  await $fetch(`/api/admin/gallery/${deletingPhoto.value.id}`, { method: 'DELETE', headers: { authorization: `Bearer ${token}` } }).catch(() => {})
-  showToast('Photo deleted.'); deletingPhoto.value = null; await fetchPhotos()
-  submitting.value = false
+
+  try {
+    await $fetch(`/api/admin/gallery/${deletingPhoto.value.id}`, {
+      method: 'DELETE',
+      headers: { authorization: `Bearer ${token}` }
+    })
+    showToast('Photo deleted.')
+    deletingPhoto.value = null
+    await fetchPhotos()
+  } catch (err: any) {
+    showToast(err?.data?.statusMessage || 'Failed to delete photo.')
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(fetchPhotos)
@@ -133,5 +179,5 @@ onMounted(fetchPhotos)
 .btn-danger { @apply px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors text-sm disabled:opacity-50; }
 .modal-overlay { @apply fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4; }
 .modal-box { @apply bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl; }
-.toast { @apply fixed bottom-6 right-6 bg-[#641D2D] text-[#F7F0E3] px-4 py-2 rounded-xl shadow-lg text-sm z-50; }
+.toast { @apply fixed bottom-6 right-6 bg-[#641D2D] text-[#F7F0E3] px-4 py-2 rounded-xl shadow-lg text-sm z-50 animate-bounce; }
 </style>
