@@ -155,15 +155,15 @@
         <div v-if="form.gift_info.enabled" class="space-y-4 pt-2">
           <!-- QR Code Upload -->
           <div class="p-4 rounded-xl border border-[#C9A24A]/30 bg-[#F7F0E3]/30 flex flex-col sm:flex-row items-center gap-5">
-            <div class="w-32 h-32 rounded-xl border-2 border-[#C9A24A] bg-white p-1 overflow-hidden shadow flex items-center justify-center flex-shrink-0 relative">
-              <img v-if="form.gift_info.qr_code_url" :src="form.gift_info.qr_code_url" alt="QR" class="w-full h-full object-contain" />
+            <div class="w-28 h-36 rounded-xl border-2 border-[#C9A24A] bg-white p-1 overflow-hidden shadow flex items-center justify-center flex-shrink-0 relative">
+              <img v-if="form.gift_info.qr_code_url" :src="form.gift_info.qr_code_url" alt="QR" class="w-full h-full object-contain rounded-lg" />
               <div v-else class="text-center p-2 text-xs text-gray-400">
-                <span class="text-2xl block mb-1">📱</span> No QR Uploaded
+                <span class="text-2xl block mb-1">📱</span> No QR Card
               </div>
             </div>
             <div class="flex-1 text-center sm:text-left space-y-2">
-              <div class="text-xs font-bold text-[#641D2D]">KHQR Code Image</div>
-              <p class="text-[11px] text-[#3C2925]/70">Upload your Bakong / ABA KHQR code screenshot or photo. It will be auto-optimized for clean rendering.</p>
+              <div class="text-xs font-bold text-[#641D2D]">KHQR Card Image</div>
+              <p class="text-[11px] text-[#3C2925]/70">Upload your Bakong / ABA KHQR card image. The image already contains the KHQR header, name, and QR code.</p>
               <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
                 <label class="btn-secondary text-xs cursor-pointer py-1.5 px-3">
                   <span>{{ uploadingQr ? 'Optimizing & Uploading...' : '📷 Upload KHQR Image' }}</span>
@@ -175,11 +175,7 @@
           </div>
 
           <!-- Bank Account Details -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="form-label">KHQR Account Name (English)</label>
-              <input v-model="form.gift_info.account_name_en" class="input-field font-mono uppercase" placeholder="e.g. SEYHA VET" />
-            </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label class="form-label">Bank Name</label>
               <input v-model="form.gift_info.bank_name" class="input-field" placeholder="e.g. ABA Bank" />
