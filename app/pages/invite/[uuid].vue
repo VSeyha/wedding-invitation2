@@ -62,6 +62,9 @@
         <!-- Photo Gallery -->
         <WeddingGallery :photos="photos" />
 
+        <!-- Digital Wedding Gift / KHQR -->
+        <WeddingGift :gift-info="wedding?.gift_info" />
+
         <!-- RSVP Attendance Form -->
         <WeddingRSVP
           :token="token"
@@ -92,6 +95,7 @@ import WeddingMessage from '~~/app/components/wedding/WeddingMessage.vue'
 import WeddingProgramme from '~~/app/components/wedding/WeddingProgramme.vue'
 import WeddingLocation from '~~/app/components/wedding/WeddingLocation.vue'
 import WeddingGallery from '~~/app/components/wedding/WeddingGallery.vue'
+import WeddingGift from '~~/app/components/wedding/WeddingGift.vue'
 import WeddingRSVP from '~~/app/components/wedding/WeddingRSVP.vue'
 
 import type { WeddingSettings } from '~~/shared/types/wedding'

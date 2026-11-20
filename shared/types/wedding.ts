@@ -6,6 +6,17 @@ export interface StoryMilestone {
   description_en: string
 }
 
+export interface WeddingGiftInfo {
+  enabled: boolean
+  qr_code_url: string
+  account_name_en: string
+  bank_name: string
+  account_name_km: string
+  account_number: string
+  message_km?: string
+  message_en?: string
+}
+
 export interface WeddingSettings {
   id: string
   bride_name_km: string
@@ -23,6 +34,7 @@ export interface WeddingSettings {
   groom_photo_url?: string | null
   bride_photo_url?: string | null
   our_story?: StoryMilestone[] | null
+  gift_info?: WeddingGiftInfo | null
   created_at?: string
   updated_at?: string
 }

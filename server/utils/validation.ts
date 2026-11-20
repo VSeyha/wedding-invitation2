@@ -11,6 +11,17 @@ export const storyMilestoneSchema = z.object({
   description_en: z.string().default('')
 })
 
+export const weddingGiftInfoSchema = z.object({
+  enabled:         z.boolean().default(true),
+  qr_code_url:     z.string().optional().default(''),
+  account_name_en: z.string().optional().default(''),
+  bank_name:       z.string().optional().default(''),
+  account_name_km: z.string().optional().default(''),
+  account_number:  z.string().optional().default(''),
+  message_km:      z.string().optional().default(''),
+  message_en:      z.string().optional().default('')
+})
+
 // ============================================================
 // Wedding Settings
 // ============================================================
@@ -29,7 +40,8 @@ export const weddingSettingsUpdateSchema = z.object({
   invitation_message_en: z.string().max(2000).optional(),
   groom_photo_url:       z.string().url().optional().nullable().or(z.literal('')),
   bride_photo_url:       z.string().url().optional().nullable().or(z.literal('')),
-  our_story:             z.array(storyMilestoneSchema).optional().nullable()
+  our_story:             z.array(storyMilestoneSchema).optional().nullable(),
+  gift_info:             weddingGiftInfoSchema.optional().nullable()
 })
 
 // ============================================================

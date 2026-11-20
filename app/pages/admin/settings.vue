@@ -3,7 +3,7 @@
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.settings') }}</h1>
-        <p class="text-sm text-[#3C2925]/60 mt-1">Edit wedding details, portraits, and love story milestones.</p>
+        <p class="text-sm text-[#3C2925]/60 mt-1">Edit wedding details, portraits, love story, and KHQR gift account.</p>
       </div>
       <button @click="save" :disabled="saving" class="btn-primary self-start">
         {{ saving ? 'Saving...' : '💾 ' + t('admin.save') }}
@@ -136,6 +136,71 @@
         </div>
       </section>
 
+      <!-- Digital Wedding Gift & KHQR (ចំណងដៃឌីជីថល) -->
+      <section class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
+              <span>🎁</span> Digital Wedding Gift & KHQR (ចំណងដៃឌីជីថល)
+            </h2>
+            <p class="text-xs text-[#3C2925]/60 mt-0.5">Customize KHQR payment card, bank details, and upload QR code image.</p>
+          </div>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" v-model="form.gift_info.enabled" class="sr-only peer" />
+            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#641D2D]"></div>
+            <span class="ml-2 text-xs font-medium text-[#3C2925]">{{ form.gift_info.enabled ? 'Enabled' : 'Disabled' }}</span>
+          </label>
+        </div>
+
+        <div v-if="form.gift_info.enabled" class="space-y-4 pt-2">
+          <!-- QR Code Upload -->
+          <div class="p-4 rounded-xl border border-[#C9A24A]/30 bg-[#F7F0E3]/30 flex flex-col sm:flex-row items-center gap-5">
+            <div class="w-32 h-32 rounded-xl border-2 border-[#C9A24A] bg-white p-1 overflow-hidden shadow flex items-center justify-center flex-shrink-0 relative">
+              <img v-if="form.gift_info.qr_code_url" :src="form.gift_info.qr_code_url" alt="QR" class="w-full h-full object-contain" />
+              <div v-else class="text-center p-2 text-xs text-gray-400">
+                <span class="text-2xl block mb-1">📱</span> No QR Uploaded
+              </div>
+            </div>
+            <div class="flex-1 text-center sm:text-left space-y-2">
+              <div class="text-xs font-bold text-[#641D2D]">KHQR Code Image</div>
+              <p class="text-[11px] text-[#3C2925]/70">Upload your Bakong / ABA KHQR code screenshot or photo. It will be auto-optimized for clean rendering.</p>
+              <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
+                <label class="btn-secondary text-xs cursor-pointer py-1.5 px-3">
+                  <span>{{ uploadingQr ? 'Optimizing & Uploading...' : '📷 Upload KHQR Image' }}</span>
+                  <input type="file" accept="image/*" class="hidden" @change="uploadQrCode" :disabled="uploadingQr" />
+                </label>
+                <button v-if="form.gift_info.qr_code_url" type="button" @click="form.gift_info.qr_code_url = ''" class="text-xs text-red-600 hover:underline">Remove QR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bank Account Details -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">KHQR Account Name (English)</label>
+              <input v-model="form.gift_info.account_name_en" class="input-field font-mono uppercase" placeholder="e.g. SEYHA VET" />
+            </div>
+            <div>
+              <label class="form-label">Bank Name</label>
+              <input v-model="form.gift_info.bank_name" class="input-field" placeholder="e.g. ABA Bank" />
+            </div>
+            <div>
+              <label class="form-label">Account Name (Khmer)</label>
+              <input v-model="form.gift_info.account_name_km" class="input-field font-khmer-heading" placeholder="e.g. វ៉េត សីហា & ស ណារី" />
+            </div>
+            <div>
+              <label class="form-label">Bank Account Number</label>
+              <input v-model="form.gift_info.account_number" class="input-field font-mono font-bold" placeholder="e.g. 007 342 922" />
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">Intro Greeting Note (Khmer)</label>
+            <textarea v-model="form.gift_info.message_km" rows="2" class="input-field font-khmer-body text-xs" />
+          </div>
+        </div>
+      </section>
+
       <!-- Invitation Message -->
       <section class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">
         <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] mb-4">💌 Invitation Message</h2>
@@ -161,7 +226,7 @@
 
 <script setup lang="ts">
 import { compressImage } from '~~/app/utils/imageCompressor'
-import type { StoryMilestone } from '~~/shared/types/wedding'
+import type { StoryMilestone, WeddingGiftInfo } from '~~/shared/types/wedding'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
@@ -171,6 +236,7 @@ const loading = ref(true)
 const saving = ref(false)
 const uploadingGroom = ref(false)
 const uploadingBride = ref(false)
+const uploadingQr = ref(false)
 const successMsg = ref('')
 const errorMsg = ref('')
 
@@ -205,6 +271,17 @@ const DEFAULT_STORY_TEMPLATE: StoryMilestone[] = [
   }
 ]
 
+const DEFAULT_GIFT_INFO: WeddingGiftInfo = {
+  enabled: true,
+  qr_code_url: '/images/khqr-default.jpg',
+  account_name_en: 'SEYHA VET',
+  bank_name: 'ABA Bank',
+  account_name_km: 'វ៉េត សីហា & ស ណារី',
+  account_number: '007 342 922',
+  message_km: 'សម្រាប់ឯកឧត្តម លោកជំទាវ លោក លោកស្រី និងភ្ញៀវកិត្តិយសទាំងអស់ ដែលមានបំណងចូលរួមចំណងដៃតាមរយៈការស្កេន KHQR ឬផ្ទេរប្រាក់តាមគណនីធនាគារ',
+  message_en: 'For guests who wish to send wedding blessings and digital gifts via KHQR or bank transfer.'
+}
+
 const form = ref<{
   bride_name_km: string
   bride_name_en: string
@@ -221,6 +298,7 @@ const form = ref<{
   invitation_message_km: string
   invitation_message_en: string
   our_story: StoryMilestone[]
+  gift_info: WeddingGiftInfo
 }>({
   bride_name_km: '',
   bride_name_en: '',
@@ -236,7 +314,8 @@ const form = ref<{
   google_maps_url: '',
   invitation_message_km: '',
   invitation_message_en: '',
-  our_story: []
+  our_story: [],
+  gift_info: { ...DEFAULT_GIFT_INFO }
 })
 
 const addStoryMilestone = () => {
@@ -314,6 +393,45 @@ const uploadCouplePhoto = async (e: Event, role: 'groom' | 'bride') => {
   }
 }
 
+const uploadQrCode = async (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  uploadingQr.value = true
+  const token = await getToken()
+
+  try {
+    // Keep QR clean & sharp with high quality
+    const compressedFile = await compressImage(file, {
+      maxWidth: 1000,
+      maxHeight: 1000,
+      quality: 0.92,
+      mimeType: 'image/webp'
+    })
+
+    const formData = new FormData()
+    formData.append('file', compressedFile)
+
+    const res = await $fetch<any>('/api/admin/couple/upload', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: formData
+    })
+
+    const uploadedUrl = res?.data?.url
+    if (uploadedUrl) {
+      form.value.gift_info.qr_code_url = uploadedUrl
+    }
+  } catch (err: any) {
+    console.error('QR upload error:', err)
+    errorMsg.value = `Failed to upload QR code: ${err?.data?.statusMessage || err.message}`
+  } finally {
+    uploadingQr.value = false
+    input.value = ''
+  }
+}
+
 onMounted(async () => {
   const token = await getToken()
   const { data } = await $fetch<any>('/api/wedding', { headers: { authorization: `Bearer ${token}` } }).catch(() => ({ data: null }))
@@ -323,10 +441,12 @@ onMounted(async () => {
       wedding_date: data.wedding_date ? new Date(data.wedding_date).toISOString().slice(0, 16) : '',
       groom_photo_url: data.groom_photo_url || '',
       bride_photo_url: data.bride_photo_url || '',
-      our_story: (data.our_story && data.our_story.length > 0) ? data.our_story : JSON.parse(JSON.stringify(DEFAULT_STORY_TEMPLATE))
+      our_story: (data.our_story && data.our_story.length > 0) ? data.our_story : JSON.parse(JSON.stringify(DEFAULT_STORY_TEMPLATE)),
+      gift_info: data.gift_info ? { ...DEFAULT_GIFT_INFO, ...data.gift_info } : { ...DEFAULT_GIFT_INFO }
     })
   } else {
     form.value.our_story = JSON.parse(JSON.stringify(DEFAULT_STORY_TEMPLATE))
+    form.value.gift_info = { ...DEFAULT_GIFT_INFO }
   }
   loading.value = false
 })
@@ -340,7 +460,7 @@ const save = async () => {
       wedding_date: form.value.wedding_date ? new Date(form.value.wedding_date).toISOString() : null
     }
     await $fetch('/api/wedding', { method: 'PUT', headers: { authorization: `Bearer ${token}` }, body: payload })
-    successMsg.value = '✓ Wedding settings and Our Story milestones saved successfully.'
+    successMsg.value = '✓ Wedding settings, KHQR, and Our Story milestones saved successfully.'
   } catch (e: any) { errorMsg.value = e?.data?.statusMessage || 'Error saving settings.' }
   saving.value = false
 }
