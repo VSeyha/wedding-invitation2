@@ -1,24 +1,98 @@
 <template>
   <div
-    class="relative bg-[#0F080B] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body"
-    :class="hasOpened ? 'min-h-screen overflow-x-hidden' : 'h-screen max-h-screen overflow-hidden'"
+    class="relative bg-[#14080D] flex justify-center selection:bg-wedding-primary selection:text-wedding-bg font-khmer-body overflow-x-hidden"
+    :class="hasOpened ? 'min-h-screen' : 'h-screen max-h-screen overflow-hidden'"
   >
-    <!-- 1. Ambient Frosted Desktop Backdrop (Dreamy blurred warm halo, hidden on mobile) -->
+    <!-- 1. Ambient Panoramic Scenic Desktop Backdrop (Cinematic soft-focus scenery with golden dust, hidden on mobile) -->
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden sm:block">
-      <!-- Soft Blurred Ambience from Angkor Wat Artwork -->
+      <!-- Panoramic Artwork with soft cinematic focus and warm color saturation -->
       <div
         v-if="bgImageUrl"
-        class="w-full h-full bg-cover bg-center scale-110 blur-3xl brightness-[0.55] saturate-[1.4] opacity-90 transition-all duration-1000"
-        :style="{ backgroundImage: `url(${bgImageUrl})` }"
+        class="w-full h-full bg-cover bg-center will-change-transform scale-105 transition-all duration-1000 opacity-65"
+        :style="{
+          backgroundImage: `url(${bgImageUrl})`,
+          filter: 'blur(3px) brightness(0.72) saturate(1.25)'
+        }"
       ></div>
-      <!-- Radial Vignette: softly draws focus directly into the mobile invitation -->
+      <!-- Soft Radial Vignette: softly draws focus directly into the mobile invitation -->
       <div
         class="absolute inset-0"
-        style="background: radial-gradient(circle at 50% 45%, transparent 20%, rgba(15, 8, 11, 0.6) 65%, rgba(10, 4, 7, 0.95) 100%);"
+        style="background: radial-gradient(circle at 50% 45%, rgba(20, 8, 13, 0.25) 0%, rgba(15, 5, 10, 0.65) 65%, rgba(10, 3, 7, 0.92) 100%);"
       ></div>
+      <!-- Ambient Golden Dust & Starlight Drift Across Desktop -->
+      <WeddingCanvasBackground
+        :config="{
+          ...appearanceConfig?.animation_config,
+          preset: 'particles',
+          particle_quantity: 24,
+          opacity: 0.35,
+          speed: 0.8
+        }"
+      />
     </div>
 
-    <!-- 2. Crisp Mobile Screen Background & Particles (Strictly Scoped to Mobile Screen Width) -->
+    <!-- 2. Desktop Decorative Side Wings (Left & Right of Mobile Screen, hidden on screens < 1200px) -->
+    <div class="fixed inset-0 pointer-events-none z-10 hidden xl:flex justify-between items-center px-6 2xl:px-14 max-w-[1700px] mx-auto">
+      <!-- Left Wing: Royal Monogram & Couple Blessing -->
+      <div class="w-64 2xl:w-72 p-6 rounded-3xl bg-[#2A1017]/75 backdrop-blur-md border border-[#C9A24A]/40 shadow-[0_15px_40px_rgba(0,0,0,0.5)] text-center text-[#F7F0E3] transform -translate-y-4 pointer-events-auto">
+        <div class="text-3xl text-wedding-secondary mb-2 select-none animate-pulse">⚜️</div>
+        <div class="text-[10px] uppercase tracking-widest text-wedding-secondary/90 font-semibold mb-1">
+          WEDDING CELEBRATION
+        </div>
+        <div class="font-khmer-heading text-base text-wedding-accent mb-2" style="line-height: 2 !important;">
+          សិរីមង្គលអាពាហ៍ពិពាហ៍
+        </div>
+        <div class="h-px w-20 mx-auto bg-gradient-to-r from-transparent via-[#C9A24A]/60 to-transparent my-2.5"></div>
+        <div class="font-khmer-heading text-lg text-white mb-0.5">
+          {{ wedding?.groom_name_km || 'វ៉េត សីហា' }}
+        </div>
+        <div class="text-xs text-wedding-secondary font-serif italic mb-0.5">&amp;</div>
+        <div class="font-khmer-heading text-lg text-white mb-2">
+          {{ wedding?.bride_name_km || 'ស ណារី' }}
+        </div>
+        <div class="text-[11px] text-[#F7F0E3]/70 font-en-heading">
+          {{ wedding?.groom_name_en || 'Vet Seyha' }} &amp; {{ wedding?.bride_name_en || 'Sar Nary' }}
+        </div>
+      </div>
+
+      <!-- Right Wing: Celebration Countdown & Venue Info -->
+      <div class="w-64 2xl:w-72 p-6 rounded-3xl bg-[#2A1017]/75 backdrop-blur-md border border-[#C9A24A]/40 shadow-[0_15px_40px_rgba(0,0,0,0.5)] text-center text-[#F7F0E3] transform -translate-y-4 pointer-events-auto">
+        <div class="text-2xl text-wedding-secondary mb-2 select-none">⏳</div>
+        <div class="text-[10px] uppercase tracking-widest text-wedding-secondary/90 font-semibold mb-2">
+          COUNTDOWN TO CELEBRATION
+        </div>
+
+        <!-- 4-Box Digital Countdown -->
+        <div class="grid grid-cols-4 gap-1.5 my-2.5">
+          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
+            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.days }}</div>
+            <div class="text-[8px] text-[#F7F0E3]/70">Days</div>
+          </div>
+          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
+            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.hours }}</div>
+            <div class="text-[8px] text-[#F7F0E3]/70">Hours</div>
+          </div>
+          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
+            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.minutes }}</div>
+            <div class="text-[8px] text-[#F7F0E3]/70">Mins</div>
+          </div>
+          <div class="bg-black/35 rounded-xl p-1.5 border border-[#C9A24A]/25">
+            <div class="text-base font-bold text-wedding-accent font-mono">{{ countdown.seconds }}</div>
+            <div class="text-[8px] text-[#F7F0E3]/70">Secs</div>
+          </div>
+        </div>
+
+        <div class="h-px w-20 mx-auto bg-gradient-to-r from-transparent via-[#C9A24A]/60 to-transparent my-2.5"></div>
+        <div class="text-[11px] font-bold text-wedding-accent font-khmer-body mb-0.5 truncate">
+          {{ wedding?.venue_name_km || 'The Premier Centre Sen Sok' }}
+        </div>
+        <div class="text-[10px] text-[#F7F0E3]/70 font-khmer-body">
+          {{ wedding?.venue_address_km || 'រាជធានីភ្នំពេញ' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Crisp Mobile Screen Background & Particles (Strictly Scoped to Mobile Screen Width) -->
     <div class="fixed inset-0 pointer-events-none z-0 flex justify-center overflow-hidden">
       <div class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] h-full relative overflow-hidden">
         <!-- Scalable Crisp Background Artwork (Angkor Wat / Royal Kbach / Custom) -->
@@ -224,6 +298,20 @@ const programmes = ref<ProgrammeType[]>([])
 const photos = ref<WeddingPhoto[]>([])
 const appearanceConfig = ref<WeddingAppearance | null>(null)
 
+// Desktop Live Countdown Timer
+const now = ref(Date.now())
+let countdownInterval: any = null
+
+const countdown = computed(() => {
+  const targetDate = wedding.value?.wedding_date || '2027-01-16T04:26:00.000Z'
+  const diff = Math.max(0, new Date(targetDate).getTime() - now.value)
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+  return { days, hours, minutes, seconds }
+})
+
 // Scroll tracking for Zoom in / Zoom out & lively motion
 const scrollProgress = ref(0)
 const scrollVelocity = ref(0)
@@ -392,11 +480,15 @@ onMounted(() => {
   loadInvitationData()
   if (import.meta.client) {
     window.addEventListener('scroll', handleScroll, { passive: true })
+    countdownInterval = setInterval(() => {
+      now.value = Date.now()
+    }, 1000)
   }
 })
 
 onUnmounted(() => {
   if (import.meta.client) {
+    if (countdownInterval) clearInterval(countdownInterval)
     document.body.style.overflow = ''
     document.documentElement.style.overflow = ''
     document.body.style.height = ''
