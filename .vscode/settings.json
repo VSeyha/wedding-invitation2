@@ -1,0 +1,17 @@
+{
+  "sql.dialect": "PostgreSQL",
+  "[sql]": {
+    "editor.defaultFormatter": "mtxr.sqltools"
+  },
+  "sqltools.connections": [
+    {
+      "name": "Supabase (PostgreSQL)",
+      "driver": "PostgreSQL",
+      "previewLimit": 50,
+      "server": "db.your-project.supabase.co",
+      "port": 5432,
+      "database": "postgres",
+      "username": "postgres"
+    }
+  ]
+}
