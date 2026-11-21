@@ -7,19 +7,26 @@ export default defineEventHandler(async () => {
 
   const { data, error } = await supabase
     .from('wedding_photos')
-    .select('id, storage_path, alt_text_km, alt_text_en, display_order')
+    .select('*')
     .order('display_order', { ascending: true })
 
   if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
-  const photosWithUrl = (data || []).map((photo) => {
-    const { data: urlData } = supabase.storage
-      .from('wedding-photos')
-      .getPublicUrl(photo.storage_path)
+  const photosWithUrl = (data || []).map((photo: any) => {
+    let url = photo.photo_url || ''
+    if (!url && photo.storage_path) {
+      const { data: urlData } = supabase.storage
+        .from('wedding-photos')
+        .getPublicUrl(photo.storage_path)
+      url = urlData.publicUrl
+    }
 
     return {
       ...photo,
-      url: urlData.publicUrl
+      url,
+      storage_path: photo.storage_path || photo.photo_url || '',
+      alt_text_km: photo.alt_text_km || photo.caption_km || '',
+      alt_text_en: photo.alt_text_en || photo.caption_en || ''
     }
   })
 

@@ -54,31 +54,41 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Insert database record (with fallback if schema differs)
-    let insertPayload: Record<string, any> = {
-      storage_path: storagePath,
-      alt_text_en: file.filename,
-      display_order: currentOrder++
-    }
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('wedding-photos')
+      .getPublicUrl(storagePath)
+    const publicUrl = urlData.publicUrl
 
+    // Insert database record (populating both column variants: storage_path & photo_url)
+    const orderIndex = currentOrder++
     let { data: photoRecord, error: dbError } = await supabase
       .from('wedding_photos')
-      .insert(insertPayload)
+      .insert({
+        storage_path: storagePath,
+        photo_url: publicUrl,
+        alt_text_en: file.filename,
+        caption_en: file.filename,
+        display_order: orderIndex
+      })
       .select()
       .single()
 
-    // If schema cache says alt_text_en is missing, retry with basic storage_path
-    if (dbError && String(dbError.message).includes('alt_text_en')) {
-      const retryResult = await supabase
+    // If insert fails due to column constraints (e.g. alt_text_en vs caption_en), retry with universal fallback
+    if (dbError) {
+      console.warn('First insert attempt failed, trying fallback insert:', dbError.message)
+      const fallbackResult = await supabase
         .from('wedding_photos')
         .insert({
+          photo_url: publicUrl,
           storage_path: storagePath,
-          display_order: insertPayload.display_order
+          display_order: orderIndex
         })
         .select()
         .single()
-      photoRecord = retryResult.data
-      dbError = retryResult.error
+
+      photoRecord = fallbackResult.data
+      dbError = fallbackResult.error
     }
 
     if (dbError) {
@@ -89,13 +99,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const { data: urlData } = supabase.storage
-      .from('wedding-photos')
-      .getPublicUrl(storagePath)
-
     uploadedPhotos.push({
       ...photoRecord,
-      url: urlData.publicUrl
+      url: publicUrl
     })
   }
 

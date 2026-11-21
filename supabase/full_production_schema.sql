@@ -108,6 +108,8 @@ create table if not exists public.wedding_photos (
 );
 
 alter table public.wedding_photos add column if not exists storage_path text not null default '';
+alter table public.wedding_photos add column if not exists photo_url text default '';
+alter table public.wedding_photos alter column photo_url drop not null;
 alter table public.wedding_photos add column if not exists alt_text_km text;
 alter table public.wedding_photos add column if not exists alt_text_en text;
 alter table public.wedding_photos add column if not exists display_order integer not null default 0;

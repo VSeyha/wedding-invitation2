@@ -13,14 +13,19 @@ export default defineEventHandler(async (event) => {
 
   if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
-  const photosWithUrl = (data || []).map((photo) => {
-    const { data: urlData } = supabase.storage
-      .from('wedding-photos')
-      .getPublicUrl(photo.storage_path)
+  const photosWithUrl = (data || []).map((photo: any) => {
+    let url = photo.photo_url || ''
+    if (!url && photo.storage_path) {
+      const { data: urlData } = supabase.storage
+        .from('wedding-photos')
+        .getPublicUrl(photo.storage_path)
+      url = urlData.publicUrl
+    }
 
     return {
       ...photo,
-      url: urlData.publicUrl
+      url,
+      storage_path: photo.storage_path || photo.photo_url || ''
     }
   })
 
