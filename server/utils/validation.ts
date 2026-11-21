@@ -60,12 +60,14 @@ export const weddingSettingsUpdateSchema = z.object({
 // ============================================================
 export const guestCreateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(200),
-  phone: z.string().max(30).optional().nullable()
+  phone: z.string().max(30).optional().nullable(),
+  note: z.string().max(200).optional().nullable()
 })
 
 export const guestUpdateSchema = z.object({
   name: z.string().min(1).max(200).optional(),
-  phone: z.string().max(30).optional().nullable()
+  phone: z.string().max(30).optional().nullable(),
+  note: z.string().max(200).optional().nullable()
 })
 
 // ============================================================

@@ -37,9 +37,41 @@
       </div>
     </div>
 
-    <!-- Search -->
-    <div class="mb-4">
-      <input v-model="search" type="text" placeholder="Search guests..." class="input-field max-w-sm" />
+    <!-- Search & Side Filter -->
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="w-full sm:max-w-sm">
+        <input v-model="search" type="text" placeholder="Search guests by name, note, phone..." class="input-field" />
+      </div>
+
+      <!-- Side Filter Tabs -->
+      <div class="flex items-center gap-1.5 p-1 bg-white border border-[#C9A24A]/30 rounded-xl shadow-xs self-start sm:self-auto text-xs">
+        <button
+          type="button"
+          @click="sideFilter = 'all'"
+          class="px-3 py-1.5 rounded-lg font-medium transition-all"
+          :class="sideFilter === 'all' ? 'bg-[#641D2D] text-[#F7F0E3] font-bold shadow-xs' : 'text-[#3C2925]/70 hover:text-[#641D2D] hover:bg-[#F7F0E3]'"
+        >
+          All ({{ guests.length }})
+        </button>
+        <button
+          type="button"
+          @click="sideFilter = 'groom'"
+          class="px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-all"
+          :class="sideFilter === 'groom' ? 'bg-emerald-700 text-white font-bold shadow-xs' : 'text-emerald-800 hover:bg-emerald-50'"
+        >
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>ខាងប្រុស ({{ groomCount }})</span>
+        </button>
+        <button
+          type="button"
+          @click="sideFilter = 'bride'"
+          class="px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-all"
+          :class="sideFilter === 'bride' ? 'bg-rose-700 text-white font-bold shadow-xs' : 'text-rose-800 hover:bg-rose-50'"
+        >
+          <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+          <span>ខាងស្រី ({{ brideCount }})</span>
+        </button>
+      </div>
     </div>
 
     <!-- Table -->
@@ -49,6 +81,7 @@
           <thead class="bg-[#641D2D]/5 border-b border-[#C9A24A]/20">
             <tr>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Name</th>
+              <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Side / Note (ខាង)</th>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Phone</th>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Status</th>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">RSVP</th>
@@ -57,14 +90,37 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-if="loading"><td colspan="6" class="px-4 py-8 text-center text-[#3C2925]/50">Loading...</td></tr>
-            <tr v-else-if="!filteredGuests.length"><td colspan="6" class="px-4 py-8 text-center text-[#3C2925]/50">No guests found.</td></tr>
+            <tr v-if="loading"><td colspan="7" class="px-4 py-8 text-center text-[#3C2925]/50">Loading...</td></tr>
+            <tr v-else-if="!filteredGuests.length"><td colspan="7" class="px-4 py-8 text-center text-[#3C2925]/50">No guests found.</td></tr>
             <tr
               v-for="guest in paginatedGuests"
               :key="guest.id"
               class="border-b border-[#C9A24A]/10 hover:bg-[#F7F0E3]/50 transition-colors"
             >
               <td class="px-4 py-3 font-medium text-[#3C2925]">{{ guest.name }}</td>
+              <td class="px-4 py-3">
+                <span
+                  v-if="guest.note === 'ខាងប្រុស' || (guest.note && guest.note.includes('ខាងប្រុស'))"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>{{ guest.note }}</span>
+                </span>
+                <span
+                  v-else-if="guest.note === 'ខាងស្រី' || (guest.note && guest.note.includes('ខាងស្រី'))"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-300"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                  <span>{{ guest.note }}</span>
+                </span>
+                <span
+                  v-else-if="guest.note"
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200"
+                >
+                  {{ guest.note }}
+                </span>
+                <span v-else class="text-gray-300 text-xs">—</span>
+              </td>
               <td class="px-4 py-3 text-[#3C2925]/70">{{ guest.phone || '—' }}</td>
               <td class="px-4 py-3">
                 <span v-if="invitation(guest)?.status === 'active'" class="badge-success">Active</span>
@@ -139,6 +195,41 @@
             <label class="form-label">Guest Name (ឈ្មោះ) *</label>
             <input v-model="form.name" type="text" required class="input-field" placeholder="e.g. Van Sopheamen" />
           </div>
+
+          <!-- Side / Note Selector -->
+          <div>
+            <label class="form-label">Side / Note (ខាង / ចំណាំ)</label>
+            <div class="flex items-center gap-2 mb-2">
+              <button
+                type="button"
+                @click="form.note = 'ខាងប្រុស'"
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all"
+                :class="form.note === 'ខាងប្រុស' ? 'bg-emerald-100 text-emerald-900 border-emerald-400 ring-2 ring-emerald-400/30 font-bold' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'"
+              >
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1"></span>
+                ខាងប្រុស (Groom)
+              </button>
+              <button
+                type="button"
+                @click="form.note = 'ខាងស្រី'"
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all"
+                :class="form.note === 'ខាងស្រី' ? 'bg-rose-100 text-rose-900 border-rose-400 ring-2 ring-rose-400/30 font-bold' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'"
+              >
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 mr-1"></span>
+                ខាងស្រី (Bride)
+              </button>
+              <button
+                v-if="form.note"
+                type="button"
+                @click="form.note = ''"
+                class="text-[11px] text-gray-400 hover:text-gray-600 underline ml-auto"
+              >
+                Clear
+              </button>
+            </div>
+            <input v-model="form.note" type="text" class="input-field text-xs" placeholder="ខាងប្រុស, ខាងស្រី, or custom note" />
+          </div>
+
           <div>
             <label class="form-label">Phone (optional)</label>
             <input v-model="form.phone" type="text" class="input-field" placeholder="+855 12 345 678" />
@@ -306,6 +397,7 @@
                   </th>
                   <th class="text-left px-3 py-2 font-semibold text-[#641D2D]">#</th>
                   <th class="text-left px-3 py-2 font-semibold text-[#641D2D]">Guest Name (ឈ្មោះ)</th>
+                  <th class="text-left px-3 py-2 font-semibold text-[#641D2D]">Side / Note (ខាង)</th>
                   <th class="text-left px-3 py-2 font-semibold text-[#641D2D]">Phone (ទូរស័ព្ទ)</th>
                   <th class="text-right px-3 py-2 font-semibold text-[#641D2D]">Status</th>
                 </tr>
@@ -326,6 +418,27 @@
                   </td>
                   <td class="px-3 py-2 text-gray-400 font-mono text-[10px]">{{ idx + 1 }}</td>
                   <td class="px-3 py-2 font-medium text-[#3C2925]">{{ item.name }}</td>
+                  <td class="px-3 py-2">
+                    <span
+                      v-if="item.note === 'ខាងប្រុស' || (item.note && item.note.includes('ខាងប្រុស'))"
+                      class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"
+                    >
+                      ខាងប្រុស
+                    </span>
+                    <span
+                      v-else-if="item.note === 'ខាងស្រី' || (item.note && item.note.includes('ខាងស្រី'))"
+                      class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200"
+                    >
+                      ខាងស្រី
+                    </span>
+                    <span
+                      v-else-if="item.note"
+                      class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200"
+                    >
+                      {{ item.note }}
+                    </span>
+                    <span v-else class="text-gray-300">—</span>
+                  </td>
                   <td class="px-3 py-2 text-gray-600 font-mono">{{ item.phone || '—' }}</td>
                   <td class="px-3 py-2 text-right">
                     <span
@@ -397,13 +510,18 @@ const deletingGuest = ref<any>(null)
 const submitting = ref(false)
 const formError = ref('')
 const toast = ref('')
-const form = ref({ name: '', phone: '', rsvp_status: 'pending' })
+const form = ref({ name: '', phone: '', note: 'ខាងប្រុស', rsvp_status: 'pending' })
 const updatingRsvpId = ref('')
+const sideFilter = ref<'all' | 'groom' | 'bride'>('all')
+
+const groomCount = computed(() => guests.value.filter(g => g.note && g.note.includes('ខាងប្រុស')).length)
+const brideCount = computed(() => guests.value.filter(g => g.note && g.note.includes('ខាងស្រី')).length)
 
 // Excel Import State
 interface ParsedGuest {
   name: string
   phone: string
+  note: string
   selected: boolean
   isDuplicate: boolean
 }
@@ -418,11 +536,18 @@ const importError = ref('')
 const siteUrl = config.public.siteUrl as string
 
 const filteredGuests = computed(() => {
+  let list = guests.value
+  if (sideFilter.value === 'groom') {
+    list = list.filter(g => g.note && g.note.includes('ខាងប្រុស'))
+  } else if (sideFilter.value === 'bride') {
+    list = list.filter(g => g.note && g.note.includes('ខាងស្រី'))
+  }
   const q = search.value.toLowerCase().trim()
-  if (!q) return guests.value
-  return guests.value.filter(g =>
+  if (!q) return list
+  return list.filter(g =>
     (g.name && g.name.toLowerCase().includes(q)) ||
-    (g.phone && g.phone.toLowerCase().includes(q))
+    (g.phone && g.phone.toLowerCase().includes(q)) ||
+    (g.note && g.note.toLowerCase().includes(q))
   )
 })
 
@@ -431,7 +556,7 @@ const paginatedGuests = computed(() => {
   return filteredGuests.value.slice(start, start + pageSize.value)
 })
 
-watch(search, () => {
+watch([search, sideFilter], () => {
   currentPage.value = 1
 })
 
@@ -490,35 +615,35 @@ const closeImportModal = () => {
 const downloadExcelTemplate = () => {
   const wb = XLSX.utils.book_new()
   const templateData = [
-    ['Name'],
-    ['Van Sopheamen'],
-    ['Neak Bunhak'],
-    ['Chhoun Sophanith'],
-    ['Srun Sundy'],
-    ['Sela MonySathya'],
-    ['Roth Brophea'],
-    ['Nguon Sotheavuth'],
-    ['Seng Sothearak'],
-    ['Leng Chhinghor'],
-    ['Chin Socheat'],
-    ['Sok Bora'],
-    ['Kranh Channak'],
-    ['Khiev Kakda'],
-    ['Eav Outdom'],
-    ['Chhoeung Chhun Virak'],
-    ['Sor Nga'],
-    ['Hoeung Lo Vutha'],
-    ['Phal Pisey'],
-    ['Ean Mesa'],
-    ['Phat Mady'],
-    ['Yem Nayhouth'],
-    ['Sun Seakly'],
-    ['Yon Kansovannary'],
-    ['Choun Pechsovann'],
-    ['Pan Sam Orn']
+    ['Name', 'Note'],
+    ['Van Sopheamen', 'ខាងប្រុស'],
+    ['Neak Bunhak', 'ខាងស្រី'],
+    ['Chhoun Sophanith', 'ខាងប្រុស'],
+    ['Srun Sundy', 'ខាងប្រុស'],
+    ['Sela MonySathya', 'ខាងប្រុស'],
+    ['Roth Brophea', 'ខាងប្រុស'],
+    ['Nguon Sotheavuth', 'ខាងប្រុស'],
+    ['Seng Sothearak', 'ខាងប្រុស'],
+    ['Leng Chhinghor', 'ខាងប្រុស'],
+    ['Chin Socheat', 'ខាងប្រុស'],
+    ['Sok Bora', 'ខាងប្រុស'],
+    ['Kranh Channak', 'ខាងប្រុស'],
+    ['Khiev Kakda', 'ខាងប្រុស'],
+    ['Eav Outdom', 'ខាងប្រុស'],
+    ['Chhoeung Chhun Virak', 'ខាងប្រុស'],
+    ['Sor Nga', 'ខាងប្រុស'],
+    ['Hoeung Lo Vutha', 'ខាងប្រុស'],
+    ['Phal Pisey', 'ខាងប្រុស'],
+    ['Ean Mesa', 'ខាងប្រុស'],
+    ['Phat Mady', 'ខាងប្រុស'],
+    ['Yem Nayhouth', 'ខាងប្រុស'],
+    ['Sun Seakly', 'ខាងប្រុស'],
+    ['Yon Kansovannary', 'ខាងប្រុស'],
+    ['Choun Pechsovann', 'ខាងប្រុស'],
+    ['Pan Sam Orn', 'ខាងប្រុស']
   ]
   const ws = XLSX.utils.aoa_to_sheet(templateData)
-  ws['!cols'] = [{ wch: 30 }]
+  ws['!cols'] = [{ wch: 25 }, { wch: 18 }]
   XLSX.utils.book_append_sheet(wb, ws, 'Participant_Registry_2')
   XLSX.writeFile(wb, 'Participant_Registry_2.xlsx')
   showToast('✓ Template downloaded: Participant_Registry_2.xlsx')
@@ -549,9 +674,10 @@ const processExcelFile = async (file: File) => {
       guests.value.map(g => g.name.toLowerCase().trim())
     )
 
-    // Detect column indexes for Name and Phone
+    // Detect column indexes for Name, Note/Side, and Phone
     let nameColIdx = 0
     let phoneColIdx = -1
+    let noteColIdx = -1
     let startRowIdx = 0
 
     // Inspect the first 5 rows to identify header row
@@ -570,6 +696,19 @@ const processExcelFile = async (file: File) => {
           cell.includes('នាម')
         ) {
           nameColIdx = c
+          foundHeader = true
+        }
+        // Check for Note / Side header keywords
+        else if (
+          cell.includes('note') ||
+          cell.includes('side') ||
+          cell.includes('ខាង') ||
+          cell.includes('ចំណាំ') ||
+          cell.includes('សម្គាល់') ||
+          cell.includes('party') ||
+          cell.includes('family')
+        ) {
+          noteColIdx = c
           foundHeader = true
         }
         // Check for Phone header keywords
@@ -602,6 +741,7 @@ const processExcelFile = async (file: File) => {
       if (!rawName) continue
 
       let rawPhone = phoneColIdx >= 0 ? String(row[phoneColIdx] || '').trim() : ''
+      let rawNote = noteColIdx >= 0 ? String(row[noteColIdx] || '').trim() : ''
 
       // Clean phone if numeric float from excel
       if (phoneColIdx >= 0 && typeof row[phoneColIdx] === 'number') {
@@ -613,6 +753,7 @@ const processExcelFile = async (file: File) => {
       parsed.push({
         name: rawName,
         phone: rawPhone,
+        note: rawNote,
         selected: !isDuplicate, // default select non-duplicates
         isDuplicate
       })
@@ -646,7 +787,8 @@ const executeImport = async () => {
     const payload = {
       guests: selectedGuests.map(g => ({
         name: g.name,
-        phone: g.phone || null
+        phone: g.phone || null,
+        note: g.note || ''
       }))
     }
 
@@ -712,8 +854,8 @@ const updateRsvpStatus = async (guest: any, status: 'pending' | 'attending' | 'n
   }
 }
 
-const openCreateModal = () => { editingGuest.value = null; form.value = { name: '', phone: '', rsvp_status: 'pending' }; formError.value = ''; showModal.value = true }
-const openEditModal = (g: any) => { editingGuest.value = g; form.value = { name: g.name, phone: g.phone || '', rsvp_status: rsvp(g) || 'pending' }; formError.value = ''; showModal.value = true }
+const openCreateModal = () => { editingGuest.value = null; form.value = { name: '', phone: '', note: 'ខាងប្រុស', rsvp_status: 'pending' }; formError.value = ''; showModal.value = true }
+const openEditModal = (g: any) => { editingGuest.value = g; form.value = { name: g.name, phone: g.phone || '', note: g.note || '', rsvp_status: rsvp(g) || 'pending' }; formError.value = ''; showModal.value = true }
 const closeModal = () => { showModal.value = false; editingGuest.value = null }
 
 const submitGuest = async () => {
@@ -724,7 +866,7 @@ const submitGuest = async () => {
       await $fetch(`/api/admin/guests/${editingGuest.value.id}`, {
         method: 'PUT',
         headers: { authorization: `Bearer ${token}` },
-        body: { name: form.value.name, phone: form.value.phone }
+        body: { name: form.value.name, phone: form.value.phone, note: form.value.note }
       })
 
       // Update RSVP status if changed
@@ -742,7 +884,7 @@ const submitGuest = async () => {
       await $fetch('/api/admin/guests', {
         method: 'POST',
         headers: { authorization: `Bearer ${token}` },
-        body: { name: form.value.name, phone: form.value.phone }
+        body: { name: form.value.name, phone: form.value.phone, note: form.value.note }
       })
       showToast('Guest added with invitation link.')
     }

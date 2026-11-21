@@ -11,11 +11,12 @@
       <div class="hidden sm:flex items-center gap-1.5 ml-2 border-l border-gray-200 pl-3">
         <span>Rows:</span>
         <select
-          :value="pageSize"
-          @change="changePageSize(Number(($event.target as HTMLSelectElement).value))"
-          class="border border-[#C9A24A]/40 rounded-md px-2 py-0.5 text-xs bg-white text-[#3C2925] font-medium focus:outline-none focus:ring-1 focus:ring-[#641D2D] cursor-pointer min-w-[54px] shadow-xs"
+          v-model.number="selectedPageSize"
+          class="border border-[#C9A24A]/60 rounded-md px-2.5 py-1 text-xs bg-white text-[#641D2D] font-bold focus:outline-none focus:ring-1 focus:ring-[#641D2D] cursor-pointer min-w-[62px] shadow-xs"
         >
-          <option v-for="size in allPageSizeOptions" :key="size" :value="size">{{ size }}</option>
+          <option v-for="size in allPageSizeOptions" :key="size" :value="size" :selected="size === Number(pageSize)">
+            {{ size }}
+          </option>
         </select>
       </div>
     </div>
@@ -95,47 +96,66 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'update:currentPage', page: number): void
+  (e: 'update:current-page', page: number): void
   (e: 'update:pageSize', size: number): void
+  (e: 'update:page-size', size: number): void
 }>()
 
 // Ensure pageSize is always present in options so select is never empty
 const allPageSizeOptions = computed(() => {
   const opts = [...props.pageSizeOptions]
-  if (!opts.includes(props.pageSize)) {
-    opts.push(props.pageSize)
+  const current = Number(props.pageSize) || 15
+  if (!opts.includes(current)) {
+    opts.push(current)
     opts.sort((a, b) => a - b)
   }
   return opts
 })
 
-const totalPages = computed(() => Math.max(1, Math.ceil(props.totalItems / props.pageSize)))
+// Two-way reactive wrapper for select v-model
+const selectedPageSize = computed({
+  get: () => Number(props.pageSize) || 15,
+  set: (val: number) => {
+    changePageSize(Number(val))
+  }
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(props.totalItems / (Number(props.pageSize) || 15))))
 
 const startIndex = computed(() => {
   if (props.totalItems === 0) return 0
-  return (props.currentPage - 1) * props.pageSize + 1
+  const size = Number(props.pageSize) || 15
+  return (props.currentPage - 1) * size + 1
 })
 
 const endIndex = computed(() => {
-  return Math.min(props.totalItems, props.currentPage * props.pageSize)
+  const size = Number(props.pageSize) || 15
+  return Math.min(props.totalItems, props.currentPage * size)
 })
 
 const goToPage = (page: number) => {
   if (page < 1 || page > totalPages.value || page === props.currentPage) return
   emit('update:currentPage', page)
+  emit('update:current-page', page)
 }
 
 const changePageSize = (newSize: number) => {
-  emit('update:pageSize', newSize)
-  const newTotalPages = Math.max(1, Math.ceil(props.totalItems / newSize))
+  const size = Number(newSize) || 15
+  emit('update:pageSize', size)
+  emit('update:page-size', size)
+  const newTotalPages = Math.max(1, Math.ceil(props.totalItems / size))
   if (props.currentPage > newTotalPages) {
     emit('update:currentPage', newTotalPages)
+    emit('update:current-page', newTotalPages)
   }
 }
 
 watch(() => props.totalItems, (count) => {
-  const max = Math.max(1, Math.ceil(count / props.pageSize))
+  const size = Number(props.pageSize) || 15
+  const max = Math.max(1, Math.ceil(count / size))
   if (props.currentPage > max) {
     emit('update:currentPage', max)
+    emit('update:current-page', max)
   }
 })
 

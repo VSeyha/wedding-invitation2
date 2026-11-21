@@ -5,7 +5,8 @@ import { z } from 'zod'
 
 const importGuestItemSchema = z.object({
   name: z.string().min(1, 'Name is required').max(200),
-  phone: z.string().nullable().optional()
+  phone: z.string().nullable().optional(),
+  note: z.string().nullable().optional()
 })
 
 const importBatchSchema = z.object({
@@ -32,7 +33,8 @@ export default defineEventHandler(async (event) => {
   const cleanRows = items
     .map(g => ({
       name: g.name.trim(),
-      phone: g.phone && String(g.phone).trim() ? String(g.phone).trim() : null
+      phone: g.phone && String(g.phone).trim() ? String(g.phone).trim() : null,
+      note: g.note && String(g.note).trim() ? String(g.note).trim() : ''
     }))
     .filter(g => g.name.length > 0)
 
@@ -44,7 +46,7 @@ export default defineEventHandler(async (event) => {
   const { data: insertedGuests, error: guestError } = await supabase
     .from('guests')
     .insert(cleanRows)
-    .select('id, name, phone, created_at')
+    .select('id, name, phone, note, created_at')
 
   if (guestError) {
     throw createError({
