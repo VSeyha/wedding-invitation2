@@ -10,42 +10,26 @@
       </h2>
       <div class="flex items-center justify-center gap-2 mt-4 text-wedding-secondary">
         <span class="w-12 h-px bg-wedding-secondary/40"></span>
-        <span class="text-lg">🪷</span>
+        <RomdoulFlower :size="20" :glow="true" />
         <span class="w-12 h-px bg-wedding-secondary/40"></span>
       </div>
     </div>
 
     <!-- Outer Khmer Card Frame with Double Gold Border -->
-    <div class="rounded-3xl p-1.5 sm:p-2 bg-gradient-to-b from-[#FAF4EB] via-[#FFFDF9] to-[#F5ECE0] border border-[#C9A24A]/30 shadow-gold-glow relative">
+    <div class="rounded-3xl p-1.5 sm:p-2 bg-gradient-to-b from-[#FAF4EB] via-[#FFFDF9] to-[#F5ECE0] border border-[#C9A24A]/30 shadow-gold-glow relative interactive-card">
       <div class="rounded-[22px] p-6 sm:p-8 bg-[#FFFDF9]/95 border border-[#C9A24A]/40 relative overflow-hidden backdrop-blur-sm text-center">
-        <!-- Traditional Corner Fleur-de-lis Accents -->
-        <div class="absolute top-2.5 left-2.5 text-[#C9A24A] select-none pointer-events-none transform -rotate-45 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
-            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
-            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
-          </svg>
+        <!-- Traditional Corner Khmer Kbach Accents -->
+        <div class="absolute top-2.5 left-2.5 select-none pointer-events-none">
+          <KhmerKbach :size="24" type="corner" position="top-left" />
         </div>
-        <div class="absolute top-2.5 right-2.5 text-[#C9A24A] select-none pointer-events-none transform rotate-45 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
-            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
-            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
-          </svg>
+        <div class="absolute top-2.5 right-2.5 select-none pointer-events-none">
+          <KhmerKbach :size="24" type="corner" position="top-right" />
         </div>
-        <div class="absolute bottom-2.5 left-2.5 text-[#C9A24A] select-none pointer-events-none transform -rotate-135 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
-            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
-            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
-          </svg>
+        <div class="absolute bottom-2.5 left-2.5 select-none pointer-events-none">
+          <KhmerKbach :size="24" type="corner" position="bottom-left" />
         </div>
-        <div class="absolute bottom-2.5 right-2.5 text-[#C9A24A] select-none pointer-events-none transform rotate-135 drop-shadow-[0_1px_2px_rgba(201,162,74,0.4)]">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C11.5 4 10 6 8.5 7.5C7 9 5.5 10 5 12C4.5 14 5.5 16 7 16.5C8.5 17 10 16 11 15C10.8 17 10.5 19 9 20.5H15C13.5 19 13.2 17 13 15C14 16 15.5 17 17 16.5C18.5 16 19.5 14 19 12C18.5 10 17 9 15.5 7.5C14 6 12.5 4 12 2Z"/>
-            <path d="M7 17C6 17 4 18 4 19C4 20 6 21 8 21C9 21 10 20.5 10.5 20C9.5 19.5 8 18.5 7 17Z"/>
-            <path d="M17 17C18 17 20 18 20 19C20 20 18 21 16 21C15 21 14 20.5 13.5 20C14.5 19.5 16 18.5 17 17Z"/>
-          </svg>
+        <div class="absolute bottom-2.5 right-2.5 select-none pointer-events-none">
+          <KhmerKbach :size="24" type="corner" position="bottom-right" />
         </div>
 
       <!-- Intro Envelope Badge & Message -->
@@ -60,7 +44,7 @@
       </div>
 
       <!-- KHQR Display Card (Uploaded file already contains KHQR header, name, and QR) -->
-      <div class="max-w-[320px] mx-auto mb-8 bg-white/95 rounded-3xl border-2 border-[#E5C77A]/40 shadow-lg p-4 sm:p-5 transition-transform hover:scale-[1.01]">
+      <div class="max-w-[320px] mx-auto mb-8 bg-white/95 rounded-3xl border-2 border-[#E5C77A]/40 shadow-lg p-4 sm:p-5 interactive-card cursor-pointer">
         <!-- The uploaded KHQR Card Image -->
         <div class="w-full rounded-2xl overflow-hidden bg-white shadow-inner border border-gray-100 flex items-center justify-center">
           <img
@@ -107,9 +91,10 @@
           <button
             type="button"
             @click="copyAccountNumber"
-            class="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-wedding-primary hover:bg-wedding-primary/90 text-wedding-bg font-medium shadow-md transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm font-khmer-body"
+            class="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-wedding-primary hover:bg-wedding-primary/90 text-wedding-bg font-medium shadow-md transition-all text-xs sm:text-sm font-khmer-body interactive-btn cursor-pointer"
+            :class="{ 'ring-4 ring-emerald-400/50 !bg-emerald-700': isCopied }"
           >
-            <span>📋</span>
+            <span>{{ isCopied ? '✨' : '📋' }}</span>
             <span>{{ isCopied ? '✓ បានចម្លងលេខគណនីរួចរាល់!' : `ចម្លងលេខគណនី ${activeGiftInfo.bank_name || 'ABA'}` }}</span>
           </button>
         </div>
@@ -125,6 +110,8 @@
 </template>
 
 <script setup lang="ts">
+import RomdoulFlower from './RomdoulFlower.vue'
+import KhmerKbach from './KhmerKbach.vue'
 import type { WeddingGiftInfo } from '~~/shared/types/wedding'
 
 const props = defineProps<{

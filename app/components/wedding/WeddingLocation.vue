@@ -8,7 +8,7 @@
       <div class="w-24 h-0.5 bg-wedding-secondary mx-auto mt-2"></div>
     </div>
 
-    <div class="khmer-card rounded-3xl p-6 sm:p-8 border-2 border-wedding-secondary/40 shadow-sm text-center">
+    <div class="khmer-card rounded-3xl p-6 sm:p-8 border-2 border-wedding-secondary/40 shadow-sm text-center interactive-card">
       <!-- Venue Name -->
       <h3 class="font-khmer-heading text-lg sm:text-2xl text-wedding-primary mb-2">
         {{ isKhmer ? (wedding?.venue_name_km || wedding?.venue_name_en) : (wedding?.venue_name_en || wedding?.venue_name_km) }}
@@ -25,7 +25,7 @@
           :href="wedding.google_maps_url"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-wedding-primary hover:bg-wedding-primary/90 text-wedding-bg font-medium shadow-md transition-all transform hover:scale-105 active:scale-95 text-sm"
+          class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-wedding-primary hover:bg-wedding-primary/90 text-wedding-bg font-medium shadow-md transition-all text-sm interactive-btn cursor-pointer"
         >
           <span>🗺️</span>
           <span>{{ t('common.open_map') }}</span>

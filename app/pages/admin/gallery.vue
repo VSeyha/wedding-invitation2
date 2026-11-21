@@ -288,13 +288,14 @@
       <div
         v-for="photo in photos"
         :key="photo.id"
-        class="relative group rounded-xl overflow-hidden border border-[#C9A24A]/30 shadow-sm aspect-square bg-gray-100"
+        class="relative group rounded-xl overflow-hidden border border-[#C9A24A]/30 shadow-sm aspect-square bg-[#F7F0E3]/40"
       >
         <img
           :src="photo.url"
           :alt="photo.alt_text_en || 'Wedding photo'"
           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
         />
         <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
           <button

@@ -1,7 +1,9 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
     <div class="max-w-md w-full khmer-card p-8 rounded-2xl border-2 border-wedding-secondary shadow-gold-glow">
-      <div class="text-4xl mb-4">⚜️</div>
+      <div class="flex items-center justify-center mb-4">
+        <KhmerKbach :size="48" type="crest" :glow="true" />
+      </div>
       <h1 class="text-2xl md:text-3xl font-khmer-heading text-wedding-heading mb-2">
         សិរីមង្គលអាពាហ៍ពិពាហ៍
       </h1>
@@ -24,5 +26,6 @@
 </template>
 
 <script setup lang="ts">
+import KhmerKbach from '~/components/wedding/KhmerKbach.vue'
 const { t } = useLocale()
 </script>

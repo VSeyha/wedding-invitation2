@@ -32,7 +32,7 @@
             <tr v-if="loading"><td colspan="6" class="px-4 py-8 text-center text-[#3C2925]/50">Loading...</td></tr>
             <tr v-else-if="!filtered.length"><td colspan="6" class="px-4 py-8 text-center text-[#3C2925]/50">No invitations found.</td></tr>
             <tr
-              v-for="inv in filtered"
+              v-for="inv in paginatedInvitations"
               :key="inv.id"
               class="border-b border-[#C9A24A]/10 hover:bg-[#F7F0E3]/50 transition-colors"
             >
@@ -75,6 +75,14 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
+      <AdminPagination
+        :total-items="filtered.length"
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        item-name="invitations"
+      />
     </div>
 
     <!-- Export -->
@@ -102,6 +110,8 @@ const invitations = ref<any[]>([])
 const loading = ref(true)
 const search = ref('')
 const filterStatus = ref('')
+const currentPage = ref(1)
+const pageSize = ref(15)
 const toast = ref('')
 const submitting = ref(false)
 
@@ -112,6 +122,15 @@ const filtered = computed(() =>
     return nameMatch && statusMatch
   })
 )
+
+const paginatedInvitations = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return filtered.value.slice(start, start + pageSize.value)
+})
+
+watch([search, filterStatus], () => {
+  currentPage.value = 1
+})
 
 const getToken = async () => {
   if (!supabase) return ''

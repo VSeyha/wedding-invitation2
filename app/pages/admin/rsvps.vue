@@ -55,7 +55,7 @@
           <tbody>
             <tr v-if="loading"><td colspan="3" class="px-4 py-8 text-center text-[#3C2925]/50">Loading...</td></tr>
             <tr v-else-if="!filtered.length"><td colspan="3" class="px-4 py-8 text-center text-[#3C2925]/50">No responses found.</td></tr>
-            <tr v-for="row in filtered" :key="row.id || row.guest_name" class="border-b border-[#C9A24A]/10 hover:bg-[#F7F0E3]/50">
+            <tr v-for="row in paginatedRsvps" :key="row.id || row.guest_name" class="border-b border-[#C9A24A]/10 hover:bg-[#F7F0E3]/50">
               <td class="px-4 py-3 font-medium text-[#3C2925]">{{ row.guest_name }}</td>
               <td class="px-4 py-3">
                 <span v-if="row.status === 'attending'" class="badge-success inline-flex items-center gap-1">
@@ -75,6 +75,14 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
+      <AdminPagination
+        :total-items="filtered.length"
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        item-name="responses"
+      />
     </div>
   </div>
 </template>
@@ -90,6 +98,8 @@ const rsvps = ref<any[]>([])
 const loading = ref(true)
 const search = ref('')
 const filterStatus = ref('')
+const currentPage = ref(1)
+const pageSize = ref(15)
 
 const stats = computed(() => ({
   total: rsvps.value.length,
@@ -105,6 +115,15 @@ const filtered = computed(() =>
     return nameMatch && statusMatch
   })
 )
+
+const paginatedRsvps = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return filtered.value.slice(start, start + pageSize.value)
+})
+
+watch([search, filterStatus], () => {
+  currentPage.value = 1
+})
 
 const getToken = async () => {
   if (!supabase) return ''

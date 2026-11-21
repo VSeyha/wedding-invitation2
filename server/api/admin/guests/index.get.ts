@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     .select(`
       id, name, phone, created_at, updated_at,
       invitations ( id, token, status, opened_at, created_at,
-        rsvps ( attendance_status, submitted_at )
+        rsvps ( id, attendance_status, submitted_at )
       )
     `)
     .order('created_at', { ascending: false })

@@ -16,10 +16,10 @@
         class="relative group"
       >
         <!-- Dot Indicator on line -->
-        <span class="absolute -left-[31px] sm:-left-[35px] top-3.5 w-3.5 h-3.5 rounded-full bg-wedding-secondary border-2 border-wedding-bg shadow-sm"></span>
+        <span class="absolute -left-[31px] sm:-left-[35px] top-3.5 w-3.5 h-3.5 rounded-full bg-wedding-secondary border-2 border-wedding-bg shadow-sm transition-transform duration-300 group-hover:scale-125 group-hover:bg-wedding-primary"></span>
 
         <!-- Event Content Box -->
-        <div class="khmer-card rounded-2xl p-4 sm:p-5 border border-wedding-secondary/30 shadow-sm transition-transform hover:-translate-y-0.5">
+        <div class="khmer-card rounded-2xl p-4 sm:p-5 border border-wedding-secondary/30 shadow-sm interactive-card cursor-pointer group-hover:border-wedding-secondary/60">
           <div class="inline-block px-2.5 py-0.5 rounded-full bg-wedding-primary/10 text-wedding-primary font-mono font-bold text-xs mb-1.5 border border-wedding-secondary/20">
             {{ formatTime(prog.event_time) }}
           </div>

@@ -21,6 +21,7 @@
           <input
             v-model="email"
             type="email"
+            autocomplete="email"
             required
             class="w-full px-3 py-2 rounded-lg border border-[#C9A24A]/40 bg-white focus:outline-none focus:ring-2 focus:ring-[#641D2D]"
             placeholder="admin@wedding.com"
@@ -34,6 +35,7 @@
           <input
             v-model="password"
             type="password"
+            autocomplete="current-password"
             required
             class="w-full px-3 py-2 rounded-lg border border-[#C9A24A]/40 bg-white focus:outline-none focus:ring-2 focus:ring-[#641D2D]"
             placeholder="••••••••"

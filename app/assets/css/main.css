@@ -83,14 +83,158 @@
   /* Lively scroll-driven entrance animation */
   .scroll-reveal {
     opacity: 0;
-    transform: translateY(28px) scale(0.97);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(32px) scale(0.97);
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: opacity, transform;
   }
 
   .scroll-reveal.revealed {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+
+  /* Staggered children entrance */
+  .scroll-reveal .stagger-1 {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+  }
+  .scroll-reveal .stagger-2 {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.22s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.22s;
+  }
+  .scroll-reveal .stagger-3 {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.34s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.34s;
+  }
+  .scroll-reveal .stagger-4 {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.46s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.46s;
+  }
+
+  .scroll-reveal.revealed .stagger-1,
+  .scroll-reveal.revealed .stagger-2,
+  .scroll-reveal.revealed .stagger-3,
+  .scroll-reveal.revealed .stagger-4 {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Interactive luxury card hover & active click feedback */
+  .interactive-card {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    will-change: transform, box-shadow;
+  }
+  .interactive-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px -10px rgba(100, 29, 45, 0.18), 0 0 24px rgba(201, 162, 74, 0.25);
+    border-color: rgba(201, 162, 74, 0.65);
+  }
+  .interactive-card:active {
+    transform: translateY(-1px) scale(0.99);
+    transition-duration: 0.1s;
+  }
+
+  /* Interactive tactile button hover & active click feedback */
+  .interactive-btn {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+    will-change: transform;
+  }
+  .interactive-btn:hover {
+    transform: translateY(-2px) scale(1.025);
+    box-shadow: 0 8px 24px -4px rgba(201, 162, 74, 0.4);
+    filter: brightness(1.03);
+  }
+  .interactive-btn:active {
+    transform: translateY(1px) scale(0.96);
+    filter: brightness(0.96);
+    transition-duration: 0.08s;
+  }
+  .interactive-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.75s ease;
+    pointer-events: none;
+  }
+  .interactive-btn:hover::after {
+    left: 140%;
+  }
+
+  /* Gentle floating keyframe for royal motifs */
+  @keyframes floatGentle {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-7px) rotate(3deg); }
+  }
+  .float-gentle {
+    display: inline-block;
+    animation: floatGentle 5s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Soft pulse for badges & dots */
+  @keyframes pulseSoft {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.85; }
+  }
+  .pulse-soft {
+    animation: pulseSoft 2.5s ease-in-out infinite;
+  }
+
+  /* Click / Tap Royal Golden Sparkle Particle */
+  @keyframes sparkleBurst {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translate(0, 0) scale(0.6) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1.25) rotate(var(--rot));
+    }
+  }
+  .click-sparkle {
+    position: fixed;
+    pointer-events: none;
+    user-select: none;
+    z-index: 9999;
+    will-change: transform, opacity;
+    animation: sparkleBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Shimmer effect for luxury image loading skeletons */
+  @keyframes shimmerWave {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .shimmer-skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: rgba(247, 240, 227, 0.6);
+  }
+  .shimmer-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(201, 162, 74, 0.12) 25%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(201, 162, 74, 0.12) 75%,
+      transparent 100%
+    );
+    animation: shimmerWave 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 }
 

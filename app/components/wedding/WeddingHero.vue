@@ -1,69 +1,53 @@
 <template>
-  <section class="relative pt-20 pb-16 px-4 text-center overflow-hidden">
-    <!-- Top Khmer Motif -->
-    <div class="inline-block mb-3 text-3xl sm:text-4xl text-wedding-secondary animate-pulse">
-      ⚜️
+  <section class="relative pt-10 sm:pt-14 pb-12 px-4 text-center overflow-hidden">
+    <!-- Subtitle Greeting in an elegant translucent pill badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-wedding-secondary/45 shadow-sm mb-3">
+      <span class="w-1.5 h-1.5 rounded-full bg-wedding-secondary animate-pulse"></span>
+      <span class="text-xs sm:text-sm text-wedding-primary font-bold tracking-wide font-khmer-heading">
+        {{ t('hero.greeting') }}
+      </span>
+      <span class="w-1.5 h-1.5 rounded-full bg-wedding-secondary animate-pulse"></span>
     </div>
 
-    <!-- Subtitle Greeting -->
-    <p class="text-xs sm:text-sm text-wedding-secondary font-bold mb-4" :class="{ 'uppercase tracking-widest font-en-heading': !isKhmer }">
-      {{ t('hero.greeting') }}
-    </p>
-
     <!-- Khmer Wedding Title -->
-    <h1 class="font-khmer-heading text-2xl sm:text-3xl text-wedding-heading mb-6" style="line-height: 2.1 !important;">
+    <h1 class="font-khmer-heading text-2xl sm:text-3xl text-wedding-heading mb-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" style="line-height: 2.1 !important;">
       {{ isKhmer ? (wedding?.venue_name_km ? 'សិរីមង្គលអាពាហ៍ពិពាហ៍' : 'សិរីមង្គលអាពាហ៍ពិពាហ៍') : 'Wedding Celebration' }}
     </h1>
 
-    <!-- Couple Names Hero Banner -->
-    <div class="max-w-xl mx-auto my-6 p-6 rounded-3xl khmer-card border-2 border-wedding-secondary/50 shadow-gold-glow">
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
-        <div>
-          <div class="font-khmer-heading text-xl sm:text-2xl text-wedding-primary">
-            {{ isKhmer ? (wedding?.groom_name_km || 'កូនកំលោះ') : (wedding?.groom_name_en || 'Groom') }}
-          </div>
-          <div class="text-xs text-wedding-text/60 font-en-heading font-medium" v-if="isKhmer">
-            {{ wedding?.groom_name_en }}
-          </div>
+    <!-- Couple Names Hero Banner (Lightweight & elegant to let background arch frame show through) -->
+    <div class="max-w-md mx-auto my-3 p-4 rounded-2xl bg-white/65 backdrop-blur-sm border border-wedding-secondary/35 shadow-sm interactive-card">
+      <div class="flex flex-col items-center justify-center gap-1">
+        <div class="font-en-heading text-xl sm:text-2xl font-bold text-wedding-primary">
+          {{ wedding?.groom_name_en || 'Vet Seyha' }} & {{ wedding?.bride_name_en || 'Sar Nary' }}
         </div>
-
-        <div class="text-2xl sm:text-3xl text-wedding-secondary font-en-heading font-bold">
-          &
-        </div>
-
-        <div>
-          <div class="font-khmer-heading text-xl sm:text-2xl text-wedding-primary">
-            {{ isKhmer ? (wedding?.bride_name_km || 'កូនក្រមុំ') : (wedding?.bride_name_en || 'Bride') }}
-          </div>
-          <div class="text-xs text-wedding-text/60 font-en-heading font-medium" v-if="isKhmer">
-            {{ wedding?.bride_name_en }}
-          </div>
+        <div class="font-khmer-heading text-lg sm:text-xl font-bold text-wedding-primary">
+          {{ wedding?.groom_name_km || 'វ៉េត សីហា' }} & {{ wedding?.bride_name_km || 'ស ណារី' }}
         </div>
       </div>
 
       <!-- Wedding Date in Traditional Khmer & English Subtitle -->
-      <div class="mt-4 pt-4 border-t border-wedding-secondary/30 text-center">
-        <div class="font-khmer-heading text-base sm:text-lg font-bold text-wedding-heading tracking-wide leading-relaxed">
+      <div class="mt-3 pt-3 border-t border-wedding-secondary/25 text-center">
+        <div class="font-khmer-heading text-sm sm:text-base font-bold text-wedding-heading tracking-wide leading-relaxed">
           {{ isKhmer ? formatKhmerDate(wedding?.wedding_date) : formatEnglishDate(wedding?.wedding_date) }}
         </div>
-        <div class="text-xs sm:text-sm text-wedding-text/60 font-en-heading font-medium mt-1">
+        <div class="text-xs text-wedding-text/70 font-en-heading font-medium mt-0.5">
           {{ isKhmer ? formatEnglishDate(wedding?.wedding_date) : formatKhmerDate(wedding?.wedding_date) }}
         </div>
       </div>
     </div>
 
     <!-- Live Countdown Timer -->
-    <div class="max-w-lg mx-auto mt-8">
-      <div class="text-xs font-bold uppercase tracking-widest text-wedding-secondary mb-3">
+    <div class="max-w-lg mx-auto mt-6">
+      <div class="text-xs font-bold uppercase tracking-widest text-wedding-secondary mb-3 filter drop-shadow-sm">
         Countdown to Our Special Day
       </div>
       <div class="grid grid-cols-4 gap-2 sm:gap-4">
         <div
           v-for="unit in countdownUnits"
           :key="unit.labelKey"
-          class="p-3 sm:p-4 rounded-2xl khmer-card border border-wedding-secondary/40 shadow-sm"
+          class="p-2.5 sm:p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm interactive-card cursor-pointer group active:scale-95"
         >
-          <div class="text-xl sm:text-3xl font-bold text-wedding-primary font-mono">
+          <div class="text-xl sm:text-3xl font-bold text-wedding-primary font-mono transition-transform duration-300 group-hover:scale-105 group-hover:text-wedding-secondary">
             {{ unit.value }}
           </div>
           <div class="text-[10px] sm:text-xs text-wedding-text/70 uppercase tracking-wider mt-1">
@@ -76,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import KhmerKbach from './KhmerKbach.vue'
 import type { WeddingSettings } from '~~/shared/types/wedding'
 import { formatKhmerDate, formatEnglishDate } from '~~/app/utils/date'
 

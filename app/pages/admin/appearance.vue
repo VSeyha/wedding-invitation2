@@ -274,9 +274,9 @@
             <div>
               <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
                 <Mail class="w-4 h-4" />
-                <span>Opening Royal Seal Envelope</span>
+                <span>Opening Invitation Experience</span>
               </h2>
-              <p class="text-xs text-[#3C2925]/60 mt-0.5">Custom envelope seal presented to guests upon opening</p>
+              <p class="text-xs text-[#3C2925]/60 mt-0.5">Custom animation & envelope presented to guests upon opening</p>
             </div>
             <button
               type="button"
@@ -289,13 +289,19 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="form-label">Seal Motif Style</label>
+              <label class="form-label">Opening Style (ទម្រង់បើកសំបុត្រ)</label>
               <select v-model="config.opening_animation_config.style" class="input-field">
+                <option value="curtain">Royal Velvet Curtains (វាំងននមង្គលការរាជវាំង)</option>
+                <option value="click_seal">Royal Romdoul Wax Seal (ត្រារាជានិយមផ្ការំដួល)</option>
+                <option value="slide_unlock">Slide Romdoul to Unlock (អូសផ្ការំដួលបើក)</option>
+                <option value="scratch">Gold Scratch-Off Reveal (កោសស្រទាប់មាសបើក)</option>
+                <option value="envelope_flap">3D Origami Envelope Flap (បត់បើកស្រោមសំបុត្រ 3D)</option>
                 <option value="golden_seal">Golden Royal Lotus Seal (សិរីមង្គលផ្កាឈូក)</option>
+                <option value="romdoul_seal">Royal Romdoul Flower (ផ្ការំដួលរាជានិយម)</option>
                 <option value="khmer_seal">Traditional Khmer Motif (ក្បាច់បុរាណ)</option>
                 <option value="lotus">Royal Blossom (ផ្កាឈូកមាស)</option>
-                <option value="fade">Simple Elegant Fade</option>
-                <option value="none">Direct Open (No Envelope)</option>
+                <option value="fade">Simple Elegant Fade (រំលេចសន្សឹមៗ)</option>
+                <option value="none">Direct Open (No Envelope) (បើកផ្ទាល់គ្មានស្រោម)</option>
               </select>
             </div>
             <div>
@@ -373,50 +379,30 @@
                 class="flex-1 w-full overflow-y-auto relative transition-colors duration-300"
                 :style="[previewCssVars, previewBackgroundStyle]"
               >
-                <!-- Live Particle Animation inside Preview -->
-                <WeddingCanvasBackground
-                  v-if="config.animation_config.enabled"
-                  :config="config.animation_config"
+                <!-- Simulated Opening Envelope in Preview (Full Mobile Screen) -->
+                <WeddingOpeningAnimation
+                  v-if="showOpeningTest"
+                  :key="'preview-opening-' + config.opening_animation_config.style"
+                  :guest-name="'Sor Nga'"
+                  :wedding="weddingData"
+                  :appearance="config"
                   :absolute="true"
+                  @opened="showOpeningTest = false"
                 />
 
-                <!-- Simulated Opening Envelope in Preview -->
-                <div
-                  v-if="showOpeningTest"
-                  class="absolute inset-0 z-30 flex items-center justify-center p-4 transition-all duration-500"
-                  :style="{ backgroundColor: config.theme_config.primary }"
-                >
-                  <div
-                    class="w-full rounded-3xl p-6 border-2 border-wedding-secondary shadow-2xl text-center relative"
-                    :style="{ backgroundColor: config.theme_config.bg }"
-                  >
-                    <div class="text-xs uppercase tracking-widest font-bold mb-1" :style="{ color: config.theme_config.secondary }">
-                      WEDDING INVITATION
-                    </div>
-                    <div class="font-khmer-heading text-lg font-bold mb-2" :style="{ color: config.theme_config.primary }">
-                      សិរីមង្គលអាពាហ៍ពិពាហ៍
-                    </div>
-                    <div class="text-xs text-wedding-text/70 mb-4">
-                      {{ weddingData.groom_name_km }} & {{ weddingData.bride_name_km }}
-                    </div>
-                    <button
-                      type="button"
-                      @click="showOpeningTest = false"
-                      class="w-16 h-16 rounded-full mx-auto flex items-center justify-center shadow-gold-glow animate-pulse text-[#641D2D]"
-                      :style="{ background: 'linear-gradient(135deg, #E5C77A, #C9A24A, #8F6B1E)' }"
-                    >
-                      <Crown class="w-7 h-7" />
-                    </button>
-                    <div class="mt-3 text-[11px] font-bold" :style="{ color: config.theme_config.primary }">
-                      ចុចបើកលិខិតអញ្ជើញ (Click to Open)
-                    </div>
-                  </div>
-                </div>
+                <!-- Full Scrollable Page Document Wrapper (Height spans entire scroll until the end) -->
+                <div class="relative min-h-full w-full">
+                  <!-- Live Particle Animation inside Preview -->
+                  <WeddingCanvasBackground
+                    v-if="config.animation_config.enabled"
+                    :config="config.animation_config"
+                    :absolute="true"
+                  />
 
-                <!-- Preview Content by Section -->
-                <div class="relative z-10 p-4 space-y-6">
-                  <!-- Section: Hero & Countdown -->
-                  <div v-if="activeSection === 'all' || activeSection === 'hero'" class="text-center pt-2">
+                  <!-- Preview Content by Section -->
+                  <div class="relative z-10 p-4 space-y-4">
+                  <!-- Section: Hero & Countdown (Padded to fit gracefully below arch florals) -->
+                  <div v-if="activeSection === 'all' || activeSection === 'hero'" class="text-center pt-7 sm:pt-8">
                     <div class="flex justify-center mb-1">
                       <Crown class="w-6 h-6" :style="{ color: config.theme_config.secondary }" />
                     </div>
@@ -538,11 +524,12 @@
                 </div>
 
                 <!-- Bottom Bar Notch -->
-                <div class="py-4 text-center">
+                <div class="py-4 text-center relative z-10">
                   <span class="inline-block w-24 h-1 bg-black/20 rounded-full"></span>
                 </div>
               </div>
             </div>
+          </div>
 
             <!-- Desktop Viewport Frame -->
             <div
@@ -570,6 +557,17 @@
                 class="flex-1 w-full overflow-y-auto relative transition-colors duration-300 p-6"
                 :style="[previewCssVars, previewBackgroundStyle]"
               >
+                <!-- Simulated Opening Envelope in Desktop Preview (Full Screen) -->
+                <WeddingOpeningAnimation
+                  v-if="showOpeningTest"
+                  :key="'preview-opening-desktop-' + config.opening_animation_config.style"
+                  :guest-name="'Sor Nga'"
+                  :wedding="weddingData"
+                  :appearance="config"
+                  :absolute="true"
+                  @opened="showOpeningTest = false"
+                />
+
                 <!-- Live Particle Animation -->
                 <WeddingCanvasBackground
                   v-if="config.animation_config.enabled"
@@ -577,45 +575,49 @@
                   :absolute="true"
                 />
 
-                <div class="max-w-md mx-auto relative z-10 text-center space-y-6">
+                <div
+                  class="max-w-md mx-auto relative z-10 text-center space-y-6 p-4 sm:p-6 bg-transparent border-0 shadow-none"
+                >
                   <!-- Header Title -->
                   <div class="pt-4">
                     <div class="flex justify-center mb-1">
                       <Crown class="w-7 h-7" :style="{ color: config.theme_config.secondary }" />
                     </div>
-                    <div class="text-xs uppercase tracking-widest font-bold" :style="{ color: config.theme_config.secondary }">
+                    <div class="text-xs uppercase tracking-widest font-bold filter drop-shadow-sm" :style="{ color: config.theme_config.secondary }">
                       THE WEDDING CELEBRATION
                     </div>
-                    <h2 class="font-khmer-heading text-2xl font-bold mt-1" :style="{ color: config.theme_config.heading }">
+                    <h2 class="font-khmer-heading text-2xl font-bold mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" :style="{ color: config.theme_config.heading }">
                       សិរីមង្គលអាពាហ៍ពិពាហ៍
                     </h2>
-                    <div class="font-en-heading text-xl font-bold mt-1" :style="{ color: config.theme_config.primary }">
-                      {{ weddingData.groom_name_en || 'Vet Seyha' }} & {{ weddingData.bride_name_en || 'Sar Nary' }}
+                    <div class="mt-4 p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm">
+                      <div class="font-en-heading text-xl font-bold" :style="{ color: config.theme_config.primary }">
+                        {{ weddingData.groom_name_en || 'Vet Seyha' }} & {{ weddingData.bride_name_en || 'Sar Nary' }}
+                      </div>
                     </div>
                   </div>
 
                   <!-- Countdown -->
                   <div class="grid grid-cols-4 gap-2 max-w-xs mx-auto">
-                    <div class="p-2.5 rounded-xl bg-white/80 border border-wedding-secondary/30 shadow-sm text-center">
+                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
                       <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.days }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/60">Days</div>
+                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Days</div>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-white/80 border border-wedding-secondary/30 shadow-sm text-center">
+                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
                       <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.hours }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/60">Hours</div>
+                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Hours</div>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-white/80 border border-wedding-secondary/30 shadow-sm text-center">
+                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
                       <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.minutes }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/60">Mins</div>
+                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Mins</div>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-white/80 border border-wedding-secondary/30 shadow-sm text-center">
+                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
                       <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.seconds }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/60">Secs</div>
+                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Secs</div>
                     </div>
                   </div>
 
                   <!-- Venue card -->
-                  <div class="p-4 rounded-2xl bg-white/80 border border-wedding-secondary/30 shadow-sm text-center">
+                  <div class="p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
                     <div class="text-xs font-bold" :style="{ color: config.theme_config.heading }">
                       {{ weddingData.venue_name_km || 'The Premier Centre Sen Sok (អគារ F)' }}
                     </div>
@@ -854,7 +856,10 @@ const resetToDefault = () => {
 }
 
 const testOpeningAnimation = () => {
-  showOpeningTest.value = true
+  showOpeningTest.value = false
+  nextTick(() => {
+    showOpeningTest.value = true
+  })
 }
 
 const loadData = async () => {

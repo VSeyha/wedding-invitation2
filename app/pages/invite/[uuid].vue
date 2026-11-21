@@ -1,35 +1,58 @@
 <template>
   <div
-    class="relative flex justify-center selection:bg-wedding-secondary/30 selection:text-wedding-primary font-khmer-body overflow-x-hidden min-h-screen"
-    :style="{ backgroundColor: 'var(--wedding-bg, #F7F0E3)' }"
+    class="relative flex justify-center selection:bg-wedding-secondary/30 selection:text-wedding-primary font-khmer-body overflow-x-hidden min-h-screen bg-[#140D0A]"
   >
-    <!-- 1. Unified Panoramic Scenic Backdrop (Seamless edge-to-edge for Desktop & Mobile) -->
+    <!-- Unified Dynamic Scenic Backdrop (Edge-to-edge for Desktop & Mobile) -->
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      <!-- Full-bleed background with atmospheric zoom & center alignment -->
+      <!-- Fullscreen Ambient Backdrop (Gives atmospheric color & depth across widescreen monitors) -->
       <div
-        class="w-full h-full bg-cover bg-center will-change-transform"
+        class="w-full h-full bg-cover bg-center will-change-transform filter sm:blur-[6px] sm:scale-105"
         :style="dynamicBackgroundStyle"
       ></div>
 
+      <!-- Subtle dark overlay (15–20% opacity) for cinematic depth and text contrast -->
+      <div class="absolute inset-0 bg-black/[0.22] pointer-events-none"></div>
+
       <!-- Depth vignette that focuses the eyes on the central invitation -->
       <div
-        class="absolute inset-0"
-        style="background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.25) 100%);"
+        class="absolute inset-0 pointer-events-none"
+        style="background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.45) 100%);"
       ></div>
 
-      <!-- Subtle theme overlay tint -->
+      <!-- Admin Configured Dynamic Overlay Tint (if customized in Admin Portal) -->
       <div
-        class="absolute inset-0 transition-opacity duration-500"
+        class="absolute inset-0 transition-opacity duration-500 pointer-events-none"
         :style="backgroundOverlayStyle"
       ></div>
 
-      <!-- Fullscreen Falling Particles across the viewport (100% synced with appearance config) -->
+      <!-- Layer 3: Existing background animations (fullscreen falling golden leaves / particles) -->
       <WeddingCanvasBackground
         v-if="appearanceConfig?.animation_config?.enabled !== false && appearanceConfig?.animation_config?.preset !== 'none'"
         :absolute="false"
         :config="appearanceConfig?.animation_config"
         :theme-colors="appearanceConfig?.theme_config"
       />
+    </div>
+
+    <!-- 2. Desktop Side Ambient Backdrop Overlay (Dim & blur side gutters to highlight the central invitation card) -->
+    <div class="fixed inset-0 pointer-events-none z-[1] hidden sm:flex justify-center">
+      <!-- Left Gutters Overlay -->
+      <div class="flex-1 h-full bg-black/50 backdrop-blur-[4px] transition-all duration-500"></div>
+      <!-- Center Invitation Slot Placeholder -->
+      <div class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] h-full pointer-events-none"></div>
+      <!-- Right Gutters Overlay -->
+      <div class="flex-1 h-full bg-black/50 backdrop-blur-[4px] transition-all duration-500"></div>
+    </div>
+
+    <!-- 3. Central Invitation Background Layer (Fitted perfectly to the invitation card column, exactly matching the phone preview) -->
+    <div class="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] pointer-events-none z-[2] overflow-hidden">
+      <!-- Sharp, perfectly framed background image inside the invitation column -->
+      <div
+        class="w-full h-full bg-cover bg-center will-change-transform"
+        :style="dynamicBackgroundStyle"
+      ></div>
+      <!-- Subtle internal contrast tint -->
+      <div class="absolute inset-0 bg-black/[0.08] pointer-events-none"></div>
     </div>
 
     <!-- Error State: Invitation Not Found or Revoked -->
@@ -62,16 +85,27 @@
     <!-- Active Valid Invitation -->
     <div
       v-else
-      class="relative z-10 w-full flex justify-center"
-      :class="hasOpened ? 'sm:py-8' : 'h-screen max-h-screen overflow-hidden'"
+      class="relative z-10 w-full flex justify-center py-0 sm:py-8 transition-all duration-700 min-h-screen"
     >
-      <!-- Centered Stationery Invitation Card -->
+      <!-- 1. Khmer Royal Seal Opening Envelope (Full Screen on Mobile & Desktop) -->
+      <WeddingOpeningAnimation
+        :guest-name="invitation?.guest_name || ''"
+        :wedding="wedding"
+        :appearance="appearanceConfig"
+        :absolute="false"
+        @opening="onEnvelopeOpening"
+        @opened="onEnvelopeOpened"
+      />
+
+      <!-- Layer 4: Main invitation content with a completely transparent wrapper -->
       <div
-        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] bg-wedding-bg/95 sm:backdrop-blur-md relative sm:rounded-3xl sm:border-2 sm:border-wedding-secondary/50 sm:shadow-[0_25px_70px_rgba(0,0,0,0.35),0_0_35px_rgba(201,162,74,0.22)] transition-all duration-500 overflow-hidden"
-        :class="hasOpened ? 'min-h-screen sm:min-h-0' : 'h-screen max-h-screen overflow-hidden flex items-center justify-center'"
+        class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] relative transition-all duration-700 min-h-screen sm:min-h-0 bg-transparent border-0 shadow-none"
       >
         <!-- Floating Language Switcher for Guest (Integrated seamlessly at top-right of Invitation Card) -->
-        <header class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-40">
+        <header
+          class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-40 transition-opacity duration-500"
+          :class="{ 'opacity-0 pointer-events-none': !hasOpened && !isOpening }"
+        >
           <button
             @click="toggleLocale"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/60 shadow-md text-xs sm:text-sm font-semibold text-wedding-primary transition-all duration-200 transform hover:scale-105 active:scale-95"
@@ -82,21 +116,13 @@
           </button>
         </header>
 
-        <!-- 1. Khmer Royal Seal Opening Envelope -->
-        <WeddingOpeningAnimation
-          :guest-name="invitation?.guest_name || ''"
-          :wedding="wedding"
-          :appearance="appearanceConfig"
-          :absolute="true"
-          @opening="onEnvelopeOpening"
-          @opened="onEnvelopeOpened"
-        />
-
-        <!-- 2. Main Invitation Content (Unveiled after seal clicked) with Lively Scroll Reveal -->
+        <!-- 2. Main Invitation Content (Unveiled seamlessly behind animation) -->
         <main
-          v-if="isOpening || hasOpened"
-          class="transition-opacity duration-1000 pb-20 relative"
-          :class="{ 'opacity-100': hasOpened, 'opacity-0 pointer-events-none': !hasOpened }"
+          class="pb-20 relative transition-all duration-1000 ease-out"
+          :class="{
+            'opacity-100 transform translate-y-0 scale-100 filter-none': isOpening || hasOpened,
+            'opacity-40 transform translate-y-2 scale-[0.98] pointer-events-none filter blur-[1px]': !isOpening && !hasOpened
+          }"
         >
           <!-- Hero Section -->
           <div class="scroll-reveal revealed">
@@ -130,7 +156,7 @@
 
           <!-- Photo Gallery -->
           <div class="scroll-reveal">
-            <WeddingGallery :photos="photos" :config="wedding?.gallery_config" />
+            <WeddingGallery :photos="photos" :config="wedding?.gallery_config" :loading="loading" />
           </div>
 
           <!-- Digital Wedding Gift / KHQR -->
@@ -157,6 +183,25 @@
           </footer>
         </main>
       </div>
+    </div>
+
+    <!-- Tactile Royal Click / Tap Golden Sparkle Particles -->
+    <div
+      v-for="s in clickSparkles"
+      :key="s.id"
+      class="click-sparkle font-serif"
+      :style="{
+        left: `${s.x}px`,
+        top: `${s.y}px`,
+        '--dx': s.dx,
+        '--dy': s.dy,
+        '--rot': s.rot,
+        fontSize: `${s.size}px`,
+        color: s.color,
+        textShadow: `0 0 8px ${s.color}`
+      }"
+    >
+      {{ s.symbol }}
     </div>
   </div>
 </template>
@@ -317,9 +362,13 @@ const setupScrollReveal = () => {
 const onEnvelopeOpening = () => {
   isOpening.value = true
   hasOpened.value = true
+  nextTick(() => {
+    setupScrollReveal()
+  })
 }
 
 const onEnvelopeOpened = () => {
+  isOpening.value = false
   hasOpened.value = true
   nextTick(() => {
     setupScrollReveal()
@@ -353,7 +402,7 @@ const dynamicBackgroundStyle = computed(() => {
       imgUrl = PRESET_BACKGROUNDS['angkor-wat']?.image_url || '/images/backgrounds/angkor-wat.png'
     }
 
-    const opacity = bg?.opacity ?? 0.85
+    const opacity = bg?.opacity ?? 1
     const scrollZoom = bg?.scroll_zoom !== false
     const effect = bg?.zoom_effect || 'zoom-in'
 
@@ -400,13 +449,14 @@ const dynamicBackgroundStyle = computed(() => {
 
 const backgroundOverlayStyle = computed(() => {
   const bg = appearanceConfig.value?.background_config
-  const color = bg?.overlay_color || '#FDF8EE'
+  const color = bg?.overlay_color || '#000000'
   const opacity = bg?.overlay_opacity ?? 0
   return {
     backgroundColor: color,
     opacity
   }
 })
+
 
 const loadInvitationData = async () => {
   loading.value = true
@@ -454,10 +504,68 @@ const onRSVPUpdated = (status: 'attending' | 'not_attending') => {
   }
 }
 
+// Tactile Royal Click / Tap Sparkle Burst Logic
+interface ClickSparkle {
+  id: number
+  x: number
+  y: number
+  dx: string
+  dy: string
+  rot: string
+  size: number
+  color: string
+  symbol: string
+}
+
+const clickSparkles = ref<ClickSparkle[]>([])
+let sparkleIdCounter = 0
+let lastSparkleTime = 0
+
+const triggerSparkleBurst = (x: number, y: number) => {
+  const nowTime = performance.now()
+  if (nowTime - lastSparkleTime < 90) return
+  lastSparkleTime = nowTime
+
+  const colors = ['#E5C77A', '#C9A24A', '#FFFDF9', '#FFD700', '#F687B3']
+  const symbols = ['✦', '✨', '•', '✧', '🌸', '❖']
+  const count = 6
+
+  const newParticles: ClickSparkle[] = []
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6
+    const distance = 22 + Math.random() * 32
+    const dx = `${Math.cos(angle) * distance}px`
+    const dy = `${Math.sin(angle) * distance}px`
+    const rot = `${Math.floor((Math.random() - 0.5) * 180)}deg`
+    const size = Math.floor(10 + Math.random() * 7)
+    const color = colors[Math.floor(Math.random() * colors.length)]
+    const symbol = symbols[Math.floor(Math.random() * symbols.length)]
+    const id = ++sparkleIdCounter
+
+    newParticles.push({ id, x, y, dx, dy, rot, size, color, symbol })
+  }
+
+  clickSparkles.value.push(...newParticles)
+
+  setTimeout(() => {
+    const ids = new Set(newParticles.map((p) => p.id))
+    clickSparkles.value = clickSparkles.value.filter((p) => !ids.has(p.id))
+  }, 680)
+}
+
+const onGlobalClick = (e: MouseEvent) => {
+  const target = e.target as HTMLElement | null
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+    return
+  }
+  triggerSparkleBurst(e.clientX, e.clientY)
+}
+
 onMounted(() => {
   loadInvitationData()
   if (import.meta.client) {
     window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('click', onGlobalClick, { passive: true })
     dampingRafId = requestAnimationFrame(updateSmoothScroll)
     countdownInterval = setInterval(() => {
       now.value = Date.now()
@@ -474,6 +582,7 @@ onUnmounted(() => {
     document.documentElement.style.height = ''
     document.body.style.touchAction = ''
     window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener('click', onGlobalClick)
     if (observer) observer.disconnect()
     if (dampingRafId) cancelAnimationFrame(dampingRafId)
   }

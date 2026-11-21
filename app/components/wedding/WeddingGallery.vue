@@ -1,5 +1,5 @@
 <template>
-  <section class="py-12 px-4 max-w-5xl mx-auto" v-if="photos.length">
+  <section class="py-12 px-4 max-w-5xl mx-auto" v-if="loading || photos.length">
     <div class="text-center mb-10">
       <div class="text-2xl text-wedding-secondary mb-1">🖼️</div>
       <h2 class="font-khmer-heading text-xl sm:text-2xl text-wedding-heading">
@@ -8,8 +8,23 @@
       <div class="w-24 h-0.5 bg-wedding-secondary mx-auto mt-2"></div>
     </div>
 
+    <!-- SKELETON PLACEHOLDER GRID (While photos are loading) -->
+    <div v-if="loading && (!photos || !photos.length)" :class="gridClasses">
+      <div
+        v-for="n in 6"
+        :key="'skeleton-' + n"
+        class="shimmer-skeleton rounded-2xl border border-wedding-secondary/20 shadow-sm overflow-hidden flex items-center justify-center relative"
+        :class="aspectClasses"
+      >
+        <div class="flex flex-col items-center gap-1.5 text-wedding-secondary/40 select-none">
+          <span class="text-2xl animate-pulse">📷</span>
+          <span class="text-[10px] font-khmer-body tracking-wider text-wedding-secondary/50">កំពុងផ្ទុករូបថត...</span>
+        </div>
+      </div>
+    </div>
+
     <!-- 1. CAROUSEL / SLIDESHOW LAYOUT -->
-    <div v-if="effectiveConfig.layout === 'carousel'" class="relative group/carousel">
+    <div v-else-if="effectiveConfig.layout === 'carousel'" class="relative group/carousel">
       <!-- Carousel Track -->
       <div
         ref="carouselTrack"
@@ -23,13 +38,37 @@
           class="snap-center flex-shrink-0 cursor-pointer overflow-hidden transition-all duration-300 transform active:scale-95 group relative bg-black/5"
           :class="[carouselWidthClasses, cardStyleClasses, aspectClasses]"
         >
+          <!-- Shimmer Placeholder before image is loaded -->
+          <div
+            v-if="!loadedImages[photo.id] && !failedImages[photo.id]"
+            class="absolute inset-0 shimmer-skeleton flex items-center justify-center z-0"
+          >
+            <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
+          </div>
+
+          <!-- Error Fallback -->
+          <div
+            v-if="failedImages[photo.id]"
+            class="absolute inset-0 bg-[#F7F0E3]/80 flex flex-col items-center justify-center text-wedding-text/50 p-2 text-center z-10"
+          >
+            <span class="text-base mb-1">🖼️</span>
+            <span class="text-[10px]">Photo unavailable</span>
+          </div>
+
+          <!-- Actual Image with Smooth Blur-up & Fade-in -->
           <img
+            v-else
             :src="photo.url"
             :alt="photo.alt_text_en || 'Wedding photo'"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            loading="lazy"
+            class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+            :loading="index < 2 ? 'eager' : 'lazy'"
+            :fetchpriority="index === 0 ? 'high' : 'auto'"
+            decoding="async"
+            @load="onImageLoad(photo.id)"
+            @error="onImageError(photo.id)"
           />
-          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl">
+          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
             🔍
           </div>
         </div>
@@ -39,7 +78,7 @@
       <button
         type="button"
         @click="scrollCarousel(-1)"
-        class="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-wedding-primary border border-wedding-secondary/40 shadow-md items-center justify-center text-lg z-10 transition-all opacity-0 group-hover/carousel:opacity-100"
+        class="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-wedding-primary border border-wedding-secondary/40 shadow-md items-center justify-center text-lg z-10 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
         aria-label="Scroll left"
       >
         ‹
@@ -47,7 +86,7 @@
       <button
         type="button"
         @click="scrollCarousel(1)"
-        class="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-wedding-primary border border-wedding-secondary/40 shadow-md items-center justify-center text-lg z-10 transition-all opacity-0 group-hover/carousel:opacity-100"
+        class="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-wedding-primary border border-wedding-secondary/40 shadow-md items-center justify-center text-lg z-10 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
         aria-label="Scroll right"
       >
         ›
@@ -66,17 +105,30 @@
         class="w-full cursor-pointer overflow-hidden relative group bg-black/5"
         :class="[cardStyleClasses, 'aspect-[16/10] sm:aspect-[21/10]']"
       >
+        <!-- Shimmer Placeholder -->
+        <div
+          v-if="!loadedImages[displayedPhotos[0].id] && !failedImages[displayedPhotos[0].id]"
+          class="absolute inset-0 shimmer-skeleton flex items-center justify-center z-0"
+        >
+          <span class="text-2xl text-wedding-secondary/40 animate-pulse">📷</span>
+        </div>
+
         <img
           :src="displayedPhotos[0].url"
           :alt="displayedPhotos[0].alt_text_en || 'Featured Wedding Photo'"
-          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
+          class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105 relative z-10"
+          :class="loadedImages[displayedPhotos[0].id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          @load="onImageLoad(displayedPhotos[0].id)"
+          @error="onImageError(displayedPhotos[0].id)"
         />
-        <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-wedding-secondary/40 text-[11px] font-semibold text-wedding-primary shadow-sm flex items-center gap-1.5">
+        <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-wedding-secondary/40 text-[11px] font-semibold text-wedding-primary shadow-sm flex items-center gap-1.5 z-20">
           <span>✨</span>
           <span>{{ isKhmer ? 'រូបភាពអនុស្សាវរីយ៍' : 'Featured Moment' }}</span>
         </div>
-        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-2xl">
+        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-2xl z-20">
           🔍
         </div>
       </div>
@@ -90,13 +142,25 @@
           class="cursor-pointer overflow-hidden relative group bg-black/5"
           :class="[cardStyleClasses, aspectClasses]"
         >
+          <!-- Shimmer Placeholder -->
+          <div
+            v-if="!loadedImages[photo.id] && !failedImages[photo.id]"
+            class="absolute inset-0 shimmer-skeleton flex items-center justify-center z-0"
+          >
+            <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
+          </div>
+
           <img
             :src="photo.url"
             :alt="photo.alt_text_en || 'Wedding photo'"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            loading="lazy"
+            class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+            :loading="index < 3 ? 'eager' : 'lazy'"
+            decoding="async"
+            @load="onImageLoad(photo.id)"
+            @error="onImageError(photo.id)"
           />
-          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl">
+          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
             🔍
           </div>
         </div>
@@ -112,16 +176,29 @@
         v-for="(photo, index) in displayedPhotos"
         :key="photo.id"
         @click="openLightbox(index)"
-        class="break-inside-avoid mb-3 sm:mb-4 cursor-pointer overflow-hidden relative group bg-black/5"
+        class="break-inside-avoid mb-3 sm:mb-4 cursor-pointer overflow-hidden relative group bg-black/5 min-h-[140px]"
         :class="cardStyleClasses"
       >
+        <!-- Shimmer Placeholder -->
+        <div
+          v-if="!loadedImages[photo.id] && !failedImages[photo.id]"
+          class="w-full h-44 shimmer-skeleton flex items-center justify-center"
+        >
+          <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
+        </div>
+
         <img
           :src="photo.url"
           :alt="photo.alt_text_en || 'Wedding photo'"
-          class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
+          class="w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105"
+          :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm absolute inset-0'"
+          :loading="index < 3 ? 'eager' : 'lazy'"
+          :fetchpriority="index === 0 ? 'high' : 'auto'"
+          decoding="async"
+          @load="onImageLoad(photo.id)"
+          @error="onImageError(photo.id)"
         />
-        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl">
+        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
           🔍
         </div>
       </div>
@@ -136,13 +213,26 @@
         class="cursor-pointer overflow-hidden relative group bg-black/5"
         :class="[cardStyleClasses, aspectClasses]"
       >
+        <!-- Shimmer Placeholder -->
+        <div
+          v-if="!loadedImages[photo.id] && !failedImages[photo.id]"
+          class="absolute inset-0 shimmer-skeleton flex items-center justify-center z-0"
+        >
+          <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
+        </div>
+
         <img
           :src="photo.url"
           :alt="photo.alt_text_en || 'Wedding photo'"
-          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          loading="lazy"
+          class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+          :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+          :loading="index < 3 ? 'eager' : 'lazy'"
+          :fetchpriority="index === 0 ? 'high' : 'auto'"
+          decoding="async"
+          @load="onImageLoad(photo.id)"
+          @error="onImageError(photo.id)"
         />
-        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl">
+        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
           🔍
         </div>
       </div>
@@ -153,7 +243,7 @@
       <button
         type="button"
         @click="isExpanded = true"
-        class="px-6 py-2.5 rounded-full bg-white/90 hover:bg-white border-2 border-wedding-secondary/50 text-wedding-primary text-xs sm:text-sm font-semibold shadow-md hover:shadow-lg transition-all transform active:scale-95 inline-flex items-center gap-2"
+        class="px-7 py-3 rounded-full bg-white/95 hover:bg-white border-2 border-wedding-secondary/50 text-wedding-primary text-xs sm:text-sm font-semibold shadow-md inline-flex items-center gap-2 interactive-btn cursor-pointer"
       >
         <span>📷</span>
         <span>{{ isKhmer ? `មើលរូបថតទាំងអស់ (${photos.length})` : `View All Photos (${photos.length})` }}</span>
@@ -206,13 +296,24 @@
             ‹
           </button>
 
-          <!-- Current Image Container with Smooth Fade & Scale -->
+          <!-- Current Image Container with Smooth Fade, Spinner & Intelligent Preloading -->
           <div class="relative max-w-4xl max-h-[72vh] sm:max-h-[82vh] w-full flex items-center justify-center">
+            <!-- Loading Spinner in Lightbox -->
+            <div
+              v-if="isLightboxLoading"
+              class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+            >
+              <div class="w-10 h-10 rounded-full border-3 border-wedding-secondary/25 border-t-wedding-secondary animate-spin"></div>
+            </div>
+
             <img
               :key="activePhotoIndex"
               :src="photos[activePhotoIndex].url"
               :alt="photos[activePhotoIndex].alt_text_en || 'Wedding photo preview'"
-              class="max-w-full max-h-[72vh] sm:max-h-[82vh] w-auto h-auto object-contain rounded-xl sm:rounded-2xl shadow-2xl transition-all duration-300 pointer-events-auto"
+              class="max-w-full max-h-[72vh] sm:max-h-[82vh] w-auto h-auto object-contain rounded-xl sm:rounded-2xl shadow-2xl transition-opacity duration-300 pointer-events-auto"
+              :class="isLightboxLoading ? 'opacity-40 scale-98' : 'opacity-100 scale-100'"
+              decoding="async"
+              @load="onLightboxImageLoad"
             />
           </div>
 
@@ -273,15 +374,57 @@
 import type { WeddingPhoto } from '~~/shared/types/programme'
 import { DEFAULT_GALLERY_CONFIG, type GalleryConfig } from '~~/shared/types/wedding'
 
-const props = defineProps<{
-  photos: WeddingPhoto[]
-  config?: Partial<GalleryConfig> | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    photos: WeddingPhoto[]
+    config?: Partial<GalleryConfig> | null
+    loading?: boolean
+  }>(),
+  {
+    loading: false
+  }
+)
 
 const { isKhmer, t } = useLocale()
 const activePhotoIndex = ref<number | null>(null)
 const isExpanded = ref(false)
 const carouselTrack = ref<HTMLElement | null>(null)
+const isLightboxLoading = ref(false)
+
+// Track image loaded state for smooth blur-up transitions
+const loadedImages = ref<Record<string, boolean>>({})
+const failedImages = ref<Record<string, boolean>>({})
+
+const onImageLoad = (id: string) => {
+  loadedImages.value[id] = true
+}
+
+const onImageError = (id: string) => {
+  failedImages.value[id] = true
+}
+
+const onLightboxImageLoad = () => {
+  isLightboxLoading.value = false
+}
+
+// Background prefetch for instant lightbox browsing
+const preloadAdjacentImages = (currIndex: number) => {
+  if (!import.meta.client || !props.photos || props.photos.length <= 1) return
+  const nextIdx = (currIndex + 1) % props.photos.length
+  const prevIdx = (currIndex - 1 + props.photos.length) % props.photos.length
+
+  const nextUrl = props.photos[nextIdx]?.url
+  const prevUrl = props.photos[prevIdx]?.url
+
+  if (nextUrl) {
+    const imgNext = new Image()
+    imgNext.src = nextUrl
+  }
+  if (prevUrl) {
+    const imgPrev = new Image()
+    imgPrev.src = prevUrl
+  }
+}
 
 const effectiveConfig = computed<GalleryConfig>(() => ({
   ...DEFAULT_GALLERY_CONFIG,
@@ -411,6 +554,8 @@ const onTouchEnd = () => {
 
 const openLightbox = (idx: number) => {
   activePhotoIndex.value = idx
+  isLightboxLoading.value = true
+  preloadAdjacentImages(idx)
 }
 
 const closeLightbox = () => {
@@ -419,12 +564,18 @@ const closeLightbox = () => {
 
 const prevPhoto = () => {
   if (activePhotoIndex.value === null) return
-  activePhotoIndex.value = (activePhotoIndex.value - 1 + props.photos.length) % props.photos.length
+  const newIdx = (activePhotoIndex.value - 1 + props.photos.length) % props.photos.length
+  activePhotoIndex.value = newIdx
+  isLightboxLoading.value = true
+  preloadAdjacentImages(newIdx)
 }
 
 const nextPhoto = () => {
   if (activePhotoIndex.value === null) return
-  activePhotoIndex.value = (activePhotoIndex.value + 1) % props.photos.length
+  const newIdx = (activePhotoIndex.value + 1) % props.photos.length
+  activePhotoIndex.value = newIdx
+  isLightboxLoading.value = true
+  preloadAdjacentImages(newIdx)
 }
 
 // Keyboard Navigation Listener

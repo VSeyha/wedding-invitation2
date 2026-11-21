@@ -286,7 +286,7 @@ const errorMsg = ref('')
 
 const DEFAULT_STORY_TEMPLATE: StoryMilestone[] = [
   {
-    icon: '⚜️',
+    icon: '✨',
     title_km: 'ថ្ងៃដែលយើងបានជួបគ្នា (២០១៩)',
     subtitle_en: 'THE FIRST MEETING (2019)',
     description_km: 'ការជួបគ្នាដោយចៃដន្យនាថ្ងៃប្រឡងបាក់ឌុបឆ្នាំ២០១៩ ដែលក្លាយជាចំណុចចាប់ផ្តើមនៃរឿងរ៉ាវទាំងអស់។',

@@ -1,8 +1,10 @@
 <template>
   <section class="py-12 px-4 max-w-2xl mx-auto text-center">
-    <div class="khmer-card rounded-3xl p-8 sm:p-10 border-2 border-wedding-secondary/40 shadow-sm relative">
+    <div class="khmer-card rounded-3xl p-8 sm:p-10 border-2 border-wedding-secondary/40 shadow-sm relative interactive-card">
       <!-- Decorative Top Seal -->
-      <div class="text-3xl text-wedding-secondary mb-3">⚜️</div>
+      <div class="flex items-center justify-center mb-3 float-gentle">
+        <KhmerKbach :size="34" type="crest" :glow="true" />
+      </div>
 
       <h2 class="font-khmer-heading text-lg sm:text-xl text-wedding-primary mb-4 leading-relaxed">
         {{ isKhmer ? 'សេចក្តីថ្លែងអំណរគុណ និងការគោរពអញ្ជើញ' : 'A Message from the Couple' }}
@@ -22,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import KhmerKbach from './KhmerKbach.vue'
 import type { WeddingSettings } from '~~/shared/types/wedding'
 
 defineProps<{

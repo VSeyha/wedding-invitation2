@@ -1,9 +1,9 @@
 {
-  "layout": "featured",
-  "columns_mobile": 2,
+  "layout": "masonry",
+  "columns_mobile": 1,
   "columns_desktop": 3,
-  "aspect_ratio": "natural",
-  "card_style": "gold-frame",
+  "aspect_ratio": "square",
+  "card_style": "minimal",
   "gap": "compact",
   "max_display": "all"
 }

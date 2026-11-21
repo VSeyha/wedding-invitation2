@@ -11,6 +11,32 @@ export interface ThemeColors {
 
 export type BackgroundType = 'none' | 'solid' | 'gradient' | 'image' | 'animated' | 'preset'
 
+export interface MobileBorderConfig {
+  enabled: boolean
+  preset?: string
+  image_url?: string
+  opacity?: number
+  style?: 'frame-overlay' | 'card-border'
+}
+
+export interface MobileBorderPresetOption {
+  id: string
+  name: string
+  name_km: string
+  image_url: string
+  style: 'frame-overlay' | 'card-border'
+}
+
+export const PRESET_MOBILE_BORDERS: Record<string, MobileBorderPresetOption> = {
+  'top-bottom': {
+    id: 'top-bottom',
+    name: 'Top & Bottom Border',
+    name_km: 'ស៊ុមក្បាល និងបាតទំព័រ',
+    image_url: '/images/mobile_screen_border_background/top_botton_border.png',
+    style: 'card-border'
+  }
+}
+
 export interface BackgroundConfig {
   type: BackgroundType
   image_url?: string
@@ -26,6 +52,7 @@ export interface BackgroundConfig {
   gradient_direction?: string
   gradient_from?: string
   gradient_to?: string
+  mobile_border?: MobileBorderConfig
 }
 
 export interface BackgroundPresetOption {
@@ -42,6 +69,18 @@ export interface BackgroundPresetOption {
 }
 
 export const PRESET_BACKGROUNDS: Record<string, BackgroundPresetOption> = {
+  'kbaj-khmer': {
+    id: 'kbaj-khmer',
+    name: 'Royal Khmer Golden Kbach',
+    name_km: 'ក្បាច់មាសរាជវាំងខ្មែរ',
+    image_url: '/images/backgrounds/kbaj-khmer.jpg',
+    type: 'image',
+    overlay_color: '#FDF8EE',
+    overlay_opacity: 0,
+    opacity: 1,
+    scroll_zoom: true,
+    zoom_effect: 'zoom-in'
+  },
   'angkor-wat': {
     id: 'angkor-wat',
     name: 'Angkor Wat Sunrise',
@@ -66,27 +105,27 @@ export const PRESET_BACKGROUNDS: Record<string, BackgroundPresetOption> = {
     scroll_zoom: true,
     zoom_effect: 'zoom-in'
   },
-  'kbaj-khmer': {
-    id: 'kbaj-khmer',
-    name: 'Khmer Traditional Kbach',
-    name_km: 'ក្បាច់បូរាណខ្មែរ រចនាបទ',
-    image_url: '/images/backgrounds/kbaj-khmer.jpg',
+  'angkor-wat3': {
+    id: 'angkor-wat3',
+    name: 'Angkor Wat Sunset',
+    name_km: 'ប្រាសាទអង្គរវត្ត ពេលអស្តង្គត',
+    image_url: '/images/backgrounds/angkor-wat3.jpg',
     type: 'image',
     overlay_color: '#FDF8EE',
-    overlay_opacity: 0.05,
-    opacity: 0.95,
+    overlay_opacity: 0,
+    opacity: 1,
     scroll_zoom: true,
     zoom_effect: 'zoom-in'
   },
-  'khmer-pattern': {
-    id: 'khmer-pattern',
-    name: 'Royal Floral Pattern',
-    name_km: 'ក្បាច់ផ្កាមាស រាជវាំង',
-    image_url: '/images/backgrounds/khmer-pattern.jpeg',
+  'bg-1': {
+    id: 'bg-1',
+    name: 'Khmer Heritage Scenic (BG 1)',
+    name_km: 'ទេសភាពបេតិកភណ្ឌខ្មែរ ១',
+    image_url: '/images/backgrounds/bg-1.png',
     type: 'image',
     overlay_color: '#FDF8EE',
-    overlay_opacity: 0.05,
-    opacity: 0.95,
+    overlay_opacity: 0,
+    opacity: 1,
     scroll_zoom: true,
     zoom_effect: 'zoom-in'
   },
@@ -99,18 +138,6 @@ export const PRESET_BACKGROUNDS: Record<string, BackgroundPresetOption> = {
     overlay_color: '#FDF8EE',
     overlay_opacity: 0.05,
     opacity: 0.92,
-    scroll_zoom: true,
-    zoom_effect: 'breathe'
-  },
-  'golden-lotus': {
-    id: 'golden-lotus',
-    name: 'Sacred Lotus Waters',
-    name_km: 'សួនផ្កាឈូកមាស',
-    image_url: '/images/backgrounds/golden-lotus.svg',
-    type: 'image',
-    overlay_color: '#1E0A12',
-    overlay_opacity: 0.12,
-    opacity: 0.85,
     scroll_zoom: true,
     zoom_effect: 'breathe'
   },
@@ -151,12 +178,19 @@ export interface AnimationConfig {
 }
 
 export type OpeningAnimationStyle =
+  | 'click_seal'
   | 'golden_seal'
+  | 'romdoul_seal'
+  | 'curtain'
+  | 'scratch'
+  | 'slide_unlock'
+  | 'envelope_flap'
+  | 'direct'
+  | 'none'
   | 'khmer_seal'
   | 'lotus'
   | 'floral'
   | 'fade'
-  | 'none'
 
 export interface OpeningAnimationConfig {
   style: OpeningAnimationStyle
