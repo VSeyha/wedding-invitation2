@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const { data, error } = await supabase
     .from('guests')
     .select(`
-      id, name, phone, note, created_at, updated_at,
+      id, name, phone, created_at, updated_at,
       invitations ( id, token, status, opened_at, created_at,
         rsvps ( id, attendance_status, submitted_at )
       )

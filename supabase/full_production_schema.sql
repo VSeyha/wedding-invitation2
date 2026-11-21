@@ -50,14 +50,11 @@ create table if not exists public.guests (
   id          uuid primary key default gen_random_uuid(),
   name        text not null,
   phone       text,
-  note        text default '',
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
 
-alter table public.guests add column if not exists note text default '';
 create index if not exists guests_name_idx on public.guests (name);
-create index if not exists guests_note_idx on public.guests (note);
 
 -- 3. TABLE: invitations
 create table if not exists public.invitations (

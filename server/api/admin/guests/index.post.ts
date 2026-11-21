@@ -12,11 +12,7 @@ export default defineEventHandler(async (event) => {
   // Create guest
   const { data: guest, error: guestError } = await supabase
     .from('guests')
-    .insert({
-      name: payload.name,
-      phone: payload.phone ?? null,
-      note: payload.note ?? ''
-    })
+    .insert({ name: payload.name, phone: payload.phone ?? null })
     .select()
     .single()
 
