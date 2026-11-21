@@ -102,13 +102,18 @@ create index if not exists wedding_programmes_order_idx on public.wedding_progra
 
 -- 6. TABLE: wedding_photos
 create table if not exists public.wedding_photos (
-  id               uuid primary key default gen_random_uuid(),
-  photo_url        text not null,
-  caption_km       text,
-  caption_en       text,
-  display_order    integer not null default 0,
-  created_at       timestamptz not null default now()
+  id             uuid primary key default gen_random_uuid(),
+  storage_path   text not null default '',
+  alt_text_km    text,
+  alt_text_en    text,
+  display_order  integer not null default 0,
+  created_at     timestamptz not null default now()
 );
+
+alter table public.wedding_photos add column if not exists storage_path text not null default '';
+alter table public.wedding_photos add column if not exists alt_text_km text;
+alter table public.wedding_photos add column if not exists alt_text_en text;
+alter table public.wedding_photos add column if not exists display_order integer not null default 0;
 
 create index if not exists wedding_photos_order_idx on public.wedding_photos (display_order);
 

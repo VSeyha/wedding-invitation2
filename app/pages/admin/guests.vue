@@ -48,7 +48,7 @@
         <button
           type="button"
           @click="sideFilter = 'all'"
-          class="px-3 py-1.5 rounded-lg font-medium transition-all"
+          class="px-3 py-1.5 rounded-lg font-medium transition-all focus:outline-none focus:ring-0"
           :class="sideFilter === 'all' ? 'bg-[#641D2D] text-[#F7F0E3] font-bold shadow-xs' : 'text-[#3C2925]/70 hover:text-[#641D2D] hover:bg-[#F7F0E3]'"
         >
           All ({{ guests.length }})
@@ -56,7 +56,7 @@
         <button
           type="button"
           @click="sideFilter = 'groom'"
-          class="px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-all"
+          class="px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-all focus:outline-none focus:ring-0"
           :class="sideFilter === 'groom' ? 'bg-emerald-700 text-white font-bold shadow-xs' : 'text-emerald-800 hover:bg-emerald-50'"
         >
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -65,11 +65,52 @@
         <button
           type="button"
           @click="sideFilter = 'bride'"
-          class="px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-all"
+          class="px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-all focus:outline-none focus:ring-0"
           :class="sideFilter === 'bride' ? 'bg-rose-700 text-white font-bold shadow-xs' : 'text-rose-800 hover:bg-rose-50'"
         >
           <span class="w-2 h-2 rounded-full bg-rose-400"></span>
           <span>ខាងស្រី ({{ brideCount }})</span>
+        </button>
+        <button
+          v-if="unassignedCount > 0"
+          type="button"
+          @click="sideFilter = 'unassigned'"
+          class="px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-all focus:outline-none focus:ring-0"
+          :class="sideFilter === 'unassigned' ? 'bg-amber-600 text-white font-bold shadow-xs' : 'text-amber-800 hover:bg-amber-50'"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>មិនទាន់កំណត់ ({{ unassignedCount }})</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Batch Assign Banner if unassigned guests exist -->
+    <div
+      v-if="unassignedCount > 0 && sideFilter === 'all'"
+      class="mb-3.5 p-3 bg-amber-50/90 border border-amber-200/90 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs"
+    >
+      <div class="flex items-center gap-2 text-amber-900 font-medium">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+        <span>
+          <strong>{{ unassignedCount }}</strong> ភ្ញៀវមិនទាន់បានកំណត់ខាង (unassigned). Assign in 1-click:
+        </span>
+      </div>
+      <div class="flex items-center gap-2 self-start sm:self-auto">
+        <button
+          type="button"
+          @click="batchAssignUnassigned('ខាងប្រុស')"
+          :disabled="batchAssigning"
+          class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors shadow-xs"
+        >
+          {{ batchAssigning ? 'Updating...' : 'Set All to ខាងប្រុស' }}
+        </button>
+        <button
+          type="button"
+          @click="batchAssignUnassigned('ខាងស្រី')"
+          :disabled="batchAssigning"
+          class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold hover:bg-rose-700 transition-colors shadow-xs"
+        >
+          {{ batchAssigning ? 'Updating...' : 'Set All to ខាងស្រី' }}
         </button>
       </div>
     </div>
@@ -99,27 +140,58 @@
             >
               <td class="px-4 py-3 font-medium text-[#3C2925]">{{ guest.name }}</td>
               <td class="px-4 py-3">
-                <span
+                <!-- If assigned to ខាងប្រុស or ខាងស្រី: clickable toggle -->
+                <button
                   v-if="guest.note === 'ខាងប្រុស' || (guest.note && guest.note.includes('ខាងប្រុស'))"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300"
+                  type="button"
+                  @click="toggleGuestSide(guest)"
+                  :disabled="updatingSideId === guest.id"
+                  title="Click to toggle to ខាងស្រី"
+                  class="group inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400 transition-all cursor-pointer"
                 >
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   <span>{{ guest.note }}</span>
-                </span>
-                <span
+                  <span class="text-[10px] text-emerald-600 opacity-60 group-hover:opacity-100">⇄</span>
+                </button>
+                <button
                   v-else-if="guest.note === 'ខាងស្រី' || (guest.note && guest.note.includes('ខាងស្រី'))"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-300"
+                  type="button"
+                  @click="toggleGuestSide(guest)"
+                  :disabled="updatingSideId === guest.id"
+                  title="Click to toggle to ខាងប្រុស"
+                  class="group inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100 hover:border-rose-400 transition-all cursor-pointer"
                 >
                   <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                   <span>{{ guest.note }}</span>
-                </span>
+                  <span class="text-[10px] text-rose-600 opacity-60 group-hover:opacity-100">⇄</span>
+                </button>
                 <span
                   v-else-if="guest.note"
                   class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200"
                 >
                   {{ guest.note }}
                 </span>
-                <span v-else class="text-gray-300 text-xs">—</span>
+                <!-- Quick 1-click assign if unassigned -->
+                <div v-else class="flex items-center gap-1">
+                  <button
+                    type="button"
+                    @click="quickSetSide(guest, 'ខាងប្រុស')"
+                    :disabled="updatingSideId === guest.id"
+                    title="Assign to Groom side (ខាងប្រុស)"
+                    class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 transition-colors"
+                  >
+                    + ខាងប្រុស
+                  </button>
+                  <button
+                    type="button"
+                    @click="quickSetSide(guest, 'ខាងស្រី')"
+                    :disabled="updatingSideId === guest.id"
+                    title="Assign to Bride side (ខាងស្រី)"
+                    class="px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-300 transition-colors"
+                  >
+                    + ខាងស្រី
+                  </button>
+                </div>
               </td>
               <td class="px-4 py-3 text-[#3C2925]/70">{{ guest.phone || '—' }}</td>
               <td class="px-4 py-3">
@@ -357,7 +429,7 @@
         <!-- Step 2: Parsed Table Preview & Confirmation -->
         <div v-else class="space-y-4">
           <!-- Summary Bar -->
-          <div class="flex flex-wrap items-center justify-between bg-[#F7F0E3]/70 p-3 rounded-xl border border-[#C9A24A]/30 text-xs">
+          <div class="flex flex-wrap items-center justify-between bg-[#F7F0E3]/70 p-3 rounded-xl border border-[#C9A24A]/30 text-xs gap-2">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
               <span class="font-bold text-[#641D2D]">
@@ -380,6 +452,18 @@
                 Choose another file
               </button>
             </div>
+          </div>
+
+          <div class="flex items-center gap-2 px-1 text-xs text-[#3C2925]">
+            <input
+              id="syncExistingGuests"
+              type="checkbox"
+              v-model="updateExistingGuests"
+              class="rounded text-[#641D2D] focus:ring-[#641D2D]"
+            />
+            <label for="syncExistingGuests" class="cursor-pointer font-medium text-[11px] sm:text-xs text-[#3C2925]">
+              Update existing guests with matching names (syncs Side / Note from Excel)
+            </label>
           </div>
 
           <!-- Scrollable Table Preview -->
@@ -407,7 +491,7 @@
                   v-for="(item, idx) in parsedImportGuests"
                   :key="idx"
                   class="hover:bg-gray-50 transition-colors"
-                  :class="{ 'bg-amber-50/50': item.isDuplicate }"
+                  :class="{ 'bg-blue-50/40': item.isDuplicate }"
                 >
                   <td class="px-3 py-2 text-center">
                     <input
@@ -443,13 +527,13 @@
                   <td class="px-3 py-2 text-right">
                     <span
                       v-if="item.isDuplicate"
-                      class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800"
-                      title="Name already exists in guest list"
+                      class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800"
+                      title="Name already exists in list; side and details will be updated"
                     >
-                      Duplicate
+                      Update Note
                     </span>
                     <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
-                      New
+                      New Guest
                     </span>
                   </td>
                 </tr>
@@ -512,10 +596,13 @@ const formError = ref('')
 const toast = ref('')
 const form = ref({ name: '', phone: '', note: 'ខាងប្រុស', rsvp_status: 'pending' })
 const updatingRsvpId = ref('')
-const sideFilter = ref<'all' | 'groom' | 'bride'>('all')
+const updatingSideId = ref('')
+const batchAssigning = ref(false)
+const sideFilter = ref<'all' | 'groom' | 'bride' | 'unassigned'>('all')
 
 const groomCount = computed(() => guests.value.filter(g => g.note && g.note.includes('ខាងប្រុស')).length)
 const brideCount = computed(() => guests.value.filter(g => g.note && g.note.includes('ខាងស្រី')).length)
+const unassignedCount = computed(() => guests.value.filter(g => !g.note || (!g.note.includes('ខាងប្រុស') && !g.note.includes('ខាងស្រី'))).length)
 
 // Excel Import State
 interface ParsedGuest {
@@ -530,6 +617,7 @@ const showImportModal = ref(false)
 const isDragging = ref(false)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const parsedImportGuests = ref<ParsedGuest[]>([])
+const updateExistingGuests = ref(true)
 const importing = ref(false)
 const importError = ref('')
 
@@ -541,6 +629,8 @@ const filteredGuests = computed(() => {
     list = list.filter(g => g.note && g.note.includes('ខាងប្រុស'))
   } else if (sideFilter.value === 'bride') {
     list = list.filter(g => g.note && g.note.includes('ខាងស្រី'))
+  } else if (sideFilter.value === 'unassigned') {
+    list = list.filter(g => !g.note || (!g.note.includes('ខាងប្រុស') && !g.note.includes('ខាងស្រី')))
   }
   const q = search.value.toLowerCase().trim()
   if (!q) return list
@@ -754,7 +844,7 @@ const processExcelFile = async (file: File) => {
         name: rawName,
         phone: rawPhone,
         note: rawNote,
-        selected: !isDuplicate, // default select non-duplicates
+        selected: true, // Default select all so user can easily sync side/note
         isDuplicate
       })
     }
@@ -768,6 +858,56 @@ const processExcelFile = async (file: File) => {
   } catch (err: any) {
     console.error('Error parsing Excel:', err)
     importError.value = `Failed to read file: ${err.message || 'Unknown format'}`
+  }
+}
+
+// Quick 1-click side assignment for a single guest
+const quickSetSide = async (guest: any, note: string) => {
+  updatingSideId.value = guest.id
+  const token = await getToken()
+  try {
+    await $fetch(`/api/admin/guests/${guest.id}`, {
+      method: 'PUT',
+      headers: { authorization: `Bearer ${token}` },
+      body: { name: guest.name, phone: guest.phone, note }
+    })
+    guest.note = note
+    showToast(`✓ "${guest.name}" assigned to ${note}`)
+  } catch (err: any) {
+    showToast(`Error: ${err?.data?.statusMessage || err?.message || 'Failed'}`)
+  } finally {
+    updatingSideId.value = ''
+  }
+}
+
+// Toggle guest side between ខាងប្រុស and ខាងស្រី on click
+const toggleGuestSide = async (guest: any) => {
+  const current = guest.note || ''
+  const next = current.includes('ខាងប្រុស') ? 'ខាងស្រី' : 'ខាងប្រុស'
+  await quickSetSide(guest, next)
+}
+
+// Batch assign all currently unassigned guests to ខាងប្រុស or ខាងស្រី
+const batchAssignUnassigned = async (note: 'ខាងប្រុស' | 'ខាងស្រី') => {
+  const unassigned = guests.value.filter(g => !g.note || (!g.note.includes('ខាងប្រុស') && !g.note.includes('ខាងស្រី')))
+  if (!unassigned.length) return
+  batchAssigning.value = true
+  const token = await getToken()
+  try {
+    await $fetch('/api/admin/guests/batch', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: {
+        guest_ids: unassigned.map(g => g.id),
+        note
+      }
+    })
+    showToast(`✓ Successfully assigned ${unassigned.length} guests to ${note}!`)
+    await fetchGuests()
+  } catch (err: any) {
+    showToast(`Error: ${err?.data?.statusMessage || err?.message || 'Failed'}`)
+  } finally {
+    batchAssigning.value = false
   }
 }
 
@@ -789,7 +929,8 @@ const executeImport = async () => {
         name: g.name,
         phone: g.phone || null,
         note: g.note || ''
-      }))
+      })),
+      update_existing: updateExistingGuests.value
     }
 
     const res: any = await $fetch('/api/admin/guests/import', {
@@ -798,8 +939,15 @@ const executeImport = async () => {
       body: payload
     })
 
-    const count = res?.count || selectedGuests.length
-    showToast(`✓ Successfully imported ${count} guests with active invitations!`)
+    const updated = res?.updated || 0
+    const inserted = res?.inserted || 0
+    if (updated > 0 && inserted > 0) {
+      showToast(`✓ Success: updated ${updated} guests & added ${inserted} new guests!`)
+    } else if (updated > 0) {
+      showToast(`✓ Success: updated ${updated} existing guests with their sides!`)
+    } else {
+      showToast(`✓ Successfully imported ${inserted || selectedGuests.length} guests!`)
+    }
     closeImportModal()
     await fetchGuests()
   } catch (err: any) {

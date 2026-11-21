@@ -10,7 +10,8 @@ const importGuestItemSchema = z.object({
 })
 
 const importBatchSchema = z.object({
-  guests: z.array(importGuestItemSchema).min(1, 'At least one guest is required')
+  guests: z.array(importGuestItemSchema).min(1, 'At least one guest is required'),
+  update_existing: z.boolean().optional().default(true)
 })
 
 export default defineEventHandler(async (event) => {
@@ -27,7 +28,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { guests: items } = parsed.data
+  const { guests: items, update_existing: updateExisting } = parsed.data
 
   // Clean and prepare rows
   const cleanRows = items
@@ -42,47 +43,73 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'No valid guest names found in import' })
   }
 
-  // 1. Batch insert into `guests` table
-  const { data: insertedGuests, error: guestError } = await supabase
+  // Fetch existing guests to detect duplicates and update if requested
+  const { data: existingGuests } = await supabase
     .from('guests')
-    .insert(cleanRows)
-    .select('id, name, phone, note, created_at')
+    .select('id, name')
 
-  if (guestError) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: `Failed to insert guests: ${guestError.message}`
-    })
+  const existingMap = new Map<string, string>()
+  existingGuests?.forEach(g => {
+    existingMap.set(g.name.toLowerCase().trim(), g.id)
+  })
+
+  const rowsToInsert: typeof cleanRows = []
+  const rowsToUpdate: { id: string; name: string; phone: string | null; note: string }[] = []
+
+  for (const row of cleanRows) {
+    const existingId = existingMap.get(row.name.toLowerCase().trim())
+    if (existingId) {
+      if (updateExisting) {
+        rowsToUpdate.push({ id: existingId, ...row })
+      }
+    } else {
+      rowsToInsert.push(row)
+    }
   }
 
-  if (!insertedGuests || !insertedGuests.length) {
-    throw createError({ statusCode: 500, statusMessage: 'No guests were created' })
+  // 1. Update existing guests (sync note & phone)
+  let updatedCount = 0
+  if (rowsToUpdate.length > 0) {
+    await Promise.all(
+      rowsToUpdate.map(async u => {
+        const updateData: Record<string, any> = { note: u.note }
+        if (u.phone) updateData.phone = u.phone
+        await supabase.from('guests').update(updateData).eq('id', u.id)
+      })
+    )
+    updatedCount = rowsToUpdate.length
   }
 
-  // 2. Batch generate invitations for each inserted guest
-  const inviteRows = insertedGuests.map(g => ({
-    guest_id: g.id,
-    status: 'active'
-  }))
+  // 2. Batch insert brand new guests
+  let insertedGuests: any[] = []
+  if (rowsToInsert.length > 0) {
+    const { data, error: guestError } = await supabase
+      .from('guests')
+      .insert(rowsToInsert)
+      .select('id, name, phone, note, created_at')
 
-  const { data: insertedInvites, error: inviteError } = await supabase
-    .from('invitations')
-    .insert(inviteRows)
-    .select('id, token, status, guest_id, created_at')
+    if (guestError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Failed to insert guests: ${guestError.message}`
+      })
+    }
+    insertedGuests = data || []
 
-  if (inviteError) {
-    console.error('Warning: Error creating invitations for imported guests:', inviteError)
+    // Batch generate invitations for each inserted guest
+    if (insertedGuests.length > 0) {
+      const inviteRows = insertedGuests.map(g => ({
+        guest_id: g.id,
+        status: 'active'
+      }))
+      await supabase.from('invitations').insert(inviteRows)
+    }
   }
-
-  // Combine inserted results for client response
-  const guestsWithInvites = insertedGuests.map(g => ({
-    ...g,
-    invitations: (insertedInvites || []).filter(i => i.guest_id === g.id)
-  }))
 
   return {
     success: true,
-    count: insertedGuests.length,
-    data: guestsWithInvites
+    count: updatedCount + insertedGuests.length,
+    updated: updatedCount,
+    inserted: insertedGuests.length
   }
 })

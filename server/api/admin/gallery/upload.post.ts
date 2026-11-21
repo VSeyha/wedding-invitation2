@@ -54,16 +54,32 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Insert database record
-    const { data: photoRecord, error: dbError } = await supabase
+    // Insert database record (with fallback if schema differs)
+    let insertPayload: Record<string, any> = {
+      storage_path: storagePath,
+      alt_text_en: file.filename,
+      display_order: currentOrder++
+    }
+
+    let { data: photoRecord, error: dbError } = await supabase
       .from('wedding_photos')
-      .insert({
-        storage_path: storagePath,
-        alt_text_en: file.filename,
-        display_order: currentOrder++
-      })
+      .insert(insertPayload)
       .select()
       .single()
+
+    // If schema cache says alt_text_en is missing, retry with basic storage_path
+    if (dbError && String(dbError.message).includes('alt_text_en')) {
+      const retryResult = await supabase
+        .from('wedding_photos')
+        .insert({
+          storage_path: storagePath,
+          display_order: insertPayload.display_order
+        })
+        .select()
+        .single()
+      photoRecord = retryResult.data
+      dbError = retryResult.error
+    }
 
     if (dbError) {
       console.error('DB insert error:', dbError)
