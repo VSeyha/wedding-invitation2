@@ -1,5 +1,6 @@
 // GET /api/wedding - Public: returns current wedding settings
 import { useServerSupabase } from '~~/server/utils/supabase'
+import { getStoredGalleryConfig } from '~~/server/utils/galleryConfig'
 
 export default defineEventHandler(async () => {
   const supabase = useServerSupabase()
@@ -15,5 +16,12 @@ export default defineEventHandler(async () => {
 
   if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
-  return { data }
+  const galleryConfig = data?.gallery_config || getStoredGalleryConfig()
+
+  return {
+    data: {
+      ...data,
+      gallery_config: galleryConfig
+    }
+  }
 })

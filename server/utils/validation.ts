@@ -25,6 +25,16 @@ export const weddingGiftInfoSchema = z.object({
 // ============================================================
 // Wedding Settings
 // ============================================================
+export const galleryConfigSchema = z.object({
+  layout:          z.enum(['grid', 'masonry', 'carousel', 'featured']).optional(),
+  columns_mobile:  z.union([z.literal(1), z.literal(2)]).optional(),
+  columns_desktop: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+  aspect_ratio:    z.enum(['square', 'portrait', 'landscape', 'natural']).optional(),
+  card_style:      z.enum(['gold-frame', 'rounded', 'glass', 'minimal']).optional(),
+  gap:             z.enum(['compact', 'normal', 'relaxed']).optional(),
+  max_display:     z.union([z.number(), z.literal('all')]).optional()
+})
+
 export const weddingSettingsUpdateSchema = z.object({
   bride_name_km:         z.string().max(200).optional(),
   bride_name_en:         z.string().max(200).optional(),
@@ -41,7 +51,8 @@ export const weddingSettingsUpdateSchema = z.object({
   groom_photo_url:       z.string().url().optional().nullable().or(z.literal('')),
   bride_photo_url:       z.string().url().optional().nullable().or(z.literal('')),
   our_story:             z.array(storyMilestoneSchema).optional().nullable(),
-  gift_info:             weddingGiftInfoSchema.optional().nullable()
+  gift_info:             weddingGiftInfoSchema.optional().nullable(),
+  gallery_config:        galleryConfigSchema.optional().nullable()
 })
 
 // ============================================================
@@ -94,7 +105,10 @@ const themeColorsSchema = z.object({
 })
 
 const backgroundConfigSchema = z.object({
-  type:            z.enum(['none', 'solid', 'gradient', 'image', 'animated']),
+  type:            z.enum(['none', 'solid', 'gradient', 'image', 'animated', 'preset']),
+  preset_name:     z.string().optional().nullable(),
+  scroll_zoom:     z.boolean().optional().default(true),
+  zoom_effect:     z.enum(['zoom-in', 'zoom-out', 'breathe']).optional().default('zoom-in'),
   image_url:       z.string().optional().nullable(),
   position:        z.string().optional(),
   size:            z.string().optional(),

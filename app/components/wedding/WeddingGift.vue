@@ -72,7 +72,7 @@
           <!-- Fallback decorative placeholder when no custom QR uploaded yet -->
           <div v-else class="text-center py-10 px-4">
             <div class="text-4xl mb-2 text-[#E1251B]">📱</div>
-            <div class="text-xs font-bold text-[#641D2D]">KHQR Code</div>
+            <div class="text-xs font-bold text-wedding-primary">KHQR Code</div>
             <div class="text-[10px] text-gray-500 mt-1">Upload QR in Admin Settings</div>
           </div>
         </div>

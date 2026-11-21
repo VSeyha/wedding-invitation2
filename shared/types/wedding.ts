@@ -17,6 +17,26 @@ export interface WeddingGiftInfo {
   message_en?: string
 }
 
+export interface GalleryConfig {
+  layout?: 'grid' | 'masonry' | 'carousel' | 'featured'
+  columns_mobile?: 1 | 2
+  columns_desktop?: 2 | 3 | 4
+  aspect_ratio?: 'square' | 'portrait' | 'landscape' | 'natural'
+  card_style?: 'gold-frame' | 'rounded' | 'glass' | 'minimal'
+  gap?: 'compact' | 'normal' | 'relaxed'
+  max_display?: number | 'all'
+}
+
+export const DEFAULT_GALLERY_CONFIG: GalleryConfig = {
+  layout: 'grid',
+  columns_mobile: 2,
+  columns_desktop: 3,
+  aspect_ratio: 'square',
+  card_style: 'gold-frame',
+  gap: 'normal',
+  max_display: 'all'
+}
+
 export interface WeddingSettings {
   id: string
   bride_name_km: string
@@ -35,6 +55,7 @@ export interface WeddingSettings {
   bride_photo_url?: string | null
   our_story?: StoryMilestone[] | null
   gift_info?: WeddingGiftInfo | null
+  gallery_config?: GalleryConfig | null
   created_at?: string
   updated_at?: string
 }

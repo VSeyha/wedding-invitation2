@@ -9,7 +9,7 @@ export interface ThemeColors {
   highlight: string
 }
 
-export type BackgroundType = 'none' | 'solid' | 'gradient' | 'image' | 'animated'
+export type BackgroundType = 'none' | 'solid' | 'gradient' | 'image' | 'animated' | 'preset'
 
 export interface BackgroundConfig {
   type: BackgroundType

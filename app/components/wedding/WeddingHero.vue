@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 import type { WeddingSettings } from '~~/shared/types/wedding'
+import { formatKhmerDate, formatEnglishDate } from '~~/app/utils/date'
 
 const props = defineProps<{
   wedding?: WeddingSettings | null

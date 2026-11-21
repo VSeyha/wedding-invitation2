@@ -3,14 +3,16 @@
     v-if="!opened"
     :class="[
       absolute ? 'absolute inset-0 z-30' : 'fixed inset-0 z-50',
-      'flex items-center justify-center p-4 bg-wedding-primary transition-all duration-1000 overflow-hidden',
+      'flex items-center justify-center p-4 transition-all duration-1000 overflow-hidden',
       isOpening ? 'opacity-0 pointer-events-none scale-105' : ''
     ]"
-    :style="{ backgroundColor: 'var(--wedding-primary, #641D2D)' }"
+    :style="{
+      background: 'radial-gradient(circle at 50% 35%, var(--wedding-bg, #F7F0E3) 0%, var(--wedding-primary, #641D2D) 125%)'
+    }"
   >
-    <!-- Background Khmer Pattern Texture -->
+    <!-- Background Texture -->
     <div
-      class="absolute inset-0 opacity-10"
+      class="absolute inset-0 opacity-15"
       :style="{
         backgroundImage: 'radial-gradient(var(--wedding-secondary, #C9A24A) 1px, transparent 1px)',
         backgroundSize: '24px 24px'
@@ -46,7 +48,7 @@
       </p>
 
       <!-- Guest Special Card -->
-      <div class="my-6 p-4 rounded-2xl bg-white/80 border border-wedding-secondary/40 shadow-inner">
+      <div class="my-6 p-4 rounded-2xl bg-white/85 border border-wedding-secondary/40 shadow-sm">
         <div class="text-xs text-wedding-text/70 font-khmer-body mb-2">
           {{ t('invitation.dear') }}
         </div>
@@ -68,7 +70,7 @@
         >
           <!-- Pulsing Outer Ring -->
           <span
-            class="absolute inset-0 rounded-full border-2 animate-ping opacity-30"
+            class="absolute inset-0 rounded-full border-2 animate-ping opacity-35"
             :style="{ borderColor: 'var(--wedding-accent, #E5C77A)' }"
           ></span>
 
@@ -96,10 +98,12 @@
 
 <script setup lang="ts">
 import type { WeddingSettings } from '~~/shared/types/wedding'
+import { formatKhmerDate, formatEnglishDate } from '~~/app/utils/date'
 
 const props = defineProps<{
   guestName?: string
   wedding?: WeddingSettings | null
+  appearance?: any
   absolute?: boolean
 }>()
 

@@ -7,27 +7,38 @@
 </template>
 
 <script setup lang="ts">
-import type { AnimationConfig } from '~~/shared/types/appearance'
+import type { AnimationConfig, ThemeColors } from '~~/shared/types/appearance'
 
 const props = withDefaults(
   defineProps<{
     config?: Partial<AnimationConfig>
     absolute?: boolean
     scrollVelocity?: number
-    palette?: 'gold' | 'pink_white'
+    palette?: 'gold' | 'pink_white' | 'auto'
+    themeColors?: ThemeColors | null
   }>(),
   {
-    palette: 'gold'
+    palette: 'auto'
   }
 )
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
+const effectivePalette = computed(() => {
+  if (props.palette && props.palette !== 'auto') return props.palette
+  const primary = (props.themeColors?.primary || '').toLowerCase()
+  const name = ((props.config as any)?.theme_name || '').toLowerCase()
+  if (primary.includes('f4') || primary.includes('db') || primary.includes('pink') || name.includes('pink')) {
+    return 'pink_white'
+  }
+  return 'gold'
+})
+
 const animationConfig = computed(() => ({
   enabled: props.config?.enabled ?? true,
   preset: props.config?.preset || 'lotus_petals',
-  speed: props.config?.speed || 1,
-  quantity: props.config?.particle_quantity || 30,
+  speed: props.config?.speed ?? 0.6,
+  quantity: props.config?.particle_quantity || 24,
   size: props.config?.object_size || 22,
   opacity: props.config?.opacity || 0.7,
   direction: props.config?.direction || 'down'
@@ -59,16 +70,19 @@ const initParticles = (width: number, height: number) => {
   else if (preset === 'hearts') type = 'heart'
   else if (preset === 'lights') type = 'light'
 
+  // Gentle, calm romantic base speed scaled down for elegant slow motion
+  const baseSpeed = (animationConfig.value.speed ?? 0.6) * 0.35
+
   for (let i = 0; i < count; i++) {
     particles.push({
       x: Math.random() * width,
       y: Math.random() * height,
-      size: (Math.random() * 0.6 + 0.7) * animationConfig.value.size,
-      speedX: (Math.random() - 0.5) * 0.8 * animationConfig.value.speed,
-      speedY: (Math.random() * 0.9 + 0.6) * animationConfig.value.speed,
+      size: (Math.random() * 0.5 + 0.75) * animationConfig.value.size,
+      speedX: (Math.random() - 0.5) * 0.15 * baseSpeed,
+      speedY: (Math.random() * 0.22 + 0.12) * baseSpeed,
       rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.02 * animationConfig.value.speed,
-      opacity: Math.random() * 0.4 + 0.4,
+      rotationSpeed: (Math.random() - 0.5) * 0.006 * baseSpeed,
+      opacity: Math.random() * 0.35 + 0.45,
       type
     })
   }
@@ -87,7 +101,7 @@ const drawPetal = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.bezierCurveTo(-p.size * 0.6, p.size * 0.8, -p.size * 0.75, -p.size * 0.4, 0, -p.size)
   ctx.closePath()
 
-  if (props.palette === 'pink_white') {
+  if (effectivePalette.value === 'pink_white') {
     // Dreamy White-to-Rose Pink gradient
     const grad = ctx.createLinearGradient(0, -p.size, 0, p.size)
     grad.addColorStop(0, '#FFFFFF') // Pure luminous white tip
@@ -133,7 +147,7 @@ const drawDust = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.beginPath()
   ctx.arc(0, 0, p.size * 0.25, 0, Math.PI * 2)
 
-  if (props.palette === 'pink_white') {
+  if (effectivePalette.value === 'pink_white') {
     ctx.fillStyle = '#FFFFFF'
     ctx.shadowColor = '#F472B6'
     ctx.shadowBlur = 10
@@ -158,7 +172,7 @@ const drawHeart = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.moveTo(0, s * 0.3)
   ctx.bezierCurveTo(-s, -s * 0.6, -s * 1.2, s * 0.4, 0, s * 1.2)
   ctx.bezierCurveTo(s * 1.2, s * 0.4, s, -s * 0.6, 0, s * 0.3)
-  if (props.palette === 'pink_white') {
+  if (effectivePalette.value === 'pink_white') {
     ctx.fillStyle = '#F472B6'
     ctx.shadowColor = '#FBCFE8'
     ctx.shadowBlur = 6
@@ -176,7 +190,7 @@ const drawLight = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.globalAlpha = p.opacity * 0.6
 
   const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size)
-  if (props.palette === 'pink_white') {
+  if (effectivePalette.value === 'pink_white') {
     grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
     grad.addColorStop(0.5, 'rgba(244, 114, 182, 0.45)')
     grad.addColorStop(1, 'rgba(244, 114, 182, 0)')
@@ -193,8 +207,6 @@ const drawLight = (ctx: CanvasRenderingContext2D, p: Particle) => {
   ctx.restore()
 }
 
-let currentDrift = 0
-
 const render = () => {
   const canvas = canvasRef.value
   if (!canvas) return
@@ -204,10 +216,6 @@ const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   if (animationConfig.value.enabled && animationConfig.value.preset !== 'none') {
-    // Smoothly lerp towards target drift so scroll never causes rapid jumps
-    const targetDrift = Math.min((props.scrollVelocity || 0) * 0.1, 0.28)
-    currentDrift += (targetDrift - currentDrift) * 0.05
-
     for (const p of particles) {
       if (p.type === 'dust') {
         drawDust(ctx, p)
@@ -219,10 +227,10 @@ const render = () => {
         drawPetal(ctx, p)
       }
 
-      // Update physics with silky smooth floating momentum
-      p.y += (p.speedY + currentDrift)
-      p.x += Math.sin(p.y * 0.015) * 0.4 + p.speedX
-      p.rotation += p.rotationSpeed + currentDrift * 0.003
+      // Smooth, gentle constant float (scrolling does not accelerate particles)
+      p.y += p.speedY
+      p.x += Math.sin(p.y * 0.008) * 0.2 + p.speedX
+      p.rotation += p.rotationSpeed
 
       // Wrap around edges
       if (p.y > canvas.height + p.size) {

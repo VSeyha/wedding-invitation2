@@ -6,10 +6,19 @@ export type Locale = 'km' | 'en'
 const dictionaries: Record<Locale, any> = { km, en }
 
 export function useLocale() {
-  const currentLocale = useState<Locale>('app-locale', () => 'km')
+  const cookieLocale = useCookie<Locale>('wedding_locale', {
+    default: () => 'km',
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: 'lax'
+  })
+
+  const currentLocale = useState<Locale>('app-locale', () => {
+    return cookieLocale.value === 'en' ? 'en' : 'km'
+  })
 
   const setLocale = (locale: Locale) => {
     currentLocale.value = locale
+    cookieLocale.value = locale
     if (import.meta.client) {
       try {
         localStorage.setItem('wedding_locale', locale)
@@ -24,13 +33,20 @@ export function useLocale() {
     setLocale(currentLocale.value === 'km' ? 'en' : 'km')
   }
 
-  // Initialize from storage on client mount
+  // Defer any localStorage check to after client mount to prevent SSR hydration mismatch
   if (import.meta.client) {
-    const saved = localStorage.getItem('wedding_locale') as Locale | null
-    if (saved && (saved === 'km' || saved === 'en') && currentLocale.value !== saved) {
-      currentLocale.value = saved
-      document.documentElement.lang = saved
-    }
+    onMounted(() => {
+      try {
+        const saved = localStorage.getItem('wedding_locale') as Locale | null
+        if (saved && (saved === 'km' || saved === 'en') && currentLocale.value !== saved) {
+          currentLocale.value = saved
+          cookieLocale.value = saved
+          document.documentElement.lang = saved
+        }
+      } catch {
+        // Ignore storage errors
+      }
+    })
   }
 
   const t = (path: string): string => {

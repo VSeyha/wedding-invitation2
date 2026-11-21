@@ -166,8 +166,8 @@
                 </label>
               </div>
 
-              <div v-if="config.background_config.scroll_zoom !== false" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-gray-100">
-                <div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-gray-100">
+                <div :class="{ 'opacity-40 pointer-events-none': !config.background_config.scroll_zoom }">
                   <label class="form-label">Zoom Effect Style</label>
                   <select v-model="config.background_config.zoom_effect" class="input-field text-xs">
                     <option value="zoom-in">Zoom In (ពង្រីកចូលពេល Scroll ចុះ)</option>
@@ -837,7 +837,16 @@ const applyPreset = (key: string, preset: { name: string; colors: ThemeColors })
 const resetToDefault = () => {
   config.value.theme_name = 'Khmer Royal Burgundy & Gold'
   config.value.theme_config = { ...DEFAULT_THEME_COLORS }
-  config.value.background_config = { type: 'none', opacity: 0.15, overlay_color: '#641D2D', overlay_opacity: 0.15 }
+  config.value.background_config = {
+    type: 'preset',
+    preset_name: 'angkor-wat',
+    image_url: '/images/backgrounds/angkor-wat.png',
+    opacity: 0.85,
+    overlay_color: '#FDF8EE',
+    overlay_opacity: 0,
+    scroll_zoom: true,
+    zoom_effect: 'zoom-in'
+  }
   config.value.animation_config.preset = 'lotus_petals'
   config.value.animation_config.enabled = true
   config.value.opening_animation_config.style = 'golden_seal'
@@ -873,9 +882,22 @@ const loadData = async () => {
     if (res?.data) {
       if (res.data.theme_name) config.value.theme_name = res.data.theme_name
       if (res.data.theme_config) config.value.theme_config = { ...DEFAULT_THEME_COLORS, ...res.data.theme_config }
-      if (res.data.background_config) config.value.background_config = res.data.background_config
-      if (res.data.animation_config) config.value.animation_config = res.data.animation_config
-      if (res.data.opening_animation_config) config.value.opening_animation_config = res.data.opening_animation_config
+      if (res.data.background_config) {
+        config.value.background_config = {
+          scroll_zoom: true,
+          zoom_effect: 'zoom-in',
+          opacity: 0.85,
+          ...res.data.background_config
+        }
+        if (!config.value.background_config.zoom_effect) {
+          config.value.background_config.zoom_effect = 'zoom-in'
+        }
+        if (config.value.background_config.scroll_zoom === undefined) {
+          config.value.background_config.scroll_zoom = true
+        }
+      }
+      if (res.data.animation_config) config.value.animation_config = { ...config.value.animation_config, ...res.data.animation_config }
+      if (res.data.opening_animation_config) config.value.opening_animation_config = { ...config.value.opening_animation_config, ...res.data.opening_animation_config }
       if (typeof res.data.is_published === 'boolean') config.value.is_published = res.data.is_published
     }
   } catch (err) {
