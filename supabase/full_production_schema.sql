@@ -4,6 +4,16 @@
 -- https://supabase.com/dashboard/project/_/sql
 -- ============================================================
 
+-- 0. GRANT ROLES PERMISSIONS
+grant usage on schema public to postgres, anon, authenticated, service_role;
+grant all on all tables in schema public to postgres, anon, authenticated, service_role;
+grant all on all routines in schema public to postgres, anon, authenticated, service_role;
+grant all on all sequences in schema public to postgres, anon, authenticated, service_role;
+
+alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on routines to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;
+
 -- 1. TABLE: wedding_settings
 create table if not exists public.wedding_settings (
   id                     uuid primary key default gen_random_uuid(),
@@ -131,7 +141,7 @@ alter table public.wedding_appearance  enable row level security;
 drop policy if exists "admin_all_wedding_settings" on public.wedding_settings;
 drop policy if exists "public_read_wedding_settings" on public.wedding_settings;
 create policy "admin_all_wedding_settings" on public.wedding_settings for all to authenticated using (true) with check (true);
-create policy "public_read_wedding_settings" on public.wedding_settings for select to anon using (true);
+create policy "public_read_wedding_settings" on public.wedding_settings for select to anon, authenticated using (true);
 
 drop policy if exists "admin_all_guests" on public.guests;
 create policy "admin_all_guests" on public.guests for all to authenticated using (true) with check (true);
