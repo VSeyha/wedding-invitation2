@@ -60,7 +60,6 @@
 </template>
 
 <script setup lang="ts">
-import KhmerKbach from './KhmerKbach.vue'
 import type { WeddingSettings } from '~~/shared/types/wedding'
 import { formatKhmerDate, formatEnglishDate } from '~~/app/utils/date'
 

@@ -58,6 +58,8 @@ interface Particle {
 
 let animationId: number | null = null
 let particles: Particle[] = []
+let lastFrameTime = 0
+const TARGET_FRAME_MS = 1000 / 60 // Cap animation at 60 FPS to prevent battery drain on 120Hz displays
 
 const initParticles = (width: number, height: number) => {
   particles = []
@@ -213,6 +215,13 @@ const render = () => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
+  const now = performance.now()
+  if (now - lastFrameTime < TARGET_FRAME_MS) {
+    animationId = requestAnimationFrame(render)
+    return
+  }
+  lastFrameTime = now
+
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   if (animationConfig.value.enabled && animationConfig.value.preset !== 'none') {
@@ -243,6 +252,19 @@ const render = () => {
   }
 
   animationId = requestAnimationFrame(render)
+}
+
+const handleVisibilityChange = () => {
+  if (typeof document === 'undefined') return
+  if (document.hidden) {
+    if (animationId) {
+      cancelAnimationFrame(animationId)
+      animationId = null
+    }
+  } else if (!animationId) {
+    lastFrameTime = performance.now()
+    animationId = requestAnimationFrame(render)
+  }
 }
 
 const handleResize = () => {
@@ -277,13 +299,15 @@ watch(
 onMounted(() => {
   if (typeof window === 'undefined') return
   handleResize()
-  window.addEventListener('resize', handleResize)
+  window.addEventListener('resize', handleResize, { passive: true })
+  document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true })
   render()
 })
 
 onUnmounted(() => {
   if (typeof window === 'undefined') return
   window.removeEventListener('resize', handleResize)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
   if (animationId) cancelAnimationFrame(animationId)
 })
 </script>

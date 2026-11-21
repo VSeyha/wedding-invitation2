@@ -15,6 +15,21 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  nitro: {
+    compressPublicAssets: true
+  },
+
+  routeRules: {
+    // SWR Edge caching for public wedding data (Vercel Edge CDN caches globally; sub-50ms TTFB)
+    '/api/wedding': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
+    '/api/appearance': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
+    '/api/programmes': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
+    '/api/gallery': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
+    // Static assets long-term immutable cache
+    '/images/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    '/audio/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } }
+  },
+
   app: {
     head: {
       title: 'Khmer Wedding Invitation',

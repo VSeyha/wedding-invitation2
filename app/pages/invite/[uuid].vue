@@ -214,14 +214,16 @@ definePageMeta({
 import WeddingCanvasBackground from '~~/app/components/wedding/WeddingCanvasBackground.vue'
 import WeddingOpeningAnimation from '~~/app/components/wedding/WeddingOpeningAnimation.vue'
 import WeddingHero from '~~/app/components/wedding/WeddingHero.vue'
-import WeddingCouple from '~~/app/components/wedding/WeddingCouple.vue'
-import WeddingOurStory from '~~/app/components/wedding/WeddingOurStory.vue'
-import WeddingMessage from '~~/app/components/wedding/WeddingMessage.vue'
-import WeddingProgramme from '~~/app/components/wedding/WeddingProgramme.vue'
-import WeddingLocation from '~~/app/components/wedding/WeddingLocation.vue'
-import WeddingGallery from '~~/app/components/wedding/WeddingGallery.vue'
-import WeddingGift from '~~/app/components/wedding/WeddingGift.vue'
-import WeddingRSVP from '~~/app/components/wedding/WeddingRSVP.vue'
+
+// Lazy-load below-the-fold components to reduce initial page bundle size and speed up FCP/LCP
+const WeddingCouple = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingCouple.vue'))
+const WeddingOurStory = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingOurStory.vue'))
+const WeddingMessage = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingMessage.vue'))
+const WeddingProgramme = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingProgramme.vue'))
+const WeddingLocation = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingLocation.vue'))
+const WeddingGallery = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingGallery.vue'))
+const WeddingGift = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingGift.vue'))
+const WeddingRSVP = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingRSVP.vue'))
 
 import { formatKhmerDate, formatEnglishDate } from '~~/app/utils/date'
 import { PRESET_BACKGROUNDS } from '~~/shared/types/appearance'
@@ -280,20 +282,6 @@ watch(
   { immediate: true }
 )
 
-// Desktop Live Countdown Timer
-const now = ref(Date.now())
-let countdownInterval: any = null
-
-const countdown = computed(() => {
-  const targetDate = wedding.value?.wedding_date || '2027-01-16T04:26:00.000Z'
-  const diff = Math.max(0, new Date(targetDate).getTime() - now.value)
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-  return { days, hours, minutes, seconds }
-})
-
 // Damped scroll tracking for silky smooth zoom and particle dynamics (no abrupt/fast changes)
 const targetScrollProgress = ref(0)
 const smoothScrollProgress = ref(0)
@@ -314,6 +302,14 @@ const updateSmoothScroll = () => {
   smoothScrollVelocity.value += dVel * 0.06
   targetScrollVelocity.value *= 0.92 // gradual momentum decay
 
+  // Performance: Stop requestAnimationFrame loop when scroll animation has settled
+  if (Math.abs(dProgress) < 0.0001 && Math.abs(smoothScrollVelocity.value) < 0.001) {
+    smoothScrollProgress.value = targetScrollProgress.value
+    smoothScrollVelocity.value = 0
+    dampingRafId = null
+    return
+  }
+
   dampingRafId = requestAnimationFrame(updateSmoothScroll)
 }
 
@@ -331,6 +327,10 @@ const handleScroll = () => {
 
   lastScrollY = y
   lastScrollTime = nowTime
+
+  if (!dampingRafId) {
+    dampingRafId = requestAnimationFrame(updateSmoothScroll)
+  }
 }
 
 const setupScrollReveal = () => {
@@ -567,15 +567,11 @@ onMounted(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     window.addEventListener('click', onGlobalClick, { passive: true })
     dampingRafId = requestAnimationFrame(updateSmoothScroll)
-    countdownInterval = setInterval(() => {
-      now.value = Date.now()
-    }, 1000)
   }
 })
 
 onUnmounted(() => {
   if (import.meta.client) {
-    if (countdownInterval) clearInterval(countdownInterval)
     document.body.style.overflow = ''
     document.documentElement.style.overflow = ''
     document.body.style.height = ''

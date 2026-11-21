@@ -51,6 +51,8 @@
             v-if="activeGiftInfo.qr_code_url"
             :src="activeGiftInfo.qr_code_url"
             alt="KHQR Payment"
+            loading="lazy"
+            decoding="async"
             class="w-full h-auto object-contain block"
           />
           <!-- Fallback decorative placeholder when no custom QR uploaded yet -->

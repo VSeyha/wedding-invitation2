@@ -1,7 +1,8 @@
 // GET /api/programmes - Public: list wedding ceremony programme
 import { useServerSupabase } from '~~/server/utils/supabase'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  setHeader(event, 'Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
   const supabase = useServerSupabase()
   if (!supabase) return { data: [] }
 

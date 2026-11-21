@@ -19,6 +19,8 @@
               v-if="wedding?.groom_photo_url"
               :src="wedding.groom_photo_url"
               :alt="wedding.groom_name_en || 'Groom'"
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-110 group-hover:rotate-1"
             />
             <div
@@ -48,6 +50,8 @@
               v-if="wedding?.bride_photo_url"
               :src="wedding.bride_photo_url"
               :alt="wedding.bride_name_en || 'Bride'"
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-1"
             />
             <div
