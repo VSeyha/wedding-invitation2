@@ -266,7 +266,7 @@
         <div class="w-full flex items-center justify-between z-20 pt-1 sm:pt-2">
           <!-- Counter Pill -->
           <div class="px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white/90 text-xs sm:text-sm font-mono tracking-wider shadow-sm">
-            {{ activePhotoIndex + 1 }} / {{ photos.length }}
+            {{ activePhotoIndex + 1 }} / {{ normalizedPhotos.length }}
           </div>
 
           <!-- Close Button (Thumb-Friendly Circle) -->
@@ -287,7 +287,7 @@
         >
           <!-- Previous Button (Desktop & Tablet) -->
           <button
-            v-if="photos.length > 1"
+            v-if="normalizedPhotos.length > 1"
             type="button"
             @click.stop="prevPhoto"
             class="hidden sm:flex absolute left-2 lg:left-6 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 backdrop-blur-md border border-white/20 text-white items-center justify-center text-2xl transition-all duration-200 z-20 shadow-lg cursor-pointer"
@@ -307,9 +307,10 @@
             </div>
 
             <img
+              v-if="normalizedPhotos[activePhotoIndex]"
               :key="activePhotoIndex"
-              :src="photos[activePhotoIndex].url"
-              :alt="photos[activePhotoIndex].alt_text_en || 'Wedding photo preview'"
+              :src="normalizedPhotos[activePhotoIndex].url"
+              :alt="normalizedPhotos[activePhotoIndex].alt_text_en || 'Wedding photo preview'"
               class="max-w-full max-h-[72vh] sm:max-h-[82vh] w-auto h-auto object-contain rounded-xl sm:rounded-2xl shadow-2xl transition-opacity duration-300 pointer-events-auto"
               :class="isLightboxLoading ? 'opacity-40 scale-98' : 'opacity-100 scale-100'"
               decoding="async"
@@ -319,7 +320,7 @@
 
           <!-- Next Button (Desktop & Tablet) -->
           <button
-            v-if="photos.length > 1"
+            v-if="normalizedPhotos.length > 1"
             type="button"
             @click.stop="nextPhoto"
             class="hidden sm:flex absolute right-2 lg:right-6 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 backdrop-blur-md border border-white/20 text-white items-center justify-center text-2xl transition-all duration-200 z-20 shadow-lg cursor-pointer"
@@ -334,7 +335,7 @@
           <!-- Mobile Thumb Navigation Buttons -->
           <div class="flex sm:hidden items-center justify-center gap-6 w-full px-6">
             <button
-              v-if="photos.length > 1"
+              v-if="normalizedPhotos.length > 1"
               type="button"
               @click.stop="prevPhoto"
               class="px-5 py-2 rounded-full bg-white/15 active:bg-white/30 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1 active:scale-95 transition-all"
@@ -343,7 +344,7 @@
             </button>
             <span class="text-[11px] text-white/50 font-light">Swipe to browse</span>
             <button
-              v-if="photos.length > 1"
+              v-if="normalizedPhotos.length > 1"
               type="button"
               @click.stop="nextPhoto"
               class="px-5 py-2 rounded-full bg-white/15 active:bg-white/30 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1 active:scale-95 transition-all"
@@ -353,9 +354,9 @@
           </div>
 
           <!-- Indicator Dots (Max 12 dots shown for clean look) -->
-          <div v-if="photos.length <= 12" class="flex items-center gap-1.5 overflow-x-auto max-w-full px-4 py-1">
+          <div v-if="normalizedPhotos.length <= 12" class="flex items-center gap-1.5 overflow-x-auto max-w-full px-4 py-1">
             <button
-              v-for="(_, dotIdx) in photos"
+              v-for="(_, dotIdx) in normalizedPhotos"
               :key="dotIdx"
               type="button"
               @click.stop="activePhotoIndex = dotIdx"
@@ -407,14 +408,34 @@ const onLightboxImageLoad = () => {
   isLightboxLoading.value = false
 }
 
+// Safe photo URL resolver to guarantee absolute Supabase public URLs (prevents relative path /invite/photos/... Router warnings)
+const resolvePhotoUrl = (rawUrl?: string) => {
+  if (!rawUrl) return ''
+  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) return rawUrl
+  if (rawUrl.startsWith('/')) return rawUrl
+  const config = useRuntimeConfig()
+  const base = (config.public.supabaseUrl as string) || ''
+  if (base) {
+    return `${base.replace(/\/+$/, '')}/storage/v1/object/public/wedding-photos/${rawUrl.replace(/^\/+/, '')}`
+  }
+  return `/${rawUrl}`
+}
+
+const normalizedPhotos = computed(() => {
+  return (props.photos || []).map((p: any) => ({
+    ...p,
+    url: resolvePhotoUrl(p.url || p.photo_url || p.storage_path)
+  }))
+})
+
 // Background prefetch for instant lightbox browsing
 const preloadAdjacentImages = (currIndex: number) => {
-  if (!import.meta.client || !props.photos || props.photos.length <= 1) return
-  const nextIdx = (currIndex + 1) % props.photos.length
-  const prevIdx = (currIndex - 1 + props.photos.length) % props.photos.length
+  if (!import.meta.client || !normalizedPhotos.value || normalizedPhotos.value.length <= 1) return
+  const nextIdx = (currIndex + 1) % normalizedPhotos.value.length
+  const prevIdx = (currIndex - 1 + normalizedPhotos.value.length) % normalizedPhotos.value.length
 
-  const nextUrl = props.photos[nextIdx]?.url
-  const prevUrl = props.photos[prevIdx]?.url
+  const nextUrl = normalizedPhotos.value[nextIdx]?.url
+  const prevUrl = normalizedPhotos.value[prevIdx]?.url
 
   if (nextUrl) {
     const imgNext = new Image()
@@ -435,7 +456,7 @@ const effectiveConfig = computed<GalleryConfig>(() => ({
 const hasMorePhotos = computed(() => {
   const limit = effectiveConfig.value.max_display
   if (typeof limit === 'number') {
-    return props.photos.length > limit
+    return normalizedPhotos.value.length > limit
   }
   return false
 })
@@ -443,9 +464,9 @@ const hasMorePhotos = computed(() => {
 const displayedPhotos = computed(() => {
   const limit = effectiveConfig.value.max_display
   if (!isExpanded.value && typeof limit === 'number') {
-    return props.photos.slice(0, limit)
+    return normalizedPhotos.value.slice(0, limit)
   }
-  return props.photos
+  return normalizedPhotos.value
 })
 
 // Dynamic Aspect Ratio Classes
@@ -563,16 +584,18 @@ const closeLightbox = () => {
 }
 
 const prevPhoto = () => {
-  if (activePhotoIndex.value === null) return
-  const newIdx = (activePhotoIndex.value - 1 + props.photos.length) % props.photos.length
+  if (activePhotoIndex.value === null || !normalizedPhotos.value.length) return
+  const len = normalizedPhotos.value.length
+  const newIdx = (activePhotoIndex.value - 1 + len) % len
   activePhotoIndex.value = newIdx
   isLightboxLoading.value = true
   preloadAdjacentImages(newIdx)
 }
 
 const nextPhoto = () => {
-  if (activePhotoIndex.value === null) return
-  const newIdx = (activePhotoIndex.value + 1) % props.photos.length
+  if (activePhotoIndex.value === null || !normalizedPhotos.value.length) return
+  const len = normalizedPhotos.value.length
+  const newIdx = (activePhotoIndex.value + 1) % len
   activePhotoIndex.value = newIdx
   isLightboxLoading.value = true
   preloadAdjacentImages(newIdx)
