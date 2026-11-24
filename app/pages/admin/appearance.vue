@@ -293,13 +293,12 @@
               <select v-model="config.opening_animation_config.style" class="input-field">
                 <option value="curtain">Royal Velvet Curtains (វាំងននមង្គលការរាជវាំង)</option>
                 <option value="click_seal">Royal Romdoul Wax Seal (ត្រារាជានិយមផ្ការំដួល)</option>
+                <option value="golden_seal">Golden Royal Lotus Seal (សិរីមង្គលផ្កាឈូក)</option>
+                <option value="khmer_seal">Traditional Khmer Motif (ក្បាច់បុរាណ)</option>
                 <option value="slide_unlock">Slide Romdoul to Unlock (អូសផ្ការំដួលបើក)</option>
                 <option value="scratch">Gold Scratch-Off Reveal (កោសស្រទាប់មាសបើក)</option>
                 <option value="envelope_flap">3D Origami Envelope Flap (បត់បើកស្រោមសំបុត្រ 3D)</option>
-                <option value="golden_seal">Golden Royal Lotus Seal (សិរីមង្គលផ្កាឈូក)</option>
-                <option value="romdoul_seal">Royal Romdoul Flower (ផ្ការំដួលរាជានិយម)</option>
-                <option value="khmer_seal">Traditional Khmer Motif (ក្បាច់បុរាណ)</option>
-                <option value="lotus">Royal Blossom (ផ្កាឈូកមាស)</option>
+                <option value="lotus">Royal Lotus Blossom (ផ្កាឈូកមាសរីក)</option>
                 <option value="fade">Simple Elegant Fade (រំលេចសន្សឹមៗ)</option>
                 <option value="none">Direct Open (No Envelope) (បើកផ្ទាល់គ្មានស្រោម)</option>
               </select>
@@ -861,6 +860,18 @@ const testOpeningAnimation = () => {
     showOpeningTest.value = true
   })
 }
+
+// Auto-replay opening animation in live preview whenever the user switches styles
+watch(
+  () => config.value.opening_animation_config.style,
+  (newStyle) => {
+    if (newStyle === 'none' || newStyle === 'direct') {
+      showOpeningTest.value = false
+    } else {
+      testOpeningAnimation()
+    }
+  }
+)
 
 const loadData = async () => {
   // Fetch real wedding details

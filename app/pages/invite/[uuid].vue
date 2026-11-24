@@ -483,6 +483,11 @@ const loadInvitationData = async () => {
       if (appRes.data.theme_config) {
         applyThemeColors(appRes.data.theme_config)
       }
+      const animStyle = appRes.data.opening_animation_config?.style
+      if (animStyle === 'none' || animStyle === 'direct') {
+        hasOpened.value = true
+        isOpening.value = false
+      }
     }
   } catch (err: any) {
     console.error('Failed to load invitation:', err)

@@ -637,22 +637,167 @@
             </span>
           </div>
 
-          <!-- VARIANT C: 3D ENVELOPE FLAP -->
-          <div v-else-if="currentStyle === 'envelope_flap'" class="mt-2 flex flex-col items-center w-full">
+          <!-- VARIANT C: 3D ORIGAMI ENVELOPE FLAP -->
+          <div v-else-if="currentStyle === 'envelope_flap'" class="mt-1 flex flex-col items-center w-full">
+            <div
+              class="relative w-64 sm:w-72 h-36 sm:h-40 cursor-pointer group select-none"
+              style="perspective: 900px;"
+              @click="triggerOpen"
+            >
+              <!-- Back Envelope Pocket with Inner Card -->
+              <div class="absolute inset-0 rounded-xl bg-gradient-to-b from-[#FAF4E6] to-[#E8D9BD] border border-[#C9A24A]/60 shadow-lg flex items-center justify-center overflow-hidden">
+                <!-- Inner Wedding Card that slides up upon opening -->
+                <div
+                  class="w-[88%] h-[82%] bg-white rounded-lg border border-[#C9A24A]/40 shadow-sm flex flex-col items-center justify-center p-2 text-center transition-all duration-700 ease-out"
+                  :class="{ '-translate-y-6 scale-105 shadow-md': isOpening }"
+                >
+                  <div class="text-[11px] font-bold text-wedding-primary font-khmer-heading">
+                    {{ wedding?.groom_name_km || 'វ៉េត សីហា' }} & {{ wedding?.bride_name_km || 'ស ណារី' }}
+                  </div>
+                  <div class="text-[9px] text-wedding-secondary font-khmer-body mt-0.5">
+                    សិរីមង្គលអាពាហ៍ពិពាហ៍
+                  </div>
+                </div>
+              </div>
+
+              <!-- Side Triangular Folds -->
+              <div class="absolute inset-0 pointer-events-none">
+                <svg class="w-full h-full" viewBox="0 0 280 160" fill="none">
+                  <!-- Left flap -->
+                  <path d="M0 0 L120 80 L0 160 Z" fill="#F2E5CE" stroke="#D4AF37" stroke-width="0.5" opacity="0.95" />
+                  <!-- Right flap -->
+                  <path d="M280 0 L160 80 L280 160 Z" fill="#F2E5CE" stroke="#D4AF37" stroke-width="0.5" opacity="0.95" />
+                  <!-- Bottom flap -->
+                  <path d="M0 160 L140 70 L280 160 Z" fill="#F8EED9" stroke="#C9A24A" stroke-width="0.75" />
+                </svg>
+              </div>
+
+              <!-- Top Triangular Flap that rotates open 180° in 3D -->
+              <div
+                class="absolute top-0 inset-x-0 h-1/2 origin-top transition-transform duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] z-20"
+                :style="{
+                  transform: isOpening ? 'rotateX(180deg)' : 'rotateX(0deg)',
+                  transformStyle: 'preserve-3d'
+                }"
+              >
+                <svg class="w-full h-full filter drop-shadow-md" viewBox="0 0 280 80" fill="none">
+                  <path d="M0 0 L140 80 L280 0 Z" fill="#FFF8EA" stroke="#C9A24A" stroke-width="1" />
+                </svg>
+                <!-- Wax Seal on Flap Tip -->
+                <div
+                  class="absolute left-1/2 -translate-x-1/2 bottom-[-14px] w-10 h-10 rounded-full bg-gradient-to-tr from-wedding-accent via-wedding-secondary to-[#8F6B1E] shadow-gold-glow flex items-center justify-center p-1 transition-all duration-300 group-hover:scale-110"
+                  :class="{ 'opacity-0 scale-50': isOpening }"
+                >
+                  <RomdoulFlower :size="22" :glow="true" />
+                </div>
+              </div>
+            </div>
+
+            <span class="mt-2 text-[11px] sm:text-xs font-bold text-wedding-primary font-khmer-heading animate-pulse flex items-center gap-1">
+              <span class="text-wedding-secondary">👉</span>
+              <span>{{ isKhmer ? 'ចុចលើស្រោមសំបុត្រ ដើម្បីបត់បើក' : 'Tap Envelope to Open 3D Flap' }}</span>
+              <span class="text-wedding-secondary">👈</span>
+            </span>
+          </div>
+
+          <!-- VARIANT D: GOLDEN ROYAL LOTUS SEAL -->
+          <div v-else-if="currentStyle === 'golden_seal'" class="mt-2 flex flex-col items-center">
             <button
               type="button"
               @click="triggerOpen"
-              class="group relative z-10 py-2.5 px-6 rounded-full bg-gradient-to-tr from-wedding-accent via-wedding-secondary to-[#8F6B1E] shadow-gold-glow flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+              class="group relative w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center shadow-gold-glow hover:shadow-gold-glow-lg transform hover:scale-110 active:scale-90 transition-all duration-300 interactive-btn cursor-pointer p-2"
+              :style="{
+                background: 'radial-gradient(circle at 35% 35%, #FFF6DB 0%, #E5C77A 35%, #C9A24A 70%, #7E4F09 100%)'
+              }"
               :title="t('common.open_invitation')"
             >
-              <RomdoulFlower :size="24" :glow="true" />
-              <span class="font-khmer-heading text-xs text-white font-bold drop-shadow">
-                {{ isKhmer ? 'បត់បើកស្រោមសំបុត្រ' : 'Unfold Envelope' }}
-              </span>
+              <!-- Pulsing Outer Ring -->
+              <span
+                class="absolute inset-0 rounded-full border-2 animate-ping opacity-40"
+                style="border-color: #E5C77A;"
+              ></span>
+              <!-- Engraved golden filigree rim -->
+              <span class="absolute inset-1 rounded-full border-2 border-dashed border-white/80 pointer-events-none"></span>
+
+              <!-- Golden Lotus Flower SVG -->
+              <LotusFlower :size="42" :glow="true" custom-class="drop-shadow group-hover:scale-110 group-active:scale-95 transition-transform" />
             </button>
+
+            <span class="mt-2 text-[11px] sm:text-xs font-bold text-wedding-primary font-khmer-heading animate-pulse flex items-center gap-1">
+              <span class="text-wedding-secondary">👉</span>
+              <span>{{ isKhmer ? 'ចុចត្រាផ្កាឈូកមាស ដើម្បីបើកសំបុត្រ' : 'Touch Golden Lotus Seal to Open' }}</span>
+              <span class="text-wedding-secondary">👈</span>
+            </span>
           </div>
 
-          <!-- VARIANT D: CLASSIC ROMDOUL WAX SEAL (Tap to Open) -->
+          <!-- VARIANT E: TRADITIONAL KHMER MOTIF CREST -->
+          <div v-else-if="currentStyle === 'khmer_seal'" class="mt-2 flex flex-col items-center">
+            <button
+              type="button"
+              @click="triggerOpen"
+              class="group relative w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center shadow-gold-glow hover:shadow-gold-glow-lg transform hover:scale-110 active:scale-90 transition-all duration-300 interactive-btn cursor-pointer p-2"
+              :style="{
+                background: 'radial-gradient(circle at 35% 35%, #FFF8E5 0%, #D4AF37 30%, #9C6B15 75%, #5C1B2A 100%)'
+              }"
+              :title="t('common.open_invitation')"
+            >
+              <!-- Pulsing Outer Ring -->
+              <span
+                class="absolute inset-0 rounded-full border-2 animate-ping opacity-40 border-[#D4AF37]"
+              ></span>
+              <!-- Engraved golden filigree rim -->
+              <span class="absolute inset-1 rounded-full border border-double border-white/85 pointer-events-none"></span>
+
+              <!-- Khmer Kbach Crest -->
+              <KhmerKbach :size="36" type="crest" :glow="true" />
+            </button>
+
+            <span class="mt-2 text-[11px] sm:text-xs font-bold text-wedding-primary font-khmer-heading animate-pulse flex items-center gap-1">
+              <span class="text-wedding-secondary">👉</span>
+              <span>{{ isKhmer ? 'ចុចត្រាក្បាច់មង្គល ដើម្បីបើកសំបុត្រ' : 'Touch Royal Khmer Crest to Open' }}</span>
+              <span class="text-wedding-secondary">👈</span>
+            </span>
+          </div>
+
+          <!-- VARIANT F: ROYAL LOTUS BLOSSOM -->
+          <div v-else-if="currentStyle === 'lotus'" class="mt-2 flex flex-col items-center">
+            <button
+              type="button"
+              @click="triggerOpen"
+              class="group relative w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center shadow-gold-glow hover:shadow-gold-glow-lg transform hover:scale-110 active:scale-90 transition-all duration-300 interactive-btn cursor-pointer p-2"
+              :style="{
+                background: 'radial-gradient(circle at 50% 50%, #FAF0DC 0%, #E5C77A 45%, #8F6B1E 100%)'
+              }"
+              :title="t('common.open_invitation')"
+            >
+              <span class="absolute inset-0 rounded-full border border-wedding-secondary animate-pulse opacity-50"></span>
+              <LotusFlower :size="44" :glow="true" custom-class="drop-shadow group-hover:scale-115 transition-transform" />
+            </button>
+
+            <span class="mt-2 text-[11px] sm:text-xs font-bold text-wedding-primary font-khmer-heading animate-pulse flex items-center gap-1">
+              <span class="text-wedding-secondary">✦</span>
+              <span>{{ isKhmer ? 'ផ្កាឈូកសិរីមង្គល - ចុចដើម្បីបើក' : 'Royal Lotus - Tap to Unveil' }}</span>
+              <span class="text-wedding-secondary">✦</span>
+            </span>
+          </div>
+
+          <!-- VARIANT G: SIMPLE ELEGANT FADE -->
+          <div v-else-if="currentStyle === 'fade'" class="mt-2 flex flex-col items-center">
+            <button
+              type="button"
+              @click="triggerOpen"
+              class="group relative py-2.5 px-7 rounded-full bg-gradient-to-r from-wedding-primary via-[#842236] to-wedding-primary text-white font-khmer-heading text-xs sm:text-sm font-bold shadow-gold-glow hover:shadow-gold-glow-lg border border-wedding-secondary/50 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+            >
+              <span class="w-2 h-2 rounded-full bg-wedding-secondary animate-ping"></span>
+              <span>{{ isKhmer ? 'សូមអញ្ជើញចូលទស្សនា' : 'Enter Invitation' }}</span>
+              <span class="text-wedding-secondary">✦</span>
+            </button>
+            <span class="mt-2 text-[10px] text-wedding-text/60 font-khmer-body">
+              {{ isKhmer ? 'ចុចដើម្បីរំលេចសំបុត្រអញ្ជើញ' : 'Tap to unveil invitation' }}
+            </span>
+          </div>
+
+          <!-- VARIANT H: CLASSIC ROMDOUL WAX SEAL (Tap to Open) -->
           <div v-else class="mt-2 flex flex-col items-center">
             <button
               type="button"
@@ -699,6 +844,7 @@
 
 <script setup lang="ts">
 import RomdoulFlower from './RomdoulFlower.vue'
+import LotusFlower from './LotusFlower.vue'
 import KhmerKbach from './KhmerKbach.vue'
 import type { WeddingSettings } from '~~/shared/types/wedding'
 import type { OpeningAnimationStyle } from '~~/shared/types/appearance'
@@ -723,10 +869,9 @@ const isOpening = ref(false)
 // Resolve configured style with backward-compatible fallbacks
 const currentStyle = computed<OpeningAnimationStyle>(() => {
   const s = props.appearance?.opening_animation_config?.style
-  if (!s || s === 'golden_seal' || s === 'romdoul_seal' || s === 'khmer_seal' || s === 'lotus' || s === 'floral' || s === 'fade') {
-    return 'click_seal'
-  }
-  if (s === 'none') return 'direct'
+  if (!s) return 'click_seal'
+  if (s === 'none' || s === 'direct') return 'direct'
+  if (s === 'romdoul_seal' || s === 'floral') return 'click_seal'
   return s
 })
 
@@ -991,6 +1136,7 @@ watch(
   (newStyle) => {
     if (newStyle === 'direct') {
       opened.value = true
+      emit('opening')
       emit('opened')
     } else if (newStyle === 'scratch') {
       nextTick(() => {
@@ -1004,6 +1150,7 @@ watch(
 onMounted(() => {
   if (currentStyle.value === 'direct') {
     opened.value = true
+    emit('opening')
     emit('opened')
   } else if (currentStyle.value === 'scratch') {
     nextTick(() => {
