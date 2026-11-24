@@ -20,9 +20,9 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // SWR Edge caching for public wedding data (Vercel Edge CDN caches globally; sub-50ms TTFB)
-    '/api/wedding': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
-    '/api/appearance': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
+    // Real-time revalidation for wedding data and appearance so admin edits reflect immediately
+    '/api/wedding': { headers: { 'cache-control': 'public, max-age=0, s-maxage=5, stale-while-revalidate=10, must-revalidate' } },
+    '/api/appearance': { headers: { 'cache-control': 'public, max-age=0, s-maxage=5, stale-while-revalidate=10, must-revalidate' } },
     '/api/programmes': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
     '/api/gallery': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
     // Static assets long-term immutable cache

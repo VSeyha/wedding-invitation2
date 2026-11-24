@@ -89,6 +89,8 @@
     >
       <!-- 1. Khmer Royal Seal Opening Envelope (Full Screen on Mobile & Desktop) -->
       <WeddingOpeningAnimation
+        v-if="appearanceConfig"
+        :key="'invite-opening-' + (appearanceConfig?.opening_animation_config?.style || 'default')"
         :guest-name="invitation?.guest_name || ''"
         :wedding="wedding"
         :appearance="appearanceConfig"
@@ -471,7 +473,7 @@ const loadInvitationData = async () => {
       $fetch<any>('/api/wedding').catch(() => null),
       $fetch<any>('/api/programmes').catch(() => null),
       $fetch<any>('/api/gallery').catch(() => null),
-      $fetch<any>('/api/appearance').catch(() => null)
+      $fetch<any>(`/api/appearance?t=${Date.now()}`).catch(() => null)
     ])
 
     if (invRes?.data) invitation.value = invRes.data

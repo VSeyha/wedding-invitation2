@@ -17,10 +17,11 @@ export default defineEventHandler(async (event) => {
       .eq('is_published', true)
   }
 
-  // Check if a draft exists
+  // Check if a record exists to update (latest updated)
   const { data: existing } = await supabase
     .from('wedding_appearance')
     .select('id')
+    .order('updated_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 

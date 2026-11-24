@@ -96,9 +96,11 @@
 
       <!-- Left Real Gold Khmer Brocade Curtain Panel (kbaj-khmer.jpg) -->
       <div
-        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-left transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[15px_0_35px_rgba(0,0,0,0.8)]"
+        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-left ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[15px_0_35px_rgba(0,0,0,0.8)]"
         :class="{ '-translate-x-[92%] scale-x-[0.22]': isOpening }"
         :style="{
+          transitionProperty: 'transform',
+          transitionDuration: animDuration + 's',
           /* 3D Cylindrical Silk/Damask Folds overlaid on authentic kbaj-khmer.jpg */
           backgroundImage: `
             repeating-linear-gradient(90deg, 
@@ -148,9 +150,11 @@
 
       <!-- Right Real Gold Khmer Brocade Curtain Panel (kbaj-khmer.jpg) -->
       <div
-        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-right transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[-15px_0_35px_rgba(0,0,0,0.8)]"
+        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-right ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[-15px_0_35px_rgba(0,0,0,0.8)]"
         :class="{ 'translate-x-[92%] scale-x-[0.22]': isOpening }"
         :style="{
+          transitionProperty: 'transform',
+          transitionDuration: animDuration + 's',
           /* 3D Cylindrical Silk/Damask Folds overlaid on authentic kbaj-khmer.jpg */
           backgroundImage: `
             repeating-linear-gradient(90deg, 
@@ -394,9 +398,11 @@
     <!-- ============================================================== -->
     <div
       v-else
-      class="w-full h-full relative rounded-none px-4 py-3 sm:px-8 sm:py-6 text-center transform transition-all duration-700 interactive-card select-none border-0 flex flex-col items-center justify-between overflow-hidden shadow-none"
+      class="w-full h-full relative rounded-none px-4 py-3 sm:px-8 sm:py-6 text-center transform interactive-card select-none border-0 flex flex-col items-center justify-between overflow-hidden shadow-none"
       :style="{
-        background: 'linear-gradient(180deg, #FFFDF8 0%, #FAF4E6 45%, #F5EBD4 100%)'
+        background: 'linear-gradient(180deg, #FFFDF8 0%, #FAF4E6 45%, #F5EBD4 100%)',
+        transitionProperty: 'transform, opacity',
+        transitionDuration: Math.min(animDuration * 0.75, 1.4) + 's'
       }"
       :class="{ 'translate-y-12 opacity-0': isOpening }"
     >
@@ -875,6 +881,11 @@ const currentStyle = computed<OpeningAnimationStyle>(() => {
   return s
 })
 
+// Resolve configured duration (in seconds)
+const animDuration = computed(() => {
+  return Number(props.appearance?.opening_animation_config?.duration) || 1.6
+})
+
 // Play royal crystal chime when opening (if sound enabled)
 const playRoyalChime = () => {
   if (!props.appearance?.opening_animation_config?.sound_enabled) return
@@ -911,7 +922,7 @@ const triggerOpen = () => {
   playRoyalChime()
   emit('opening')
 
-  const dur = Math.max((props.appearance?.opening_animation_config?.duration || 1.2) * 1000, 800)
+  const dur = Math.max(animDuration.value * 1000, 800)
   setTimeout(() => {
     opened.value = true
     emit('opened')
@@ -930,6 +941,10 @@ const initScratchCanvas = () => {
   const canvas = scratchCanvasRef.value
   if (!canvas) return
   const rect = canvas.getBoundingClientRect()
+  if (rect.width === 0 || rect.height === 0) {
+    setTimeout(initScratchCanvas, 80)
+    return
+  }
   canvas.width = rect.width * 2
   canvas.height = rect.height * 2
   const ctx = canvas.getContext('2d')
