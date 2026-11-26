@@ -27,7 +27,7 @@ export const weddingGiftInfoSchema = z.object({
 // ============================================================
 export const galleryConfigSchema = z.object({
   layout: z.enum(['grid', 'masonry', 'carousel', 'featured']).optional(),
-  columns_mobile: z.union([z.literal(1), z.literal(2)]).optional(),
+  columns_mobile: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]).optional(),
   columns_desktop: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
   aspect_ratio: z.enum(['square', 'portrait', 'landscape', 'natural']).optional(),
   card_style: z.enum(['gold-frame', 'rounded', 'glass', 'minimal']).optional(),

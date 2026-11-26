@@ -123,28 +123,18 @@
           <label class="block text-xs font-bold uppercase tracking-wider text-[#641D2D] mb-2">
             Mobile Columns (ទូរស័ព្ទដៃ)
           </label>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <button
+              v-for="col in [1, 2, 3, 4] as const"
+              :key="col"
               type="button"
-              @click="galleryConfig.columns_mobile = 1"
+              @click="galleryConfig.columns_mobile = col"
               class="p-2.5 rounded-xl border text-center transition-all cursor-pointer"
-              :class="galleryConfig.columns_mobile === 1
+              :class="galleryConfig.columns_mobile === col
                 ? 'border-[#641D2D] bg-[#F7F0E3]/70 font-semibold text-[#641D2D] ring-1 ring-[#641D2D]'
                 : 'border-gray-200 hover:border-[#C9A24A]/60 text-gray-700'"
             >
-              <div class="font-bold text-xs">1 Column</div>
-              <div class="text-[10px] text-gray-500">Full Width Cards</div>
-            </button>
-            <button
-              type="button"
-              @click="galleryConfig.columns_mobile = 2"
-              class="p-2.5 rounded-xl border text-center transition-all cursor-pointer"
-              :class="galleryConfig.columns_mobile === 2
-                ? 'border-[#641D2D] bg-[#F7F0E3]/70 font-semibold text-[#641D2D] ring-1 ring-[#641D2D]'
-                : 'border-gray-200 hover:border-[#C9A24A]/60 text-gray-700'"
-            >
-              <div class="font-bold text-xs">2 Columns</div>
-              <div class="text-[10px] text-gray-500">Compact 2x2 Grid</div>
+              <div class="font-bold text-xs">{{ col }} {{ col === 1 ? 'Col' : 'Cols' }}</div>
             </button>
           </div>
         </div>

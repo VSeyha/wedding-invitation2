@@ -3,7 +3,7 @@ import path from 'node:path'
 
 export interface GalleryConfig {
   layout?: 'grid' | 'masonry' | 'carousel' | 'featured'
-  columns_mobile?: 1 | 2
+  columns_mobile?: 1 | 2 | 3 | 4
   columns_desktop?: 2 | 3 | 4
   aspect_ratio?: 'square' | 'portrait' | 'landscape' | 'natural'
   card_style?: 'gold-frame' | 'rounded' | 'glass' | 'minimal'

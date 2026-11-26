@@ -505,23 +505,37 @@ const masonryItemMarginClass = computed(() => {
 
 // Grid Columns Classes
 const gridClasses = computed(() => {
-  const mob = effectiveConfig.value.columns_mobile === 1 ? 'grid-cols-1' : 'grid-cols-2'
-  const desk = effectiveConfig.value.columns_desktop === 2
-    ? 'sm:grid-cols-2'
-    : effectiveConfig.value.columns_desktop === 4
-      ? 'sm:grid-cols-4'
-      : 'sm:grid-cols-3'
+  const mobMap: Record<number, string> = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4'
+  }
+  const deskMap: Record<number, string> = {
+    2: 'sm:grid-cols-2',
+    3: 'sm:grid-cols-3',
+    4: 'sm:grid-cols-4'
+  }
+  const mob = mobMap[effectiveConfig.value.columns_mobile || 2] || 'grid-cols-2'
+  const desk = deskMap[effectiveConfig.value.columns_desktop || 3] || 'sm:grid-cols-3'
   return `grid ${mob} ${desk} ${gapClasses.value}`
 })
 
 // Masonry Columns Classes
 const masonryClasses = computed(() => {
-  const mob = effectiveConfig.value.columns_mobile === 1 ? 'columns-1' : 'columns-2'
-  const desk = effectiveConfig.value.columns_desktop === 4
-    ? 'sm:columns-3 lg:columns-4'
-    : effectiveConfig.value.columns_desktop === 2
-      ? 'sm:columns-2'
-      : 'sm:columns-3'
+  const mobMap: Record<number, string> = {
+    1: 'columns-1',
+    2: 'columns-2',
+    3: 'columns-3',
+    4: 'columns-4'
+  }
+  const deskMap: Record<number, string> = {
+    2: 'sm:columns-2',
+    3: 'sm:columns-3',
+    4: 'sm:columns-4'
+  }
+  const mob = mobMap[effectiveConfig.value.columns_mobile || 2] || 'columns-2'
+  const desk = deskMap[effectiveConfig.value.columns_desktop || 3] || 'sm:columns-3'
   return `${mob} ${desk} ${gapClasses.value}`
 })
 
