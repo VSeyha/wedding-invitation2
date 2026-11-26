@@ -106,29 +106,29 @@
 
       <!-- Left Real Gold Khmer Brocade Curtain Panel (kbaj-khmer.jpg) -->
       <div
-        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-left will-change-transform shadow-[15px_0_35px_rgba(0,0,0,0.8)]"
+        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-left will-change-transform shadow-[12px_0_40px_rgba(0,0,0,0.75)]"
         :class="{ '-translate-x-full scale-x-[0.35] opacity-0': isOpening }"
         :style="{
           transitionProperty: 'transform, opacity',
           transitionDuration: `${animDuration}s, ${Math.max(animDuration * 0.35, 0.35)}s`,
           transitionDelay: `0s, ${Math.max(animDuration * 0.65, 0.45)}s`,
           transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1), ease-out',
-          /* 3D Cylindrical Silk/Damask Folds overlaid on authentic kbaj-khmer.jpg */
+          /* Realistic 3D Draped Silk/Velvet Folds overlaid on kbaj-khmer.jpg */
           backgroundImage: `
             repeating-linear-gradient(90deg, 
-              rgba(65,35,4,0.82) 0px, 
-              rgba(130,80,10,0.55) 14px, 
-              rgba(201,147,26,0.15) 28px, 
-              rgba(255,238,168,0.48) 42px, 
-              rgba(255,252,220,0.65) 48px, 
-              rgba(255,238,168,0.48) 54px, 
-              rgba(201,147,26,0.15) 68px, 
-              rgba(130,80,10,0.55) 82px, 
-              rgba(65,35,4,0.82) 96px
+              rgba(48,14,22,0.88) 0px, 
+              rgba(92,34,28,0.62) 18px, 
+              rgba(176,128,36,0.28) 34px, 
+              rgba(245,222,155,0.42) 48px, 
+              rgba(255,244,204,0.52) 54px, 
+              rgba(245,222,155,0.42) 60px, 
+              rgba(176,128,36,0.28) 74px, 
+              rgba(92,34,28,0.62) 90px, 
+              rgba(48,14,22,0.88) 108px
             ),
             url('/images/backgrounds/kbaj-khmer.jpg')
           `,
-          backgroundSize: '96px 100%, 360px auto',
+          backgroundSize: '108px 100%, 360px auto',
           backgroundRepeat: 'repeat-x, repeat'
         }"
       >
@@ -162,29 +162,29 @@
 
       <!-- Right Real Gold Khmer Brocade Curtain Panel (kbaj-khmer.jpg) -->
       <div
-        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-right will-change-transform shadow-[-15px_0_35px_rgba(0,0,0,0.8)]"
+        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-right will-change-transform shadow-[-12px_0_40px_rgba(0,0,0,0.75)]"
         :class="{ 'translate-x-full scale-x-[0.35] opacity-0': isOpening }"
         :style="{
           transitionProperty: 'transform, opacity',
           transitionDuration: `${animDuration}s, ${Math.max(animDuration * 0.35, 0.35)}s`,
           transitionDelay: `0s, ${Math.max(animDuration * 0.65, 0.45)}s`,
           transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1), ease-out',
-          /* 3D Cylindrical Silk/Damask Folds overlaid on authentic kbaj-khmer.jpg */
+          /* Realistic 3D Draped Silk/Velvet Folds overlaid on kbaj-khmer.jpg */
           backgroundImage: `
             repeating-linear-gradient(90deg, 
-              rgba(65,35,4,0.82) 0px, 
-              rgba(130,80,10,0.55) 14px, 
-              rgba(201,147,26,0.15) 28px, 
-              rgba(255,238,168,0.48) 42px, 
-              rgba(255,252,220,0.65) 48px, 
-              rgba(255,238,168,0.48) 54px, 
-              rgba(201,147,26,0.15) 68px, 
-              rgba(130,80,10,0.55) 82px, 
-              rgba(65,35,4,0.82) 96px
+              rgba(48,14,22,0.88) 0px, 
+              rgba(92,34,28,0.62) 18px, 
+              rgba(176,128,36,0.28) 34px, 
+              rgba(245,222,155,0.42) 48px, 
+              rgba(255,244,204,0.52) 54px, 
+              rgba(245,222,155,0.42) 60px, 
+              rgba(176,128,36,0.28) 74px, 
+              rgba(92,34,28,0.62) 90px, 
+              rgba(48,14,22,0.88) 108px
             ),
             url('/images/backgrounds/kbaj-khmer.jpg')
           `,
-          backgroundSize: '96px 100%, 360px auto',
+          backgroundSize: '108px 100%, 360px auto',
           backgroundRepeat: 'repeat-x, repeat'
         }"
       >
@@ -227,7 +227,7 @@
         }"
       >
         <div
-          class="relative w-full max-w-[340px] sm:max-w-[430px] max-h-[90vh] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-gradient-to-b from-[#FFFDF9]/98 via-white/98 to-[#FAF1DF]/98 border-2 border-wedding-secondary shadow-[0_25px_65px_rgba(0,0,0,0.7),0_0_40px_rgba(201,162,74,0.45)] backdrop-blur-md flex flex-col items-center justify-between overflow-hidden text-center select-none"
+          class="relative w-full max-w-[340px] sm:max-w-[430px] max-h-[88vh] rounded-2xl sm:rounded-3xl p-4 sm:p-6 bg-gradient-to-b from-[#FFFDF9]/[0.97] via-[#FFFBF3]/[0.97] to-[#F7EAD2]/[0.97] border-2 border-wedding-secondary shadow-[0_25px_70px_rgba(0,0,0,0.65),0_0_45px_rgba(201,162,74,0.38)] backdrop-blur-md flex flex-col items-center justify-between overflow-hidden text-center select-none"
         >
           <!-- Elegant Inset Gold Borders -->
           <div class="absolute inset-1.5 sm:inset-2.5 border border-[#D4AF37]/70 pointer-events-none rounded-xl sm:rounded-2xl"></div>
@@ -382,7 +382,7 @@
             <button
               type="button"
               @click="triggerOpen"
-              class="group relative py-2 px-5 sm:px-6 rounded-full bg-gradient-to-tr from-wedding-accent via-wedding-secondary to-[#8F6B1E] shadow-gold-glow hover:shadow-gold-glow-lg flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+              class="group relative py-2.5 px-6 sm:px-7 rounded-full bg-gradient-to-r from-[#8F6B1E] via-[#C9A24A] to-[#8F6B1E] border border-[#FFF2CE]/60 shadow-[0_10px_28px_rgba(143,107,30,0.45)] hover:shadow-[0_14px_34px_rgba(201,162,74,0.6)] flex items-center gap-2.5 interactive-btn cursor-pointer"
             >
               <span class="absolute inset-0 rounded-full border border-white/60 animate-ping opacity-30"></span>
               <RomdoulFlower :size="24" :glow="true" />
