@@ -81,9 +81,37 @@
         key="loading"
         class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10 w-full"
       >
-        <div class="text-4xl mb-4 animate-bounce">💌</div>
-        <div class="font-khmer-heading text-lg text-wedding-primary animate-pulse">
-          {{ t('common.loading') }}
+        <div class="relative w-full max-w-[290px] rounded-3xl bg-[#FFFDF9]/92 backdrop-blur-md border border-[#C9A24A]/55 shadow-[0_20px_55px_rgba(60,25,15,0.28)] px-7 py-7 flex flex-col items-center overflow-hidden">
+          <!-- Subtle Inset Gold Frame -->
+          <div class="absolute inset-2 rounded-2xl border border-[#C9A24A]/30 pointer-events-none"></div>
+
+          <!-- 4 Delicate Khmer Kbach Corners -->
+          <div class="absolute top-2.5 left-2.5 opacity-75 pointer-events-none"><KhmerKbach :size="14" type="corner" position="top-left" /></div>
+          <div class="absolute top-2.5 right-2.5 opacity-75 pointer-events-none"><KhmerKbach :size="14" type="corner" position="top-right" /></div>
+          <div class="absolute bottom-2.5 left-2.5 opacity-75 pointer-events-none"><KhmerKbach :size="14" type="corner" position="bottom-left" /></div>
+          <div class="absolute bottom-2.5 right-2.5 opacity-75 pointer-events-none"><KhmerKbach :size="14" type="corner" position="bottom-right" /></div>
+
+          <!-- Animated Golden Halo + Romdoul Emblem -->
+          <div class="relative w-16 h-16 mb-4 flex items-center justify-center">
+            <div
+              class="absolute inset-0 rounded-full border-2 border-transparent border-t-[#C9A24A] border-r-[#E5C77A]/60 animate-spin"
+              style="animation-duration: 2.2s;"
+            ></div>
+            <div class="absolute inset-1.5 rounded-full bg-gradient-to-br from-[#FFFDF7] to-[#FAF0DC] border border-[#C9A24A]/35 shadow-inner flex items-center justify-center">
+              <RomdoulFlower :size="34" :glow="true" custom-class="animate-pulse" />
+            </div>
+          </div>
+
+          <!-- Bilingual Royal Loading Text -->
+          <div class="font-khmer-heading text-base text-[#641D2D] leading-relaxed">
+            {{ t('common.loading') }}
+          </div>
+          <div class="text-[10px] tracking-[0.22em] text-[#8F6B1E] font-semibold uppercase mt-1">
+            Preparing Invitation
+          </div>
+
+          <!-- Smooth Gold Shimmer Bar -->
+          <div class="mt-4 w-36 h-1 rounded-full bg-[#C9A24A]/20 overflow-hidden relative shimmer-skeleton"></div>
         </div>
       </div>
 
@@ -164,7 +192,7 @@
 
           <!-- Photo Gallery -->
           <div class="scroll-reveal">
-            <WeddingGallery :photos="photos" :config="wedding?.gallery_config" :loading="loading" />
+            <WeddingGallery :photos="photos" :config="wedding?.gallery_config" :loading="galleryLoading" />
           </div>
 
           <!-- Digital Wedding Gift / KHQR -->
@@ -223,6 +251,8 @@ definePageMeta({
 import WeddingCanvasBackground from '~~/app/components/wedding/WeddingCanvasBackground.vue'
 import WeddingOpeningAnimation from '~~/app/components/wedding/WeddingOpeningAnimation.vue'
 import WeddingHero from '~~/app/components/wedding/WeddingHero.vue'
+import RomdoulFlower from '~~/app/components/wedding/RomdoulFlower.vue'
+import KhmerKbach from '~~/app/components/wedding/KhmerKbach.vue'
 
 // Lazy-load below-the-fold components to reduce initial page bundle size and speed up FCP/LCP
 const WeddingCouple = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingCouple.vue'))
@@ -248,6 +278,7 @@ const { applyThemeColors } = useWeddingAppearance()
 
 const token = computed(() => (route.params.uuid as string) || '')
 const loading = ref(true)
+const galleryLoading = ref(true)
 const errorState = ref<number | null>(null)
 const isOpening = ref(false)
 const hasOpened = ref(false)
@@ -475,24 +506,37 @@ const backgroundOverlayStyle = computed(() => {
 
 const loadInvitationData = async () => {
   loading.value = true
+  galleryLoading.value = true
   errorState.value = null
 
+  // Fetch below-the-fold data in parallel without blocking the opening screen
+  $fetch<any>('/api/programmes')
+    .then((progRes) => {
+      if (progRes?.data) programmes.value = progRes.data
+    })
+    .catch(() => null)
+
+  $fetch<any>(`/api/gallery?t=${Date.now()}`)
+    .then((galRes) => {
+      if (galRes?.data) photos.value = galRes.data
+    })
+    .catch(() => null)
+    .finally(() => {
+      galleryLoading.value = false
+    })
+
   try {
-    const [invRes, wedRes, progRes, galRes, appRes] = await Promise.all([
+    const [invRes, wedRes, appRes] = await Promise.all([
       $fetch<any>(`/api/invitations/${token.value}`).catch((e) => {
         errorState.value = e.statusCode || 404
         return null
       }),
       $fetch<any>(`/api/wedding?t=${Date.now()}`).catch(() => null),
-      $fetch<any>('/api/programmes').catch(() => null),
-      $fetch<any>(`/api/gallery?t=${Date.now()}`).catch(() => null),
       $fetch<any>(`/api/appearance?t=${Date.now()}`).catch(() => null)
     ])
 
     if (invRes?.data) invitation.value = invRes.data
     if (wedRes?.data) wedding.value = wedRes.data
-    if (progRes?.data) programmes.value = progRes.data
-    if (galRes?.data) photos.value = galRes.data
     if (appRes?.data) {
       appearanceConfig.value = appRes.data
       if (appRes.data.theme_config) {
