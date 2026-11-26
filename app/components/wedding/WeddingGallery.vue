@@ -35,8 +35,8 @@
           v-for="(photo, index) in displayedPhotos"
           :key="photo.id"
           @click="openLightbox(index)"
-          class="snap-center flex-shrink-0 cursor-pointer overflow-hidden transition-all duration-300 transform active:scale-95 group relative bg-black/5"
-          :class="[carouselWidthClasses, cardStyleClasses, aspectClasses]"
+          class="snap-center flex-shrink-0 cursor-pointer overflow-hidden transition-all duration-300 transform active:scale-95 group relative"
+          :class="[carouselWidthClasses, cardStyleClasses, aspectClasses, !loadedImages[photo.id] && !failedImages[photo.id] && effectiveConfig.card_style !== 'glass' ? 'bg-black/5' : '']"
         >
           <!-- Shimmer Placeholder before image is loaded -->
           <div
@@ -56,20 +56,21 @@
           </div>
 
           <!-- Actual Image with Smooth Blur-up & Fade-in -->
-          <img
-            v-else
-            :src="photo.url"
-            :alt="photo.alt_text_en || 'Wedding photo'"
-            class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
-            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
-            :loading="index < 2 ? 'eager' : 'lazy'"
-            :fetchpriority="index === 0 ? 'high' : 'auto'"
-            decoding="async"
-            @load="onImageLoad(photo.id)"
-            @error="onImageError(photo.id)"
-          />
-          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
-            🔍
+          <div v-else class="w-full h-full relative overflow-hidden" :class="innerMediaClasses">
+            <img
+              :src="photo.url"
+              :alt="photo.alt_text_en || 'Wedding photo'"
+              class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+              :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+              :loading="index < 2 ? 'eager' : 'lazy'"
+              :fetchpriority="index === 0 ? 'high' : 'auto'"
+              decoding="async"
+              @load="onImageLoad(photo.id)"
+              @error="onImageError(photo.id)"
+            />
+            <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
+              🔍
+            </div>
           </div>
         </div>
       </div>
@@ -102,8 +103,8 @@
       <div
         v-if="displayedPhotos[0]"
         @click="openLightbox(0)"
-        class="w-full cursor-pointer overflow-hidden relative group bg-black/5"
-        :class="[cardStyleClasses, 'aspect-[16/10] sm:aspect-[21/10]']"
+        class="w-full cursor-pointer overflow-hidden relative group"
+        :class="[cardStyleClasses, 'aspect-[16/10] sm:aspect-[21/10]', !loadedImages[displayedPhotos[0].id] && !failedImages[displayedPhotos[0].id] && effectiveConfig.card_style !== 'glass' ? 'bg-black/5' : '']"
       >
         <!-- Shimmer Placeholder -->
         <div
@@ -113,23 +114,25 @@
           <span class="text-2xl text-wedding-secondary/40 animate-pulse">📷</span>
         </div>
 
-        <img
-          :src="displayedPhotos[0].url"
-          :alt="displayedPhotos[0].alt_text_en || 'Featured Wedding Photo'"
-          class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105 relative z-10"
-          :class="loadedImages[displayedPhotos[0].id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          @load="onImageLoad(displayedPhotos[0].id)"
-          @error="onImageError(displayedPhotos[0].id)"
-        />
-        <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-wedding-secondary/40 text-[11px] font-semibold text-wedding-primary shadow-sm flex items-center gap-1.5 z-20">
-          <span>✨</span>
-          <span>{{ isKhmer ? 'រូបភាពអនុស្សាវរីយ៍' : 'Featured Moment' }}</span>
-        </div>
-        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-2xl z-20">
-          🔍
+        <div class="w-full h-full relative overflow-hidden" :class="innerMediaClasses">
+          <img
+            :src="displayedPhotos[0].url"
+            :alt="displayedPhotos[0].alt_text_en || 'Featured Wedding Photo'"
+            class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105 relative z-10"
+            :class="loadedImages[displayedPhotos[0].id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            @load="onImageLoad(displayedPhotos[0].id)"
+            @error="onImageError(displayedPhotos[0].id)"
+          />
+          <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-wedding-secondary/40 text-[11px] font-semibold text-wedding-primary shadow-sm flex items-center gap-1.5 z-20">
+            <span>✨</span>
+            <span>{{ isKhmer ? 'រូបភាពអនុស្សាវរីយ៍' : 'Featured Moment' }}</span>
+          </div>
+          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-2xl z-20">
+            🔍
+          </div>
         </div>
       </div>
 
@@ -139,8 +142,8 @@
           v-for="(photo, index) in displayedPhotos.slice(1)"
           :key="photo.id"
           @click="openLightbox(index + 1)"
-          class="cursor-pointer overflow-hidden relative group bg-black/5"
-          :class="[cardStyleClasses, aspectClasses]"
+          class="cursor-pointer overflow-hidden relative group"
+          :class="[cardStyleClasses, aspectClasses, !loadedImages[photo.id] && !failedImages[photo.id] && effectiveConfig.card_style !== 'glass' ? 'bg-black/5' : '']"
         >
           <!-- Shimmer Placeholder -->
           <div
@@ -150,18 +153,20 @@
             <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
           </div>
 
-          <img
-            :src="photo.url"
-            :alt="photo.alt_text_en || 'Wedding photo'"
-            class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
-            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
-            :loading="index < 3 ? 'eager' : 'lazy'"
-            decoding="async"
-            @load="onImageLoad(photo.id)"
-            @error="onImageError(photo.id)"
-          />
-          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
-            🔍
+          <div class="w-full h-full relative overflow-hidden" :class="innerMediaClasses">
+            <img
+              :src="photo.url"
+              :alt="photo.alt_text_en || 'Wedding photo'"
+              class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+              :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+              :loading="index < 3 ? 'eager' : 'lazy'"
+              decoding="async"
+              @load="onImageLoad(photo.id)"
+              @error="onImageError(photo.id)"
+            />
+            <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
+              🔍
+            </div>
           </div>
         </div>
       </div>
@@ -196,20 +201,21 @@
           <span class="text-[10px]">Photo unavailable</span>
         </div>
 
-        <img
-          v-else
-          :src="photo.url"
-          :alt="photo.alt_text_en || 'Wedding photo'"
-          class="block w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105"
-          :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm absolute inset-0'"
-          :loading="index < 3 ? 'eager' : 'lazy'"
-          :fetchpriority="index === 0 ? 'high' : 'auto'"
-          decoding="async"
-          @load="onImageLoad(photo.id)"
-          @error="onImageError(photo.id)"
-        />
-        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
-          🔍
+        <div v-else class="w-full relative overflow-hidden" :class="innerMediaClasses">
+          <img
+            :src="photo.url"
+            :alt="photo.alt_text_en || 'Wedding photo'"
+            class="block w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105"
+            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm absolute inset-0'"
+            :loading="index < 3 ? 'eager' : 'lazy'"
+            :fetchpriority="index === 0 ? 'high' : 'auto'"
+            decoding="async"
+            @load="onImageLoad(photo.id)"
+            @error="onImageError(photo.id)"
+          />
+          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
+            🔍
+          </div>
         </div>
       </div>
     </div>
@@ -220,8 +226,8 @@
         v-for="(photo, index) in displayedPhotos"
         :key="photo.id"
         @click="openLightbox(index)"
-        class="cursor-pointer overflow-hidden relative group bg-black/5"
-        :class="[cardStyleClasses, aspectClasses]"
+        class="cursor-pointer overflow-hidden relative group"
+        :class="[cardStyleClasses, aspectClasses, !loadedImages[photo.id] && !failedImages[photo.id] && effectiveConfig.card_style !== 'glass' ? 'bg-black/5' : '']"
       >
         <!-- Shimmer Placeholder -->
         <div
@@ -231,19 +237,21 @@
           <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
         </div>
 
-        <img
-          :src="photo.url"
-          :alt="photo.alt_text_en || 'Wedding photo'"
-          class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
-          :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
-          :loading="index < 3 ? 'eager' : 'lazy'"
-          :fetchpriority="index === 0 ? 'high' : 'auto'"
-          decoding="async"
-          @load="onImageLoad(photo.id)"
-          @error="onImageError(photo.id)"
-        />
-        <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
-          🔍
+        <div class="w-full h-full relative overflow-hidden" :class="innerMediaClasses">
+          <img
+            :src="photo.url"
+            :alt="photo.alt_text_en || 'Wedding photo'"
+            class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+            :loading="index < 3 ? 'eager' : 'lazy'"
+            :fetchpriority="index === 0 ? 'high' : 'auto'"
+            decoding="async"
+            @load="onImageLoad(photo.id)"
+            @error="onImageError(photo.id)"
+          />
+          <div class="absolute inset-0 bg-wedding-primary/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xl z-20">
+            🔍
+          </div>
         </div>
       </div>
     </div>
@@ -492,10 +500,16 @@ const aspectClasses = computed(() => {
 const cardStyleClasses = computed(() => {
   const style = effectiveConfig.value.card_style || 'gold-frame'
   if (style === 'rounded') return 'rounded-2xl sm:rounded-3xl border border-wedding-secondary/30 shadow-sm'
-  if (style === 'glass') return 'rounded-2xl bg-white/80 backdrop-blur-md border border-white/50 shadow-md p-1'
+  if (style === 'glass') {
+    return 'rounded-2xl bg-white/25 backdrop-blur-md border border-white/60 ring-1 ring-inset ring-white/40 shadow-[0_8px_28px_rgba(100,29,45,0.14)] p-1.5'
+  }
   if (style === 'minimal') return 'rounded-lg overflow-hidden'
   // gold-frame (default luxury)
   return 'rounded-2xl border-2 border-wedding-secondary/40 shadow-sm hover:shadow-gold-glow/50 transition-shadow'
+})
+
+const innerMediaClasses = computed(() => {
+  return effectiveConfig.value.card_style === 'glass' ? 'rounded-xl' : ''
 })
 
 // Gap Classes
