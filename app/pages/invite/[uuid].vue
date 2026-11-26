@@ -6,6 +6,7 @@
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       <!-- Fullscreen Ambient Backdrop (Gives atmospheric color & depth across widescreen monitors) -->
       <div
+        ref="ambientBgRef"
         class="w-full h-full bg-cover bg-center will-change-transform filter sm:blur-[6px] sm:scale-105"
         :style="dynamicBackgroundStyle"
       ></div>
@@ -48,6 +49,7 @@
     <div class="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] pointer-events-none z-[2] overflow-hidden">
       <!-- Sharp, perfectly framed background image inside the invitation column -->
       <div
+        ref="centerBgRef"
         class="w-full h-full bg-cover bg-center will-change-transform"
         :style="dynamicBackgroundStyle"
       ></div>
@@ -289,31 +291,55 @@ watch(
   { immediate: true }
 )
 
-// Damped scroll tracking for silky smooth zoom and particle dynamics (no abrupt/fast changes)
+// Damped scroll tracking for silky smooth GPU-only zoom (zero Vue re-render overhead)
+const ambientBgRef = ref<HTMLElement | null>(null)
+const centerBgRef = ref<HTMLElement | null>(null)
 const targetScrollProgress = ref(0)
-const smoothScrollProgress = ref(0)
-const targetScrollVelocity = ref(0)
-const smoothScrollVelocity = ref(0)
-let lastScrollY = 0
-let lastScrollTime = 0
+let smoothProgress = 0
+let lastRafTime = 0
 let dampingRafId: number | null = null
 let observer: IntersectionObserver | null = null
 
-const updateSmoothScroll = () => {
-  // Damped linear interpolation (lerp factor 0.04 = super smooth & silky glide)
-  const dProgress = targetScrollProgress.value - smoothScrollProgress.value
-  smoothScrollProgress.value += dProgress * 0.04
+const computeZoomScale = (progress: number): number => {
+  const bg = appearanceConfig.value?.background_config
+  if (bg && bg.type !== 'preset' && bg.type !== 'image') return 1
+  if (bg?.scroll_zoom === false) return 1.02
 
-  // Smoothly damp velocity so it accelerates gently and coasts to a stop smoothly
-  const dVel = targetScrollVelocity.value - smoothScrollVelocity.value
-  smoothScrollVelocity.value += dVel * 0.06
-  targetScrollVelocity.value *= 0.92 // gradual momentum decay
+  const effect = bg?.zoom_effect || 'zoom-in'
+  if (effect === 'zoom-out') {
+    return 1.10 - progress * 0.10
+  }
+  if (effect === 'breathe') {
+    return 1.02 + (1 - Math.cos(progress * Math.PI * 2)) * 0.04
+  }
+  // Default: 'zoom-in'
+  return 1.0 + progress * 0.10
+}
 
-  // Performance: Stop requestAnimationFrame loop when scroll animation has settled
-  if (Math.abs(dProgress) < 0.0001 && Math.abs(smoothScrollVelocity.value) < 0.001) {
-    smoothScrollProgress.value = targetScrollProgress.value
-    smoothScrollVelocity.value = 0
+const applyBackgroundZoomTransform = (progress: number) => {
+  const scale = computeZoomScale(progress)
+  const s = scale.toFixed(6)
+  const transform = `scale3d(${s}, ${s}, 1)`
+  if (ambientBgRef.value) ambientBgRef.value.style.transform = transform
+  if (centerBgRef.value) centerBgRef.value.style.transform = transform
+}
+
+const updateSmoothScroll = (now: number) => {
+  const dt = lastRafTime ? Math.min((now - lastRafTime) / 1000, 0.05) : 0.016
+  lastRafTime = now
+
+  // Frame-rate-independent exponential smoothing (silky across 60Hz / 90Hz / 120Hz)
+  const alpha = 1 - Math.exp(-5.5 * dt)
+  const dProgress = targetScrollProgress.value - smoothProgress
+  smoothProgress += dProgress * alpha
+
+  applyBackgroundZoomTransform(smoothProgress)
+
+  if (Math.abs(dProgress) < 0.00005) {
+    smoothProgress = targetScrollProgress.value
+    applyBackgroundZoomTransform(smoothProgress)
     dampingRafId = null
+    lastRafTime = 0
     return
   }
 
@@ -327,15 +353,8 @@ const handleScroll = () => {
   const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
   targetScrollProgress.value = Math.min(Math.max(y / max, 0), 1)
 
-  const nowTime = performance.now()
-  const dt = Math.max(nowTime - lastScrollTime, 16)
-  const dy = Math.abs(y - lastScrollY)
-  targetScrollVelocity.value = Math.min(dy / dt, 2.0)
-
-  lastScrollY = y
-  lastScrollTime = nowTime
-
   if (!dampingRafId) {
+    lastRafTime = performance.now()
     dampingRafId = requestAnimationFrame(updateSmoothScroll)
   }
 }
@@ -411,26 +430,14 @@ const dynamicBackgroundStyle = computed(() => {
     }
 
     const opacity = bg?.opacity ?? 1
-    const scrollZoom = bg?.scroll_zoom !== false
-    const effect = bg?.zoom_effect || 'zoom-in'
-
-    let scale = 1.02
-    if (scrollZoom) {
-      if (effect === 'zoom-in') {
-        scale = 1.02 + smoothScrollProgress.value * 0.05
-      } else if (effect === 'zoom-out') {
-        scale = 1.07 - smoothScrollProgress.value * 0.05
-      } else if (effect === 'breathe') {
-        scale = 1.02 + Math.sin(smoothScrollProgress.value * Math.PI) * 0.03
-      }
-    }
+    const initialScale = computeZoomScale(smoothProgress).toFixed(6)
 
     return {
       backgroundImage: `url(${imgUrl})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       opacity,
-      transform: `scale(${scale.toFixed(4)})`
+      transform: `scale3d(${initialScale}, ${initialScale}, 1)`
     }
   }
 
