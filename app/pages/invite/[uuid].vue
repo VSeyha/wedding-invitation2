@@ -75,13 +75,20 @@
         </div>
       </div>
 
-      <!-- Loading State -->
+      <!-- Loading State (Rich Royal Burgundy & Gold background, no image) -->
       <div
         v-else-if="loading"
         key="loading"
-        class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10 w-full"
+        class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 text-center w-full"
+        style="background: radial-gradient(circle at 50% 35%, #5A1727 0%, #340B15 58%, #1A050A 100%);"
       >
-        <div class="relative w-full max-w-[290px] rounded-3xl bg-[#FFFDF9]/92 backdrop-blur-md border border-[#C9A24A]/55 shadow-[0_20px_55px_rgba(60,25,15,0.28)] px-7 py-7 flex flex-col items-center overflow-hidden">
+        <!-- Soft Golden Ambient Halo behind Card -->
+        <div
+          class="absolute w-72 h-72 rounded-full pointer-events-none opacity-25 blur-3xl"
+          style="background: radial-gradient(circle, #E5C77A 0%, transparent 70%);"
+        ></div>
+
+        <div class="relative w-full max-w-[290px] rounded-3xl bg-[#FFFDF9]/95 backdrop-blur-md border border-[#C9A24A]/65 shadow-[0_24px_60px_rgba(0,0,0,0.55),0_0_30px_rgba(201,162,74,0.2)] px-7 py-7 flex flex-col items-center overflow-hidden">
           <!-- Subtle Inset Gold Frame -->
           <div class="absolute inset-2 rounded-2xl border border-[#C9A24A]/30 pointer-events-none"></div>
 
