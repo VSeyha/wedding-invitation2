@@ -37,8 +37,11 @@ export default {
           'Moul',
           '"Khmer OS Muol Light"',
           '"Khmer OS Muol"',
-          '"Noto Serif Khmer"',
-          '"Khmer OS"',
+          '"Noto Sans Khmer"',
+          '"Khmer MN"',
+          '"Khmer Sangam MN"',
+          '"Khmer UI"',
+          'DaunPenh',
           'serif'
         ],
         'khmer-body': [
@@ -47,6 +50,10 @@ export default {
           '"Khmer OS Battambang"',
           '"Khmer OS"',
           '"Khmer Sangam MN"',
+          '"Khmer MN"',
+          '"Khmer UI"',
+          '"Leelawadee UI"',
+          'DaunPenh',
           'sans-serif'
         ],
         'en-heading': ['"Cormorant Garamond"', 'Georgia', 'serif'],

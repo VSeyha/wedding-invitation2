@@ -993,7 +993,7 @@ const initScratchCanvas = () => {
 
   // Traditional watermark text
   ctx.fillStyle = '#641D2D'
-  ctx.font = 'bold 12px "Kantumruy Pro", sans-serif'
+  ctx.font = 'bold 12px "Kantumruy Pro", "Noto Sans Khmer", "Khmer Sangam MN", "Khmer UI", sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText('✨ កោសផ្ការំដួលបើកសំបុត្រ ✨', rect.width / 2, rect.height / 2 - 8)
