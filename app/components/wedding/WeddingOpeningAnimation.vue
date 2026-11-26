@@ -936,6 +936,9 @@ const scratchCanvasRef = ref<HTMLCanvasElement | null>(null)
 const scratchCompleted = ref(false)
 let isScratching = false
 let scratchCheckCounter = 0
+let lastScratchPoint: { x: number; y: number } | null = null
+
+const SCRATCH_BRUSH_RADIUS = 13
 
 const initScratchCanvas = () => {
   const canvas = scratchCanvasRef.value
@@ -950,7 +953,7 @@ const initScratchCanvas = () => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  ctx.scale(2, 2)
+  ctx.setTransform(2, 0, 0, 2, 0, 0)
 
   // Golden metallic gradient fill
   const grad = ctx.createLinearGradient(0, 0, rect.width, rect.height)
@@ -980,18 +983,35 @@ const initScratchCanvas = () => {
 
 const scratchPoint = (x: number, y: number) => {
   const canvas = scratchCanvasRef.value
-  if (!canvas) return
+  if (!canvas || scratchCompleted.value) return
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
+  ctx.save()
   ctx.globalCompositeOperation = 'destination-out'
-  ctx.beginPath()
-  ctx.arc(x * 2, y * 2, 32, 0, Math.PI * 2)
-  ctx.fill()
+  ctx.fillStyle = '#000'
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = SCRATCH_BRUSH_RADIUS * 2
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+
+  if (lastScratchPoint) {
+    ctx.beginPath()
+    ctx.moveTo(lastScratchPoint.x, lastScratchPoint.y)
+    ctx.lineTo(x, y)
+    ctx.stroke()
+  } else {
+    ctx.beginPath()
+    ctx.arc(x, y, SCRATCH_BRUSH_RADIUS, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  ctx.restore()
+
+  lastScratchPoint = { x, y }
 
   // Periodically check scratched percentage
   scratchCheckCounter++
-  if (scratchCheckCounter % 8 === 0) {
+  if (scratchCheckCounter % 6 === 0) {
     checkScratchProgress()
   }
 }
@@ -1003,21 +1023,36 @@ const checkScratchProgress = () => {
   if (!ctx) return
 
   try {
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const totalPixels = imgData.data.length / 4
+    const w = canvas.width
+    const h = canvas.height
+    if (w === 0 || h === 0) return
+
+    // Focus on the central inner content area where the flower & font sit
+    const startX = Math.floor(w * 0.14)
+    const endX = Math.ceil(w * 0.86)
+    const startY = Math.floor(h * 0.12)
+    const endY = Math.ceil(h * 0.88)
+    const regionW = endX - startX
+    const regionH = endY - startY
+
+    const imgData = ctx.getImageData(startX, startY, regionW, regionH)
+    let sampled = 0
     let transparentCount = 0
 
     // Sample every 4th pixel for high performance
     for (let i = 3; i < imgData.data.length; i += 16) {
-      if (imgData.data[i] === 0) transparentCount++
+      sampled++
+      if (imgData.data[i] < 128) transparentCount++
     }
 
-    const ratio = transparentCount / (totalPixels / 4)
-    if (ratio > 0.32) {
+    const ratio = sampled > 0 ? transparentCount / sampled : 0
+    if (ratio >= 0.80) {
       scratchCompleted.value = true
+      isScratching = false
+      lastScratchPoint = null
       setTimeout(() => {
         triggerOpen()
-      }, 400)
+      }, 650)
     }
   } catch (_) {
     // If CORS or tainted canvas, fallback gracefully
@@ -1026,11 +1061,15 @@ const checkScratchProgress = () => {
 
 const forceRevealScratch = () => {
   scratchCompleted.value = true
-  triggerOpen()
+  lastScratchPoint = null
+  setTimeout(() => {
+    triggerOpen()
+  }, 450)
 }
 
 const startScratch = (e: MouseEvent) => {
   isScratching = true
+  lastScratchPoint = null
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
   scratchPoint(e.clientX - rect.left, e.clientY - rect.top)
 }
@@ -1043,12 +1082,14 @@ const drawScratch = (e: MouseEvent) => {
 
 const stopScratch = () => {
   isScratching = false
+  lastScratchPoint = null
   checkScratchProgress()
 }
 
 const startScratchTouch = (e: TouchEvent) => {
   if (!e.touches[0]) return
   isScratching = true
+  lastScratchPoint = null
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
   scratchPoint(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top)
 }
@@ -1180,6 +1221,9 @@ defineExpose({
     opened.value = false
     isOpening.value = false
     scratchCompleted.value = false
+    isScratching = false
+    lastScratchPoint = null
+    scratchCheckCounter = 0
     sliderOffset.value = 0
     if (currentStyle.value === 'scratch') {
       nextTick(() => {
