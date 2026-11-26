@@ -4,7 +4,8 @@
     :class="[
       absolute ? 'absolute inset-0 z-30' : 'fixed inset-0 z-50',
       'flex items-center justify-center p-0 overflow-hidden select-none',
-      isOpening && currentStyle !== 'curtain' ? 'opacity-0 pointer-events-none scale-105 transition-all duration-700' : ''
+      isOpening ? 'pointer-events-none' : '',
+      isOpening && currentStyle !== 'curtain' ? 'opacity-0 scale-105 transition-all duration-700' : ''
     ]"
     :style="{
       background: currentStyle === 'curtain' ? 'transparent' : 'radial-gradient(circle at 50% 35%, var(--wedding-bg, #F7F0E3) 0%, var(--wedding-primary, #641D2D) 130%)'
@@ -26,8 +27,14 @@
     <div v-if="currentStyle === 'curtain'" class="absolute inset-0 z-40 overflow-hidden flex pointer-events-none">
       <!-- Top Royal Khmer Draped Valance / Pelmet (ស្បៃរំយោលក្បាលវាំងនន) -->
       <div
-        class="absolute top-0 left-0 right-0 z-30 pointer-events-none transition-transform duration-900 ease-[cubic-bezier(0.25,1,0.5,1)]"
-        :class="{ '-translate-y-full': isOpening }"
+        class="absolute top-0 left-0 right-0 z-30 pointer-events-none will-change-transform"
+        :class="{ '-translate-y-full opacity-0': isOpening }"
+        :style="{
+          transitionProperty: 'transform, opacity',
+          transitionDuration: `${Math.max(animDuration * 0.85, 0.7)}s, ${Math.max(animDuration * 0.35, 0.35)}s`,
+          transitionDelay: `0s, ${Math.max(animDuration * 0.5, 0.35)}s`,
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1), ease-out'
+        }"
       >
         <!-- Golden Decorative Arch Pelmet with Scalloped Drapes (Using kbaj-khmer.jpg) -->
         <div class="w-full relative filter drop-shadow-xl">
@@ -96,11 +103,13 @@
 
       <!-- Left Real Gold Khmer Brocade Curtain Panel (kbaj-khmer.jpg) -->
       <div
-        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-left ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[15px_0_35px_rgba(0,0,0,0.8)]"
-        :class="{ '-translate-x-[92%] scale-x-[0.22]': isOpening }"
+        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-left will-change-transform shadow-[15px_0_35px_rgba(0,0,0,0.8)]"
+        :class="{ '-translate-x-full scale-x-[0.35] opacity-0': isOpening }"
         :style="{
-          transitionProperty: 'transform',
-          transitionDuration: animDuration + 's',
+          transitionProperty: 'transform, opacity',
+          transitionDuration: `${animDuration}s, ${Math.max(animDuration * 0.35, 0.35)}s`,
+          transitionDelay: `0s, ${Math.max(animDuration * 0.65, 0.45)}s`,
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1), ease-out',
           /* 3D Cylindrical Silk/Damask Folds overlaid on authentic kbaj-khmer.jpg */
           backgroundImage: `
             repeating-linear-gradient(90deg, 
@@ -150,11 +159,13 @@
 
       <!-- Right Real Gold Khmer Brocade Curtain Panel (kbaj-khmer.jpg) -->
       <div
-        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-right ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[-15px_0_35px_rgba(0,0,0,0.8)]"
-        :class="{ 'translate-x-[92%] scale-x-[0.22]': isOpening }"
+        class="w-1/2 h-full relative overflow-hidden pointer-events-auto origin-right will-change-transform shadow-[-15px_0_35px_rgba(0,0,0,0.8)]"
+        :class="{ 'translate-x-full scale-x-[0.35] opacity-0': isOpening }"
         :style="{
-          transitionProperty: 'transform',
-          transitionDuration: animDuration + 's',
+          transitionProperty: 'transform, opacity',
+          transitionDuration: `${animDuration}s, ${Math.max(animDuration * 0.35, 0.35)}s`,
+          transitionDelay: `0s, ${Math.max(animDuration * 0.65, 0.45)}s`,
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1), ease-out',
           /* 3D Cylindrical Silk/Damask Folds overlaid on authentic kbaj-khmer.jpg */
           backgroundImage: `
             repeating-linear-gradient(90deg, 
@@ -204,8 +215,13 @@
 
       <!-- Center Royal Wedding Invitation Card on Curtains (Authentic Cambodian Style) -->
       <div
-        class="absolute inset-0 flex flex-col items-center justify-center z-50 transition-all duration-700 ease-out px-3 sm:px-4 pointer-events-auto"
-        :class="{ 'opacity-0 scale-90 pointer-events-none': isOpening }"
+        class="absolute inset-0 flex flex-col items-center justify-center z-50 px-3 sm:px-4 pointer-events-auto will-change-transform"
+        :class="{ 'opacity-0 scale-95 pointer-events-none': isOpening }"
+        :style="{
+          transitionProperty: 'opacity, transform',
+          transitionDuration: `${Math.min(animDuration * 0.4, 0.55)}s`,
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        }"
       >
         <div
           class="relative w-full max-w-[340px] sm:max-w-[430px] max-h-[90vh] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 bg-gradient-to-b from-[#FFFDF9]/98 via-white/98 to-[#FAF1DF]/98 border-2 border-wedding-secondary shadow-[0_25px_65px_rgba(0,0,0,0.7),0_0_40px_rgba(201,162,74,0.45)] backdrop-blur-md flex flex-col items-center justify-between overflow-hidden text-center select-none"
