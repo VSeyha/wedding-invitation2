@@ -375,9 +375,20 @@
 
               <!-- Live Mobile Viewport -->
               <div
-                class="flex-1 w-full overflow-y-auto relative transition-colors duration-300"
-                :style="[previewCssVars, previewBackgroundStyle]"
+                class="flex-1 w-full relative overflow-hidden bg-[#140D0A]"
+                :style="previewCssVars"
               >
+                <!-- Dedicated Background Layer (opacity & zoom only affect background, never foreground text) -->
+                <div
+                  class="absolute inset-0 bg-cover bg-center will-change-transform transition-transform duration-150 ease-out pointer-events-none"
+                  :style="previewBackgroundStyle"
+                ></div>
+                <!-- Dynamic Overlay Tint Layer -->
+                <div
+                  class="absolute inset-0 transition-opacity duration-300 pointer-events-none"
+                  :style="previewOverlayStyle"
+                ></div>
+
                 <!-- Simulated Opening Envelope in Preview (Full Mobile Screen) -->
                 <WeddingOpeningAnimation
                   v-if="showOpeningTest"
@@ -389,17 +400,21 @@
                   @opened="showOpeningTest = false"
                 />
 
-                <!-- Full Scrollable Page Document Wrapper (Height spans entire scroll until the end) -->
-                <div class="relative min-h-full w-full">
-                  <!-- Live Particle Animation inside Preview -->
-                  <WeddingCanvasBackground
-                    v-if="config.animation_config.enabled"
-                    :config="config.animation_config"
-                    :absolute="true"
-                  />
+                <!-- Live Particle Animation inside Preview -->
+                <WeddingCanvasBackground
+                  v-if="config.animation_config.enabled"
+                  :config="config.animation_config"
+                  :theme-colors="config.theme_config"
+                  :absolute="true"
+                />
 
+                <!-- Scrollable Content Layer -->
+                <div
+                  class="relative z-10 h-full w-full overflow-y-auto"
+                  @scroll="onPreviewScroll"
+                >
                   <!-- Preview Content by Section -->
-                  <div class="relative z-10 p-4 space-y-4">
+                  <div class="p-4 space-y-4">
                   <!-- Section: Hero & Countdown (Padded to fit gracefully below arch florals) -->
                   <div v-if="activeSection === 'all' || activeSection === 'hero'" class="text-center pt-7 sm:pt-8">
                     <div class="flex justify-center mb-1">
@@ -520,15 +535,15 @@
                       </button>
                     </div>
                   </div>
-                </div>
+                  </div>
 
-                <!-- Bottom Bar Notch -->
-                <div class="py-4 text-center relative z-10">
-                  <span class="inline-block w-24 h-1 bg-black/20 rounded-full"></span>
+                  <!-- Bottom Bar Notch -->
+                  <div class="py-4 text-center relative z-10">
+                    <span class="inline-block w-24 h-1 bg-black/20 rounded-full"></span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
             <!-- Desktop Viewport Frame -->
             <div
@@ -553,9 +568,28 @@
 
               <!-- Desktop Content Viewport -->
               <div
-                class="flex-1 w-full overflow-y-auto relative transition-colors duration-300 p-6"
-                :style="[previewCssVars, previewBackgroundStyle]"
+                class="flex-1 w-full relative overflow-hidden bg-[#140D0A]"
+                :style="previewCssVars"
               >
+                <!-- Ambient Blurred Side Gutter Background -->
+                <div
+                  class="absolute inset-0 bg-cover bg-center filter blur-[6px] scale-105 pointer-events-none"
+                  :style="previewBackgroundStyle"
+                ></div>
+                <div class="absolute inset-0 bg-black/45 pointer-events-none"></div>
+
+                <!-- Centered Invitation Column Background (matches live invite/[uuid].vue) -->
+                <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-md overflow-hidden pointer-events-none">
+                  <div
+                    class="w-full h-full bg-cover bg-center will-change-transform transition-transform duration-150 ease-out"
+                    :style="previewBackgroundStyle"
+                  ></div>
+                  <div
+                    class="absolute inset-0 transition-opacity duration-300"
+                    :style="previewOverlayStyle"
+                  ></div>
+                </div>
+
                 <!-- Simulated Opening Envelope in Desktop Preview (Full Screen) -->
                 <WeddingOpeningAnimation
                   v-if="showOpeningTest"
@@ -571,57 +605,136 @@
                 <WeddingCanvasBackground
                   v-if="config.animation_config.enabled"
                   :config="config.animation_config"
+                  :theme-colors="config.theme_config"
                   :absolute="true"
                 />
 
+                <!-- Scrollable Desktop Content -->
                 <div
-                  class="max-w-md mx-auto relative z-10 text-center space-y-6 p-4 sm:p-6 bg-transparent border-0 shadow-none"
+                  class="relative z-10 h-full w-full overflow-y-auto p-6"
+                  @scroll="onPreviewScroll"
                 >
-                  <!-- Header Title -->
-                  <div class="pt-4">
-                    <div class="flex justify-center mb-1">
-                      <Crown class="w-7 h-7" :style="{ color: config.theme_config.secondary }" />
-                    </div>
-                    <div class="text-xs uppercase tracking-widest font-bold filter drop-shadow-sm" :style="{ color: config.theme_config.secondary }">
-                      THE WEDDING CELEBRATION
-                    </div>
-                    <h2 class="font-khmer-heading text-2xl font-bold mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" :style="{ color: config.theme_config.heading }">
-                      សិរីមង្គលអាពាហ៍ពិពាហ៍
-                    </h2>
-                    <div class="mt-4 p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm">
-                      <div class="font-en-heading text-xl font-bold" :style="{ color: config.theme_config.primary }">
-                        {{ weddingData.groom_name_en || 'Vet Seyha' }} & {{ weddingData.bride_name_en || 'Sar Nary' }}
+                  <div class="max-w-md mx-auto text-center space-y-6 p-4 sm:p-6">
+                    <!-- Section: Hero & Countdown -->
+                    <div v-if="activeSection === 'all' || activeSection === 'hero'" class="space-y-4 pt-2">
+                      <div>
+                        <div class="flex justify-center mb-1">
+                          <Crown class="w-7 h-7" :style="{ color: config.theme_config.secondary }" />
+                        </div>
+                        <div class="text-xs uppercase tracking-widest font-bold filter drop-shadow-sm" :style="{ color: config.theme_config.secondary }">
+                          THE WEDDING CELEBRATION
+                        </div>
+                        <h2 class="font-khmer-heading text-2xl mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]" :style="{ color: config.theme_config.heading }">
+                          សិរីមង្គលអាពាហ៍ពិពាហ៍
+                        </h2>
+                        <div class="mt-4 p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm">
+                          <div class="font-en-heading text-xl font-bold" :style="{ color: config.theme_config.primary }">
+                            {{ weddingData.groom_name_en || 'Vet Seyha' }} & {{ weddingData.bride_name_en || 'Sar Nary' }}
+                          </div>
+                          <div class="font-khmer-heading text-sm mt-1" :style="{ color: config.theme_config.heading }">
+                            {{ weddingData.groom_name_km }} & {{ weddingData.bride_name_km }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Countdown -->
+                      <div class="grid grid-cols-4 gap-2 max-w-xs mx-auto">
+                        <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
+                          <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.days }}</div>
+                          <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Days</div>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
+                          <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.hours }}</div>
+                          <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Hours</div>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
+                          <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.minutes }}</div>
+                          <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Mins</div>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
+                          <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.seconds }}</div>
+                          <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Secs</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <!-- Countdown -->
-                  <div class="grid grid-cols-4 gap-2 max-w-xs mx-auto">
-                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
-                      <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.days }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Days</div>
+                    <!-- Section: Couple -->
+                    <div v-if="activeSection === 'all' || activeSection === 'couple'" class="space-y-3 pt-2">
+                      <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider" :style="{ color: config.theme_config.secondary }">GROOM & BRIDE</div>
+                        <div class="font-khmer-heading text-base" :style="{ color: config.theme_config.heading }">កូនកម្លោះ & កូនក្រមុំ</div>
+                      </div>
+                      <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/30 text-center shadow-sm">
+                          <div class="w-16 h-16 rounded-full mx-auto border-2 border-wedding-secondary overflow-hidden bg-gray-100 flex items-center justify-center mb-2 shadow-inner">
+                            <img v-if="weddingData.groom_photo_url" :src="weddingData.groom_photo_url" alt="Groom" class="w-full h-full object-cover" />
+                            <User v-else class="w-8 h-8 text-[#C9A24A]" />
+                          </div>
+                          <div class="font-khmer-heading text-xs" :style="{ color: config.theme_config.primary }">{{ weddingData.groom_name_km }}</div>
+                          <div class="text-[10px] text-gray-500 font-mono">{{ weddingData.groom_name_en }}</div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/30 text-center shadow-sm">
+                          <div class="w-16 h-16 rounded-full mx-auto border-2 border-wedding-secondary overflow-hidden bg-gray-100 flex items-center justify-center mb-2 shadow-inner">
+                            <img v-if="weddingData.bride_photo_url" :src="weddingData.bride_photo_url" alt="Bride" class="w-full h-full object-cover" />
+                            <User v-else class="w-8 h-8 text-[#C9A24A]" />
+                          </div>
+                          <div class="font-khmer-heading text-xs" :style="{ color: config.theme_config.primary }">{{ weddingData.bride_name_km }}</div>
+                          <div class="text-[10px] text-gray-500 font-mono">{{ weddingData.bride_name_en }}</div>
+                        </div>
+                      </div>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
-                      <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.hours }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Hours</div>
-                    </div>
-                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
-                      <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.minutes }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Mins</div>
-                    </div>
-                    <div class="p-2.5 rounded-xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
-                      <div class="text-lg font-bold font-mono" :style="{ color: config.theme_config.primary }">{{ countdown.seconds }}</div>
-                      <div class="text-[10px] uppercase text-[#3C2925]/70 font-semibold">Secs</div>
-                    </div>
-                  </div>
 
-                  <!-- Venue card -->
-                  <div class="p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
-                    <div class="text-xs font-bold" :style="{ color: config.theme_config.heading }">
-                      {{ weddingData.venue_name_km || 'The Premier Centre Sen Sok (អគារ F)' }}
+                    <!-- Section: Our Story -->
+                    <div v-if="activeSection === 'all' || activeSection === 'story'" class="space-y-2 pt-2">
+                      <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider" :style="{ color: config.theme_config.secondary }">OUR STORY</div>
+                        <div class="font-khmer-heading text-sm" :style="{ color: config.theme_config.heading }">ដំណើររឿងរបស់យើងខ្ញុំ</div>
+                      </div>
+                      <div class="p-3.5 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/30 shadow-sm space-y-2 text-left">
+                        <div class="flex items-start gap-2.5">
+                          <Sparkles class="w-3.5 h-3.5 mt-0.5 text-wedding-primary flex-shrink-0" />
+                          <div>
+                            <div class="font-khmer-heading text-[11px]" :style="{ color: config.theme_config.primary }">ថ្ងៃដែលយើងបានជួបគ្នា (២០១៩)</div>
+                            <div class="text-[10px] text-[#3C2925]/70 font-khmer-body">ការជួបគ្នាដោយចៃដន្យ នៃថ្ងៃប្រឡងបាក់ឌុបឆ្នាំ២០១៩...</div>
+                          </div>
+                        </div>
+                        <div class="border-t border-dashed border-gray-200 pt-2 flex items-start gap-2.5">
+                          <Crown class="w-3.5 h-3.5 mt-0.5 text-wedding-primary flex-shrink-0" />
+                          <div>
+                            <div class="font-khmer-heading text-[11px]" :style="{ color: config.theme_config.primary }">ថ្ងៃជ័យមង្គលអាពាហ៍ពិពាហ៍ (១៦.០១.២០២៧)</div>
+                            <div class="text-[10px] text-[#3C2925]/70 font-khmer-body">ថ្ងៃសៅរ៍ ទី១៦ ខែមករា ឆ្នាំ២០២៧ ជាការចាប់ផ្តើមទំព័រជីវិតថ្មី...</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div class="text-[11px] text-[#3C2925]/70 mt-1 font-khmer-body">
-                      ថ្ងៃសៅរ៍ ទី១៦ ខែមករា ឆ្នាំ២០២៧
+
+                    <!-- Section: KHQR Digital Gift -->
+                    <div v-if="activeSection === 'all' || activeSection === 'gift'" class="space-y-2 pt-2">
+                      <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider" :style="{ color: config.theme_config.secondary }">WEDDING GIFT</div>
+                        <div class="font-khmer-heading text-sm" :style="{ color: config.theme_config.heading }">ចំណងដៃ និងពរជ័យឌីជីថល</div>
+                      </div>
+                      <div class="p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
+                        <div class="w-32 mx-auto rounded-xl overflow-hidden border border-gray-200 shadow-sm mb-2 bg-white">
+                          <img :src="weddingData.gift_info?.qr_code_url || '/images/khqr-default.jpg'" alt="KHQR" class="w-full h-auto object-contain block" />
+                        </div>
+                        <div class="font-khmer-heading text-xs" :style="{ color: config.theme_config.primary }">
+                          {{ weddingData.gift_info?.bank_name || 'ABA Bank' }} ({{ weddingData.gift_info?.account_name_km || 'វ៉េត សីហា & ស ណារី' }})
+                        </div>
+                        <div class="font-mono text-sm font-bold tracking-wider mt-0.5" :style="{ color: config.theme_config.heading }">
+                          {{ weddingData.gift_info?.account_number || '007 342 922' }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Venue card -->
+                    <div class="p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-wedding-secondary/40 shadow-sm text-center">
+                      <div class="text-xs font-bold font-khmer-heading" :style="{ color: config.theme_config.heading }">
+                        {{ weddingData.venue_name_km || 'The Premier Centre Sen Sok (អគារ F)' }}
+                      </div>
+                      <div class="text-[11px] text-[#3C2925]/70 mt-1 font-khmer-body">
+                        ថ្ងៃសៅរ៍ ទី១៦ ខែមករា ឆ្នាំ២០២៧
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -761,18 +874,33 @@ const previewCssVars = computed(() => {
   }
 })
 
-// Real-time Background styling for the preview frame
+const previewScrollProgress = ref(0)
+
+const onPreviewScroll = (e: Event) => {
+  const el = e.target as HTMLElement | null
+  if (!el) return
+  const max = Math.max(el.scrollHeight - el.clientHeight, 1)
+  previewScrollProgress.value = Math.min(Math.max(el.scrollTop / max, 0), 1)
+}
+
+// Real-time Background styling for the preview frame (isolated from foreground content)
 const previewBackgroundStyle = computed(() => {
   const bg = config.value.background_config
   const c = config.value.theme_config
 
+  if (bg.type === 'none') {
+    return { backgroundColor: c.bg }
+  }
   if (bg.type === 'solid') {
     return { backgroundColor: bg.overlay_color || c.bg }
   }
   if (bg.type === 'gradient') {
     const dir = bg.gradient_direction || 'to bottom'
+    const from = bg.gradient_from || c.bg
+    const to = bg.gradient_to || c.primary
     return {
-      background: `linear-gradient(${dir}, ${c.bg}, ${c.primary})`
+      background: `linear-gradient(${dir}, ${from}, ${to})`,
+      opacity: bg.opacity ?? 0.85
     }
   }
   let imgUrl = bg.image_url
@@ -780,14 +908,34 @@ const previewBackgroundStyle = computed(() => {
     imgUrl = PRESET_BACKGROUNDS[bg.preset_name].image_url
   }
   if (imgUrl) {
+    let scale = 1.02
+    if (bg.scroll_zoom !== false) {
+      const effect = bg.zoom_effect || 'zoom-in'
+      if (effect === 'zoom-out') {
+        scale = 1.10 - previewScrollProgress.value * 0.10
+      } else if (effect === 'breathe') {
+        scale = 1.02 + (1 - Math.cos(previewScrollProgress.value * Math.PI * 2)) * 0.04
+      } else {
+        scale = 1.0 + previewScrollProgress.value * 0.10
+      }
+    }
     return {
       backgroundImage: `url(${imgUrl})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      opacity: bg.opacity ?? 0.85
+      opacity: bg.opacity ?? 1,
+      transform: `scale3d(${scale.toFixed(4)}, ${scale.toFixed(4)}, 1)`
     }
   }
   return { backgroundColor: c.bg }
+})
+
+const previewOverlayStyle = computed(() => {
+  const bg = config.value.background_config
+  return {
+    backgroundColor: bg.overlay_color || '#000000',
+    opacity: bg.overlay_opacity ?? 0
+  }
 })
 
 const selectBackgroundPreset = (presetKey: string) => {
@@ -876,7 +1024,7 @@ watch(
 const loadData = async () => {
   // Fetch real wedding details
   try {
-    const wedRes = await $fetch<any>('/api/wedding').catch(() => null)
+    const wedRes = await $fetch<any>(`/api/wedding?t=${Date.now()}`).catch(() => null)
     if (wedRes?.data) {
       weddingData.value = {
         ...weddingData.value,
@@ -891,9 +1039,9 @@ const loadData = async () => {
   // Fetch admin appearance
   try {
     const token = await getToken()
-    const res = await $fetch<any>('/api/admin/appearance', {
+    const res = await $fetch<any>(`/api/admin/appearance?t=${Date.now()}`, {
       headers: token ? { authorization: `Bearer ${token}` } : {}
-    }).catch(() => $fetch<any>('/api/appearance'))
+    }).catch(() => $fetch<any>(`/api/appearance?t=${Date.now()}`))
 
     if (res?.data) {
       if (res.data.theme_name) config.value.theme_name = res.data.theme_name
