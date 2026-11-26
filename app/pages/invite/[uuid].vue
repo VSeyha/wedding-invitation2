@@ -137,21 +137,6 @@
       <div
         class="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] relative transition-all duration-700 min-h-screen sm:min-h-0 bg-transparent border-0 shadow-none"
       >
-        <!-- Floating Language Switcher for Guest (Integrated seamlessly at top-right of Invitation Card) -->
-        <header
-          class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-40 transition-opacity duration-500"
-          :class="{ 'opacity-0 pointer-events-none': !hasOpened && !isOpening }"
-        >
-          <button
-            @click="toggleLocale"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/60 shadow-md text-xs sm:text-sm font-semibold text-wedding-primary transition-all duration-200 transform hover:scale-105 active:scale-95"
-            :title="t('common.language')"
-          >
-            <span class="w-2 h-2 rounded-full bg-wedding-secondary animate-pulse"></span>
-            <span>{{ isKhmer ? 'English' : 'ភាសាខ្មែរ' }}</span>
-          </button>
-        </header>
-
         <!-- 2. Main Invitation Content (Unveiled seamlessly behind animation) -->
         <main
           class="pb-20 relative will-change-transform transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
@@ -221,6 +206,36 @@
       </div>
     </div>
     </Transition>
+
+    <!-- Fixed Screen Controls (Language Switcher & Scroll-to-Top) -->
+    <div
+      v-if="!loading && !errorState && (hasOpened || isOpening)"
+      class="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] pointer-events-none z-40"
+    >
+      <!-- Fixed Top-Right Language Switcher -->
+      <button
+        type="button"
+        @click="toggleLocale"
+        class="pointer-events-auto absolute top-3.5 right-3.5 sm:top-5 sm:right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/60 shadow-md text-xs sm:text-sm font-semibold text-wedding-primary transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer"
+        :title="t('common.language')"
+      >
+        <span class="w-2 h-2 rounded-full bg-wedding-secondary animate-pulse"></span>
+        <span>{{ isKhmer ? 'English' : 'ភាសាខ្មែរ' }}</span>
+      </button>
+
+      <!-- Fixed Bottom-Right Scroll to Top Button -->
+      <button
+        type="button"
+        @click="scrollToTop"
+        aria-label="Scroll to top"
+        class="absolute bottom-5 right-3.5 sm:bottom-6 sm:right-5 w-11 h-11 rounded-full bg-[#FFFDF9]/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/70 shadow-[0_8px_24px_rgba(100,29,45,0.22)] text-wedding-primary flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] interactive-btn cursor-pointer"
+        :class="showScrollTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-4 scale-90 pointer-events-none'"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 15l-6-6-6 6" />
+        </svg>
+      </button>
+    </div>
 
     <!-- Tactile Royal Click / Tap Golden Sparkle Particles -->
     <div
@@ -326,6 +341,7 @@ watch(
 const ambientBgRef = ref<HTMLElement | null>(null)
 const centerBgRef = ref<HTMLElement | null>(null)
 const targetScrollProgress = ref(0)
+const showScrollTop = ref(false)
 let smoothProgress = 0
 let lastRafTime = 0
 let dampingRafId: number | null = null
@@ -381,6 +397,7 @@ const handleScroll = () => {
   if (!import.meta.client) return
 
   const y = window.scrollY || document.documentElement.scrollTop
+  showScrollTop.value = y > 280
   const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
   targetScrollProgress.value = Math.min(Math.max(y / max, 0), 1)
 
@@ -388,6 +405,11 @@ const handleScroll = () => {
     lastRafTime = performance.now()
     dampingRafId = requestAnimationFrame(updateSmoothScroll)
   }
+}
+
+const scrollToTop = () => {
+  if (!import.meta.client) return
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const setupScrollReveal = () => {
