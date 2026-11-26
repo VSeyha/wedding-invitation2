@@ -176,21 +176,31 @@
         v-for="(photo, index) in displayedPhotos"
         :key="photo.id"
         @click="openLightbox(index)"
-        class="break-inside-avoid cursor-pointer overflow-hidden relative group bg-black/5 min-h-[140px]"
-        :class="[cardStyleClasses, masonryItemMarginClass]"
+        class="break-inside-avoid cursor-pointer overflow-hidden relative group"
+        :class="[cardStyleClasses, masonryItemMarginClass, !loadedImages[photo.id] && !failedImages[photo.id] ? 'bg-black/5' : '']"
       >
         <!-- Shimmer Placeholder -->
         <div
           v-if="!loadedImages[photo.id] && !failedImages[photo.id]"
-          class="w-full h-44 shimmer-skeleton flex items-center justify-center"
+          class="w-full h-28 sm:h-36 shimmer-skeleton flex items-center justify-center"
         >
           <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
         </div>
 
+        <!-- Error Fallback -->
+        <div
+          v-if="failedImages[photo.id]"
+          class="w-full py-8 bg-[#F7F0E3]/80 flex flex-col items-center justify-center text-wedding-text/50 p-2 text-center"
+        >
+          <span class="text-base mb-1">🖼️</span>
+          <span class="text-[10px]">Photo unavailable</span>
+        </div>
+
         <img
+          v-else
           :src="photo.url"
           :alt="photo.alt_text_en || 'Wedding photo'"
-          class="w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105"
+          class="block w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105"
           :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm absolute inset-0'"
           :loading="index < 3 ? 'eager' : 'lazy'"
           :fetchpriority="index === 0 ? 'high' : 'auto'"
