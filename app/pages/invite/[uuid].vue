@@ -55,38 +55,42 @@
       <div class="absolute inset-0 bg-black/[0.08] pointer-events-none"></div>
     </div>
 
-    <!-- Error State: Invitation Not Found or Revoked -->
-    <div
-      v-if="errorState"
-      class="min-h-screen flex items-center justify-center p-6 text-center relative z-10 w-full"
-    >
-      <div class="max-w-md w-full khmer-card p-8 rounded-3xl border-2 border-wedding-secondary shadow-gold-glow">
-        <div class="text-4xl mb-3">⚠️</div>
-        <h1 class="text-xl font-bold text-wedding-primary font-khmer-heading mb-2">
-          {{ errorState === 410 ? t('invitation.revoked_title') : t('invitation.not_found_title') }}
-        </h1>
-        <p class="text-sm text-wedding-text/80 font-khmer-body">
-          {{ errorState === 410 ? t('invitation.revoked_desc') : t('invitation.not_found_desc') }}
-        </p>
+    <Transition name="page-fade" mode="out-in">
+      <!-- Error State: Invitation Not Found or Revoked -->
+      <div
+        v-if="errorState"
+        key="error"
+        class="min-h-screen flex items-center justify-center p-6 text-center relative z-10 w-full"
+      >
+        <div class="max-w-md w-full khmer-card p-8 rounded-3xl border-2 border-wedding-secondary shadow-gold-glow">
+          <div class="text-4xl mb-3">⚠️</div>
+          <h1 class="text-xl font-bold text-wedding-primary font-khmer-heading mb-2">
+            {{ errorState === 410 ? t('invitation.revoked_title') : t('invitation.not_found_title') }}
+          </h1>
+          <p class="text-sm text-wedding-text/80 font-khmer-body">
+            {{ errorState === 410 ? t('invitation.revoked_desc') : t('invitation.not_found_desc') }}
+          </p>
+        </div>
       </div>
-    </div>
 
-    <!-- Loading State -->
-    <div
-      v-else-if="loading"
-      class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10 w-full"
-    >
-      <div class="text-4xl mb-4 animate-bounce">💌</div>
-      <div class="font-khmer-heading text-lg text-wedding-primary animate-pulse">
-        {{ t('common.loading') }}
+      <!-- Loading State -->
+      <div
+        v-else-if="loading"
+        key="loading"
+        class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10 w-full"
+      >
+        <div class="text-4xl mb-4 animate-bounce">💌</div>
+        <div class="font-khmer-heading text-lg text-wedding-primary animate-pulse">
+          {{ t('common.loading') }}
+        </div>
       </div>
-    </div>
 
-    <!-- Active Valid Invitation -->
-    <div
-      v-else
-      class="relative z-10 w-full flex justify-center py-0 sm:py-8 transition-all duration-700 min-h-screen"
-    >
+      <!-- Active Valid Invitation -->
+      <div
+        v-else
+        key="active"
+        class="relative z-10 w-full flex justify-center py-0 sm:py-8 min-h-screen"
+      >
       <!-- 1. Khmer Royal Seal Opening Envelope (Full Screen on Mobile & Desktop) -->
       <WeddingOpeningAnimation
         v-if="appearanceConfig"
@@ -120,10 +124,10 @@
 
         <!-- 2. Main Invitation Content (Unveiled seamlessly behind animation) -->
         <main
-          class="pb-20 relative transition-all duration-1000 ease-out"
+          class="pb-20 relative will-change-transform transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           :class="{
-            'opacity-100 transform translate-y-0 scale-100 filter-none': isOpening || hasOpened,
-            'opacity-40 transform translate-y-2 scale-[0.98] pointer-events-none filter blur-[1px]': !isOpening && !hasOpened
+            'opacity-100 translate-y-0 scale-100': isOpening || hasOpened,
+            'opacity-0 translate-y-3 scale-[0.985] pointer-events-none': !isOpening && !hasOpened
           }"
         >
           <!-- Hero Section -->
@@ -186,6 +190,7 @@
         </main>
       </div>
     </div>
+    </Transition>
 
     <!-- Tactile Royal Click / Tap Golden Sparkle Particles -->
     <div
@@ -345,12 +350,13 @@ const setupScrollReveal = () => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('revealed')
+          observer?.unobserve(entry.target)
         }
       })
     },
     {
-      threshold: 0.08,
-      rootMargin: '0px 0px -40px 0px'
+      threshold: 0.02,
+      rootMargin: '0px 0px -15px 0px'
     }
   )
 

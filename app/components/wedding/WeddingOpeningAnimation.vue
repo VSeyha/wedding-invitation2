@@ -3,12 +3,15 @@
     v-if="!opened && currentStyle !== 'direct'"
     :class="[
       absolute ? 'absolute inset-0 z-30' : 'fixed inset-0 z-50',
-      'flex items-center justify-center p-0 overflow-hidden select-none',
+      'flex items-center justify-center p-0 overflow-hidden select-none will-change-transform',
       isOpening ? 'pointer-events-none' : '',
-      isOpening && currentStyle !== 'curtain' ? 'opacity-0 scale-105 transition-all duration-700' : ''
+      isOpening && currentStyle !== 'curtain' ? 'opacity-0 scale-[1.03]' : ''
     ]"
     :style="{
-      background: currentStyle === 'curtain' ? 'transparent' : 'radial-gradient(circle at 50% 35%, var(--wedding-bg, #F7F0E3) 0%, var(--wedding-primary, #641D2D) 130%)'
+      background: currentStyle === 'curtain' ? 'transparent' : 'radial-gradient(circle at 50% 35%, var(--wedding-bg, #F7F0E3) 0%, var(--wedding-primary, #641D2D) 130%)',
+      transitionProperty: currentStyle !== 'curtain' ? 'opacity, transform' : 'none',
+      transitionDuration: currentStyle !== 'curtain' ? `${Math.max(Math.min(animDuration * 0.85, 1.4), 0.6)}s` : '0s',
+      transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
     }"
   >
     <!-- Background Texture -->
@@ -938,7 +941,9 @@ const triggerOpen = () => {
   playRoyalChime()
   emit('opening')
 
-  const dur = Math.max(animDuration.value * 1000, 800)
+  const dur = currentStyle.value === 'curtain'
+    ? Math.max(animDuration.value * 1000, 800)
+    : Math.max(Math.min(animDuration.value * 0.85, 1.4) * 1000, 600)
   setTimeout(() => {
     opened.value = true
     emit('opened')
