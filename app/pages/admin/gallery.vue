@@ -238,7 +238,7 @@
               : 'max-w-4xl bg-white/95 rounded-2xl p-4 sm:p-6 shadow-sm border border-[#C9A24A]/30'"
           >
             <!-- Embedded Gallery Component Running Live Config -->
-            <WeddingGallery :photos="previewPhotosList" :config="galleryConfig" />
+            <WeddingGallery :photos="previewPhotosList" :config="galleryConfig" :force-viewport="previewDevice" />
           </div>
         </div>
       </div>

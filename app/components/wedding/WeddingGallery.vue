@@ -153,12 +153,18 @@
             <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
           </div>
 
-          <div class="w-full h-full relative overflow-hidden" :class="innerMediaClasses">
+          <div
+            class="w-full relative overflow-hidden"
+            :class="[effectiveConfig.aspect_ratio === 'natural' ? 'h-auto' : 'h-full', innerMediaClasses]"
+          >
             <img
               :src="photo.url"
               :alt="photo.alt_text_en || 'Wedding photo'"
-              class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
-              :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+              class="block w-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+              :class="[
+                effectiveConfig.aspect_ratio === 'natural' ? 'h-auto' : 'h-full',
+                loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'
+              ]"
               :loading="index < 3 ? 'eager' : 'lazy'"
               decoding="async"
               @load="onImageLoad(photo.id)"
@@ -182,7 +188,12 @@
         :key="photo.id"
         @click="openLightbox(index)"
         class="break-inside-avoid cursor-pointer overflow-hidden relative group"
-        :class="[cardStyleClasses, masonryItemMarginClass, !loadedImages[photo.id] && !failedImages[photo.id] ? 'bg-black/5' : '']"
+        :class="[
+          cardStyleClasses,
+          masonryItemMarginClass,
+          effectiveConfig.aspect_ratio !== 'natural' ? aspectClasses : '',
+          !loadedImages[photo.id] && !failedImages[photo.id] && effectiveConfig.card_style !== 'glass' ? 'bg-black/5' : ''
+        ]"
       >
         <!-- Shimmer Placeholder -->
         <div
@@ -201,12 +212,19 @@
           <span class="text-[10px]">Photo unavailable</span>
         </div>
 
-        <div v-else class="w-full relative overflow-hidden" :class="innerMediaClasses">
+        <div
+          v-else
+          class="w-full relative overflow-hidden"
+          :class="[effectiveConfig.aspect_ratio !== 'natural' ? 'h-full' : 'h-auto', innerMediaClasses]"
+        >
           <img
             :src="photo.url"
             :alt="photo.alt_text_en || 'Wedding photo'"
-            class="block w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105"
-            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm absolute inset-0'"
+            class="block w-full object-cover transition-all duration-700 ease-out group-hover:scale-105"
+            :class="[
+              effectiveConfig.aspect_ratio !== 'natural' ? 'h-full' : 'h-auto',
+              loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm absolute inset-0'
+            ]"
             :loading="index < 3 ? 'eager' : 'lazy'"
             :fetchpriority="index === 0 ? 'high' : 'auto'"
             decoding="async"
@@ -237,12 +255,18 @@
           <span class="text-lg text-wedding-secondary/40 animate-pulse">📷</span>
         </div>
 
-        <div class="w-full h-full relative overflow-hidden" :class="innerMediaClasses">
+        <div
+          class="w-full relative overflow-hidden"
+          :class="[effectiveConfig.aspect_ratio === 'natural' ? 'h-auto' : 'h-full', innerMediaClasses]"
+        >
           <img
             :src="photo.url"
             :alt="photo.alt_text_en || 'Wedding photo'"
-            class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
-            :class="loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'"
+            class="block w-full object-cover transition-all duration-700 ease-out group-hover:scale-110 relative z-10"
+            :class="[
+              effectiveConfig.aspect_ratio === 'natural' ? 'h-auto' : 'h-full',
+              loadedImages[photo.id] ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'
+            ]"
             :loading="index < 3 ? 'eager' : 'lazy'"
             :fetchpriority="index === 0 ? 'high' : 'auto'"
             decoding="async"
@@ -398,9 +422,11 @@ const props = withDefaults(
     photos: WeddingPhoto[]
     config?: Partial<GalleryConfig> | null
     loading?: boolean
+    forceViewport?: 'mobile' | 'desktop' | null
   }>(),
   {
-    loading: false
+    loading: false,
+    forceViewport: null
   }
 )
 
@@ -515,6 +541,11 @@ const innerMediaClasses = computed(() => {
 // Gap Classes
 const gapClasses = computed(() => {
   const gap = effectiveConfig.value.gap || 'normal'
+  if (props.forceViewport === 'mobile') {
+    if (gap === 'compact') return 'gap-2'
+    if (gap === 'relaxed') return 'gap-4'
+    return 'gap-2.5'
+  }
   if (gap === 'compact') return 'gap-2 sm:gap-2.5'
   if (gap === 'relaxed') return 'gap-4 sm:gap-5'
   return 'gap-2.5 sm:gap-3.5'
@@ -522,6 +553,11 @@ const gapClasses = computed(() => {
 
 const masonryItemMarginClass = computed(() => {
   const gap = effectiveConfig.value.gap || 'normal'
+  if (props.forceViewport === 'mobile') {
+    if (gap === 'compact') return 'mb-2'
+    if (gap === 'relaxed') return 'mb-4'
+    return 'mb-2.5'
+  }
   if (gap === 'compact') return 'mb-2 sm:mb-2.5'
   if (gap === 'relaxed') return 'mb-4 sm:mb-5'
   return 'mb-2.5 sm:mb-3.5'
@@ -540,7 +576,17 @@ const gridClasses = computed(() => {
     3: 'sm:grid-cols-3',
     4: 'sm:grid-cols-4'
   }
+  const deskForcedMap: Record<number, string> = {
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4'
+  }
   const mob = mobMap[effectiveConfig.value.columns_mobile || 2] || 'grid-cols-2'
+  if (props.forceViewport === 'mobile') return `grid ${mob} ${gapClasses.value}`
+  if (props.forceViewport === 'desktop') {
+    const d = deskForcedMap[effectiveConfig.value.columns_desktop || 3] || 'grid-cols-3'
+    return `grid ${d} ${gapClasses.value}`
+  }
   const desk = deskMap[effectiveConfig.value.columns_desktop || 3] || 'sm:grid-cols-3'
   return `grid ${mob} ${desk} ${gapClasses.value}`
 })
@@ -558,14 +604,44 @@ const masonryClasses = computed(() => {
     3: 'sm:columns-3',
     4: 'sm:columns-4'
   }
+  const deskForcedMap: Record<number, string> = {
+    2: 'columns-2',
+    3: 'columns-3',
+    4: 'columns-4'
+  }
   const mob = mobMap[effectiveConfig.value.columns_mobile || 2] || 'columns-2'
+  if (props.forceViewport === 'mobile') return `${mob} ${gapClasses.value}`
+  if (props.forceViewport === 'desktop') {
+    const d = deskForcedMap[effectiveConfig.value.columns_desktop || 3] || 'columns-3'
+    return `${d} ${gapClasses.value}`
+  }
   const desk = deskMap[effectiveConfig.value.columns_desktop || 3] || 'sm:columns-3'
   return `${mob} ${desk} ${gapClasses.value}`
 })
 
-// Carousel Card Widths
+// Carousel Card Widths (synced with mobile & desktop columns)
 const carouselWidthClasses = computed(() => {
-  return 'w-[80%] sm:w-[46%] md:w-[32%]'
+  const mobMap: Record<number, string> = {
+    1: 'w-[88%]',
+    2: 'w-[48%]',
+    3: 'w-[32%]',
+    4: 'w-[24%]'
+  }
+  const deskMap: Record<number, string> = {
+    2: 'sm:w-[48%]',
+    3: 'sm:w-[32%]',
+    4: 'sm:w-[24%]'
+  }
+  const deskForcedMap: Record<number, string> = {
+    2: 'w-[48%]',
+    3: 'w-[32%]',
+    4: 'w-[24%]'
+  }
+  const mob = mobMap[effectiveConfig.value.columns_mobile || 2] || 'w-[48%]'
+  if (props.forceViewport === 'mobile') return mob
+  if (props.forceViewport === 'desktop') return deskForcedMap[effectiveConfig.value.columns_desktop || 3] || 'w-[32%]'
+  const desk = deskMap[effectiveConfig.value.columns_desktop || 3] || 'sm:w-[32%]'
+  return `${mob} ${desk}`
 })
 
 const scrollCarousel = (direction: number) => {
