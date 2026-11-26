@@ -3,7 +3,7 @@ import { useServerSupabase } from '~~/server/utils/supabase'
 import { getStoredGalleryConfig } from '~~/server/utils/galleryConfig'
 
 export default defineEventHandler(async (event) => {
-  setHeader(event, 'Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
+  setHeader(event, 'Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=10, must-revalidate')
   const supabase = useServerSupabase()
   if (!supabase) {
     throw createError({ statusCode: 503, statusMessage: 'Database not configured' })

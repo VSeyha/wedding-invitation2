@@ -476,9 +476,9 @@ const loadInvitationData = async () => {
         errorState.value = e.statusCode || 404
         return null
       }),
-      $fetch<any>('/api/wedding').catch(() => null),
+      $fetch<any>(`/api/wedding?t=${Date.now()}`).catch(() => null),
       $fetch<any>('/api/programmes').catch(() => null),
-      $fetch<any>('/api/gallery').catch(() => null),
+      $fetch<any>(`/api/gallery?t=${Date.now()}`).catch(() => null),
       $fetch<any>(`/api/appearance?t=${Date.now()}`).catch(() => null)
     ])
 

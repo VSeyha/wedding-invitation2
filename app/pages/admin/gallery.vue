@@ -406,7 +406,7 @@ const fetchPhotosAndConfig = async () => {
       $fetch<any>('/api/admin/gallery', {
         headers: { authorization: `Bearer ${token}` }
       }).catch(() => null),
-      $fetch<any>('/api/wedding').catch(() => null)
+      $fetch<any>(`/api/wedding?t=${Date.now()}`).catch(() => null)
     ])
 
     photos.value = galRes?.data || []

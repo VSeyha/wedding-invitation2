@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     '/api/wedding': { headers: { 'cache-control': 'public, max-age=0, s-maxage=5, stale-while-revalidate=10, must-revalidate' } },
     '/api/appearance': { headers: { 'cache-control': 'public, max-age=0, s-maxage=5, stale-while-revalidate=10, must-revalidate' } },
     '/api/programmes': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
-    '/api/gallery': { swr: 300, headers: { 'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600' } },
+    '/api/gallery': { headers: { 'cache-control': 'public, max-age=0, s-maxage=5, stale-while-revalidate=10, must-revalidate' } },
     // Static assets long-term immutable cache
     '/images/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
     '/audio/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } }

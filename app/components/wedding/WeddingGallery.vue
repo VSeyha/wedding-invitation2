@@ -176,8 +176,8 @@
         v-for="(photo, index) in displayedPhotos"
         :key="photo.id"
         @click="openLightbox(index)"
-        class="break-inside-avoid mb-3 sm:mb-4 cursor-pointer overflow-hidden relative group bg-black/5 min-h-[140px]"
-        :class="cardStyleClasses"
+        class="break-inside-avoid cursor-pointer overflow-hidden relative group bg-black/5 min-h-[140px]"
+        :class="[cardStyleClasses, masonryItemMarginClass]"
       >
         <!-- Shimmer Placeholder -->
         <div
@@ -494,6 +494,13 @@ const gapClasses = computed(() => {
   if (gap === 'compact') return 'gap-2 sm:gap-2.5'
   if (gap === 'relaxed') return 'gap-4 sm:gap-5'
   return 'gap-2.5 sm:gap-3.5'
+})
+
+const masonryItemMarginClass = computed(() => {
+  const gap = effectiveConfig.value.gap || 'normal'
+  if (gap === 'compact') return 'mb-2 sm:mb-2.5'
+  if (gap === 'relaxed') return 'mb-4 sm:mb-5'
+  return 'mb-2.5 sm:mb-3.5'
 })
 
 // Grid Columns Classes
