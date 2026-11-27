@@ -52,7 +52,8 @@ export const weddingSettingsUpdateSchema = z.object({
   bride_photo_url: z.string().url().optional().nullable().or(z.literal('')),
   our_story: z.array(storyMilestoneSchema).optional().nullable(),
   gift_info: weddingGiftInfoSchema.optional().nullable(),
-  gallery_config: galleryConfigSchema.optional().nullable()
+  gallery_config: galleryConfigSchema.optional().nullable(),
+  telegram_message: z.string().max(2000).optional().nullable()
 })
 
 // ============================================================

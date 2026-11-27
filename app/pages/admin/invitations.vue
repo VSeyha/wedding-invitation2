@@ -158,8 +158,17 @@ const getToken = async () => {
 const fetch = async () => {
   loading.value = true
   const token = await getToken()
-  const { data } = await $fetch<any>('/api/admin/invitations', { headers: { authorization: `Bearer ${token}` } }).catch(() => ({ data: [] }))
-  invitations.value = data || []
+  const [invRes, wedRes] = await Promise.all([
+    $fetch<any>('/api/admin/invitations', { headers: { authorization: `Bearer ${token}` } }).catch(() => ({ data: [] })),
+    $fetch<any>(`/api/wedding?t=${Date.now()}`).catch(() => null)
+  ])
+  invitations.value = invRes?.data || []
+  if (wedRes?.data?.telegram_message) {
+    telegramTemplate.value = wedRes.data.telegram_message
+    if (import.meta.client) {
+      localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, wedRes.data.telegram_message)
+    }
+  }
   loading.value = false
 }
 

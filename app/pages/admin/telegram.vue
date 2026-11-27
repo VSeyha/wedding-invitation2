@@ -70,10 +70,11 @@
             <button
               type="button"
               @click="saveTemplate"
-              class="px-5 py-2 rounded-lg bg-[#641D2D] text-[#F7F0E3] text-xs font-semibold hover:bg-[#641D2D]/90 transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-sm"
+              :disabled="saving || loading"
+              class="px-5 py-2 rounded-lg bg-[#641D2D] text-[#F7F0E3] text-xs font-semibold hover:bg-[#641D2D]/90 transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
             >
               <Save class="w-3.5 h-3.5" />
-              <span>Save Configuration</span>
+              <span>{{ saving ? 'Saving...' : 'Save Configuration' }}</span>
             </button>
           </div>
         </div>
@@ -153,6 +154,7 @@ import { Send, Save, RotateCcw, Sparkles, Mail } from 'lucide-vue-next'
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 
 const { t } = useLocale()
+const supabase = useSupabase()
 const config = useRuntimeConfig()
 const siteUrl = config.public.siteUrl as string
 
@@ -178,6 +180,14 @@ const template = ref(DEFAULT_TELEGRAM_TEMPLATE)
 const sampleGuest = ref('លោក សុខា')
 const sampleLink = `${siteUrl}/invite/sample-invitation`
 const toast = ref('')
+const loading = ref(true)
+const saving = ref(false)
+
+const getToken = async () => {
+  if (!supabase) return ''
+  const { data } = await supabase.auth.getSession()
+  return data.session?.access_token || ''
+}
 
 const showToast = (msg: string) => {
   toast.value = msg
@@ -202,19 +212,30 @@ const applyPreset = (text: string) => {
   saveTemplate()
 }
 
-const saveTemplate = () => {
-  if (import.meta.client) {
-    localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, template.value)
+const saveTemplate = async () => {
+  saving.value = true
+  try {
+    const token = await getToken()
+    await $fetch('/api/wedding', {
+      method: 'PUT',
+      headers: { authorization: `Bearer ${token}` },
+      body: { telegram_message: template.value }
+    })
+    if (import.meta.client) {
+      localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, template.value)
+    }
+    showToast('✓ Telegram message saved to Supabase!')
+  } catch (err: any) {
+    console.error('Failed to save Telegram message:', err)
+    showToast(err?.data?.statusMessage || 'Failed to save Telegram message.')
+  } finally {
+    saving.value = false
   }
-  showToast('✓ Telegram message configuration saved!')
 }
 
-const resetTemplate = () => {
+const resetTemplate = async () => {
   template.value = DEFAULT_TELEGRAM_TEMPLATE
-  if (import.meta.client) {
-    localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, DEFAULT_TELEGRAM_TEMPLATE)
-  }
-  showToast('Restored default Telegram message.')
+  await saveTemplate()
 }
 
 const testShareTelegram = () => {
@@ -223,10 +244,21 @@ const testShareTelegram = () => {
   window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
 }
 
-onMounted(() => {
-  if (import.meta.client) {
-    const saved = localStorage.getItem(TELEGRAM_TEMPLATE_STORAGE_KEY)
-    if (saved !== null) template.value = saved
+onMounted(async () => {
+  loading.value = true
+  try {
+    const res = await $fetch<any>(`/api/wedding?t=${Date.now()}`).catch(() => null)
+    if (res?.data?.telegram_message) {
+      template.value = res.data.telegram_message
+      if (import.meta.client) {
+        localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, res.data.telegram_message)
+      }
+    } else if (import.meta.client) {
+      const saved = localStorage.getItem(TELEGRAM_TEMPLATE_STORAGE_KEY)
+      if (saved) template.value = saved
+    }
+  } finally {
+    loading.value = false
   }
 })
 </script>
