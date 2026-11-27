@@ -230,6 +230,7 @@ import {
   Images,
   Palette,
   Settings,
+  Send,
   ExternalLink,
   ChevronLeft,
   ChevronRight,
@@ -272,6 +273,7 @@ const navGroups = [
     items: [
       { path: '/admin/guests', labelKey: 'admin.guests', iconComponent: Users },
       { path: '/admin/invitations', labelKey: 'admin.invitations', iconComponent: Mail },
+      { path: '/admin/telegram', labelKey: 'admin.telegram', iconComponent: Send },
       { path: '/admin/rsvps', labelKey: 'admin.rsvps', iconComponent: CheckSquare }
     ]
   },

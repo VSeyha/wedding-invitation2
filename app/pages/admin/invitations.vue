@@ -5,66 +5,13 @@
         <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.invitations') }}</h1>
         <p class="text-sm text-[#3C2925]/60 mt-1">View, share via Telegram, revoke and regenerate invitation links.</p>
       </div>
-      <button
-        type="button"
-        @click="showTelegramConfig = !showTelegramConfig"
-        class="btn-secondary text-xs inline-flex items-center gap-1.5 self-start cursor-pointer"
+      <NuxtLink
+        to="/admin/telegram"
+        class="btn-secondary text-xs inline-flex items-center gap-1.5 self-start"
       >
         <Send class="w-3.5 h-3.5 text-sky-600" />
-        <span>{{ showTelegramConfig ? 'Hide Telegram Message' : 'Customize Telegram Message' }}</span>
-      </button>
-    </div>
-
-    <!-- Telegram Message Configuration Card -->
-    <div v-if="showTelegramConfig" class="mb-6 bg-white rounded-xl border border-[#C9A24A]/30 p-5 shadow-sm">
-      <div class="flex items-center justify-between gap-2 mb-3">
-        <div>
-          <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
-            <Send class="w-4 h-4 text-sky-600" />
-            <span>Telegram Share Message</span>
-          </h2>
-          <p class="text-xs text-[#3C2925]/60 mt-0.5">
-            Customize the invitation message sent when sharing via Telegram. Use <code class="px-1 py-0.5 rounded bg-[#F7F0E3] text-[#641D2D] font-mono">{guest}</code> for the guest's name.
-          </p>
-        </div>
-        <button
-          type="button"
-          @click="resetTelegramTemplate"
-          class="text-xs text-[#641D2D] hover:underline font-medium cursor-pointer flex-shrink-0"
-        >
-          Reset Default
-        </button>
-      </div>
-
-      <textarea
-        v-model="telegramTemplate"
-        rows="3"
-        class="input-field font-khmer-body"
-        placeholder="Enter custom Telegram invitation message..."
-      />
-
-      <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div class="text-xs text-[#3C2925]/70 bg-[#F7F0E3]/60 border border-[#C9A24A]/20 rounded-lg px-3 py-2 flex-1 font-khmer-body">
-          <span class="font-bold text-[#641D2D] mr-1">Preview:</span>
-          <span>{{ previewTelegramMessage }}</span>
-        </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <button
-            type="button"
-            @click="insertGuestPlaceholder"
-            class="px-3 py-2 rounded-lg border border-[#C9A24A]/40 text-xs font-medium text-[#641D2D] hover:bg-[#F7F0E3] transition-colors cursor-pointer"
-          >
-            + Insert {guest}
-          </button>
-          <button
-            type="button"
-            @click="saveTelegramTemplate"
-            class="px-4 py-2 rounded-lg bg-[#641D2D] text-[#F7F0E3] text-xs font-medium hover:bg-[#641D2D]/90 transition-colors cursor-pointer"
-          >
-            Save Message
-          </button>
-        </div>
-      </div>
+        <span>Configure Telegram Message</span>
+      </NuxtLink>
     </div>
 
     <!-- Search & Filter -->
@@ -176,33 +123,13 @@ const submitting = ref(false)
 
 const TELEGRAM_TEMPLATE_STORAGE_KEY = 'wedding_telegram_share_template'
 const DEFAULT_TELEGRAM_TEMPLATE = 'សូមគោរពអញ្ជើញ {guest} ចូលរួមក្នុងពិធីមង្គលការរបស់យើងខ្ញុំ 💐💍 សូមចុចលើតំណភ្ជាប់ខាងក្រោមដើម្បីបើកសំបុត្រអញ្ជើញ៖'
-const showTelegramConfig = ref(false)
 const telegramTemplate = ref(DEFAULT_TELEGRAM_TEMPLATE)
 
-const formatTelegramMessage = (guestName?: string) => {
+const formatTelegramMessage = (guestName?: string, url?: string) => {
   const name = guestName?.trim() || 'ភ្ញៀវកិត្តិយស'
-  return (telegramTemplate.value || DEFAULT_TELEGRAM_TEMPLATE).replaceAll('{guest}', name)
-}
-
-const previewTelegramMessage = computed(() => formatTelegramMessage('លោក សុខា'))
-
-const insertGuestPlaceholder = () => {
-  telegramTemplate.value = telegramTemplate.value ? `${telegramTemplate.value} {guest}` : '{guest}'
-}
-
-const saveTelegramTemplate = () => {
-  if (import.meta.client) {
-    localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, telegramTemplate.value)
-  }
-  showToast('Telegram message template saved!')
-}
-
-const resetTelegramTemplate = () => {
-  telegramTemplate.value = DEFAULT_TELEGRAM_TEMPLATE
-  if (import.meta.client) {
-    localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, DEFAULT_TELEGRAM_TEMPLATE)
-  }
-  showToast('Restored default Telegram message.')
+  return (telegramTemplate.value || DEFAULT_TELEGRAM_TEMPLATE)
+    .replaceAll('{guest}', name)
+    .replaceAll('{link}', url || '')
 }
 
 const filtered = computed(() =>
@@ -241,8 +168,9 @@ const inviteUrl = (inv: any) => `${siteUrl}/invite/${inv.token}`
 
 const copyLink = async (inv: any) => { await navigator.clipboard.writeText(inviteUrl(inv)); showToast('Link copied!') }
 const shareTelegram = (inv: any) => {
-  const url = encodeURIComponent(inviteUrl(inv))
-  const text = encodeURIComponent(formatTelegramMessage(inv.guests?.name))
+  const rawUrl = inviteUrl(inv)
+  const url = encodeURIComponent(rawUrl)
+  const text = encodeURIComponent(formatTelegramMessage(inv.guests?.name, rawUrl))
   window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
 }
 
