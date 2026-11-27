@@ -476,13 +476,20 @@ const uploadQrCode = async (e: Event) => {
   }
 }
 
+const toLocalDateTimeInput = (isoOrDate: string | Date): string => {
+  const d = new Date(isoOrDate)
+  if (isNaN(d.getTime())) return ''
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 onMounted(async () => {
   const token = await getToken()
-  const { data } = await $fetch<any>('/api/wedding', { headers: { authorization: `Bearer ${token}` } }).catch(() => ({ data: null }))
+  const { data } = await $fetch<any>(`/api/wedding?t=${Date.now()}`, { headers: { authorization: `Bearer ${token}` } }).catch(() => ({ data: null }))
   if (data) {
     Object.assign(form.value, {
       ...data,
-      wedding_date: data.wedding_date ? new Date(data.wedding_date).toISOString().slice(0, 16) : '',
+      wedding_date: data.wedding_date ? toLocalDateTimeInput(data.wedding_date) : '',
       groom_photo_url: data.groom_photo_url || '',
       bride_photo_url: data.bride_photo_url || '',
       our_story: (data.our_story && data.our_story.length > 0) ? data.our_story : JSON.parse(JSON.stringify(DEFAULT_STORY_TEMPLATE)),
