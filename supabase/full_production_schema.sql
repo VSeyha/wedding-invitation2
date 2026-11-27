@@ -90,9 +90,12 @@ create table if not exists public.invitations (
   guest_id uuid not null references public.guests(id) on delete cascade,
   token uuid not null unique default gen_random_uuid(),
   status text not null default 'active' check (status in ('active', 'revoked')),
+  sent_at timestamptz,
   opened_at timestamptz,
   created_at timestamptz not null default now()
 );
+alter table public.invitations
+add column if not exists sent_at timestamptz;
 create index if not exists invitations_token_idx on public.invitations (token);
 create index if not exists invitations_guest_id_idx on public.invitations (guest_id);
 create index if not exists invitations_status_idx on public.invitations (status);

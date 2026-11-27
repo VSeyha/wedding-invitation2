@@ -15,13 +15,22 @@
     </div>
 
     <!-- Search, Filter & Share Language -->
-    <div class="mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
       <input v-model="search" type="text" placeholder="Search by guest name..." class="input-field max-w-sm" />
-      <select v-model="filterStatus" class="input-field max-w-[180px]">
+      <select v-model="filterStatus" class="input-field max-w-[160px]">
         <option value="">All Statuses</option>
         <option value="active">Active</option>
         <option value="revoked">Revoked</option>
       </select>
+      <select v-model="filterSent" class="input-field max-w-[165px]">
+        <option value="">All Share Status</option>
+        <option value="unsent">Not Sent Yet</option>
+        <option value="sent">Sent ✓</option>
+      </select>
+      <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F7F0E3] border border-[#C9A24A]/30 text-xs font-medium text-[#641D2D]">
+        <span>Sent:</span>
+        <span class="font-bold">{{ sentCount }} / {{ invitations.length }}</span>
+      </div>
       <div class="flex items-center gap-1.5 sm:ml-auto bg-white px-2.5 py-1.5 rounded-lg border border-[#C9A24A]/30 text-xs">
         <span class="text-[#3C2925]/70 font-medium">Telegram Msg:</span>
         <button
@@ -50,6 +59,7 @@
             <tr>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Guest</th>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Status</th>
+              <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Sent</th>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">RSVP</th>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Opened</th>
               <th class="text-left px-4 py-3 font-semibold text-[#641D2D]">Created</th>
@@ -60,9 +70,9 @@
             <AdminTableSkeleton
               v-if="loading"
               :rows="6"
-              :columns="['text', 'pill', 'pill', 'muted', 'muted', 'actions']"
+              :columns="['text', 'pill', 'pill', 'pill', 'muted', 'muted', 'actions']"
             />
-            <tr v-else-if="!filtered.length"><td colspan="6" class="px-4 py-8 text-center text-[#3C2925]/50">No invitations found.</td></tr>
+            <tr v-else-if="!filtered.length"><td colspan="7" class="px-4 py-8 text-center text-[#3C2925]/50">No invitations found.</td></tr>
             <tr
               v-for="inv in paginatedInvitations"
               :key="inv.id"
@@ -71,6 +81,17 @@
               <td class="px-4 py-3 font-medium text-[#3C2925]">{{ inv.guests?.name }}</td>
               <td class="px-4 py-3">
                 <span :class="inv.status === 'active' ? 'badge-success' : 'badge-error'">{{ inv.status }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <button
+                  type="button"
+                  @click="toggleSent(inv)"
+                  :title="isSent(inv) ? 'Click to mark as Not Sent' : 'Click to mark as Sent'"
+                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors cursor-pointer"
+                  :class="isSent(inv) ? 'bg-sky-100 text-sky-700 hover:bg-sky-200' : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'"
+                >
+                  <span>{{ isSent(inv) ? '✓ Sent' : 'Not Sent' }}</span>
+                </button>
               </td>
               <td class="px-4 py-3">
                 <span v-if="inv.rsvps?.attendance_status === 'attending'" class="badge-success">✓ Attending</span>
@@ -139,10 +160,13 @@ const invitations = ref<any[]>([])
 const loading = ref(true)
 const search = ref('')
 const filterStatus = ref('')
+const filterSent = ref('')
 const currentPage = ref(1)
 const pageSize = ref(15)
 const toast = ref('')
 const submitting = ref(false)
+const localSentMap = ref<Record<string, string>>({})
+const SENT_MAP_STORAGE_KEY = 'wedding_invitations_sent_map'
 
 const STORAGE_KEY_KM = 'wedding_telegram_share_template_km'
 const STORAGE_KEY_EN = 'wedding_telegram_share_template_en'
@@ -162,11 +186,19 @@ const formatTelegramMessage = (guestName?: string) => {
   return tpl.replaceAll('{guest}', name)
 }
 
+const isSent = (inv: any) => Boolean(inv?.sent_at || localSentMap.value[inv?.id])
+
+const sentCount = computed(() => invitations.value.filter(i => isSent(i)).length)
+
 const filtered = computed(() =>
   invitations.value.filter(i => {
     const nameMatch = i.guests?.name?.toLowerCase().includes(search.value.toLowerCase())
     const statusMatch = !filterStatus.value || i.status === filterStatus.value
-    return nameMatch && statusMatch
+    const sentMatch =
+      !filterSent.value ||
+      (filterSent.value === 'sent' && isSent(i)) ||
+      (filterSent.value === 'unsent' && !isSent(i))
+    return nameMatch && statusMatch && sentMatch
   })
 )
 
@@ -175,7 +207,7 @@ const paginatedInvitations = computed(() => {
   return filtered.value.slice(start, start + pageSize.value)
 })
 
-watch([search, filterStatus], () => {
+watch([search, filterStatus, filterSent], () => {
   currentPage.value = 1
 })
 
@@ -209,11 +241,48 @@ const fetch = async () => {
 const showToast = (msg: string) => { toast.value = msg; setTimeout(() => { toast.value = '' }, 3000) }
 const inviteUrl = (inv: any) => `${siteUrl}/invite/${inv.token}`
 
-const copyLink = async (inv: any) => { await navigator.clipboard.writeText(inviteUrl(inv)); showToast('Link copied!') }
-const shareTelegram = (inv: any) => {
+const setSentState = async (inv: any, sent: boolean) => {
+  const nowIso = new Date().toISOString()
+  inv.sent_at = sent ? nowIso : null
+
+  if (import.meta.client) {
+    if (sent) {
+      localSentMap.value[inv.id] = nowIso
+    } else {
+      delete localSentMap.value[inv.id]
+    }
+    localStorage.setItem(SENT_MAP_STORAGE_KEY, JSON.stringify(localSentMap.value))
+  }
+
+  try {
+    const token = await getToken()
+    await $fetch(`/api/admin/invitations/${inv.id}`, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}` },
+      body: { action: sent ? 'mark_sent' : 'mark_unsent' }
+    })
+  } catch {
+    // Keep optimistic/local state if network fails
+  }
+}
+
+const toggleSent = async (inv: any) => {
+  const next = !isSent(inv)
+  await setSentState(inv, next)
+  showToast(next ? 'Marked as Sent ✓' : 'Marked as Not Sent')
+}
+
+const copyLink = async (inv: any) => {
+  await navigator.clipboard.writeText(inviteUrl(inv))
+  await setSentState(inv, true)
+  showToast('Link copied & marked Sent ✓')
+}
+
+const shareTelegram = async (inv: any) => {
   const url = encodeURIComponent(inviteUrl(inv))
   const text = encodeURIComponent(formatTelegramMessage(inv.guests?.name))
   window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
+  await setSentState(inv, true)
 }
 
 const doAction = async (inv: any, action: string) => {
@@ -226,9 +295,10 @@ const doAction = async (inv: any, action: string) => {
 }
 
 const exportCSV = () => {
-  const rows = [['Guest Name', 'Status', 'RSVP', 'Opened At', 'Token URL']]
+  const rows = [['Guest Name', 'Status', 'Sent At', 'RSVP', 'Opened At', 'Token URL']]
   invitations.value.forEach(i => rows.push([
     i.guests?.name || '', i.status,
+    i.sent_at || localSentMap.value[i.id] || '',
     i.rsvps?.attendance_status || 'pending',
     i.opened_at || '',
     inviteUrl(i)
@@ -242,8 +312,16 @@ onMounted(() => {
   if (import.meta.client) {
     const savedKm = localStorage.getItem(STORAGE_KEY_KM)
     const savedEn = localStorage.getItem(STORAGE_KEY_EN)
+    const savedSentMap = localStorage.getItem(SENT_MAP_STORAGE_KEY)
     if (savedKm !== null) telegramTemplateKm.value = savedKm
     if (savedEn !== null) telegramTemplateEn.value = savedEn
+    if (savedSentMap) {
+      try {
+        localSentMap.value = JSON.parse(savedSentMap)
+      } catch {
+        localSentMap.value = {}
+      }
+    }
   }
   fetch()
 })

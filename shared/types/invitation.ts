@@ -8,6 +8,7 @@ export interface Invitation {
   guest_id: string
   token: string
   status: InvitationStatus
+  sent_at?: string | null
   opened_at: string | null
   created_at?: string
   guest?: Guest
