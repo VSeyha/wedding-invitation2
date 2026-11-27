@@ -214,21 +214,49 @@
     </div>
     </Transition>
 
-    <!-- Fixed Screen Controls (Language Switcher & Scroll-to-Top) -->
+    <!-- Fixed Screen Controls (Music Player, Language Switcher & Scroll-to-Top) -->
     <div
       v-if="!loading && !errorState && (hasOpened || isOpening)"
       class="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] pointer-events-none z-40"
     >
-      <!-- Fixed Top-Right Language Switcher -->
-      <button
-        type="button"
-        @click="toggleLocale"
-        class="pointer-events-auto absolute top-3.5 right-3.5 sm:top-5 sm:right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/60 shadow-md text-xs sm:text-sm font-semibold text-wedding-primary transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer"
-        :title="t('common.language')"
-      >
-        <span class="w-2 h-2 rounded-full bg-wedding-secondary animate-pulse"></span>
-        <span>{{ isKhmer ? 'English' : 'ភាសាខ្មែរ' }}</span>
-      </button>
+      <!-- Top-Right Controls: Music Toggle + Language Switcher -->
+      <div class="pointer-events-auto absolute top-3.5 right-3.5 sm:top-5 sm:right-5 flex items-center gap-2">
+        <!-- Background Wedding Music Toggle -->
+        <button
+          v-if="musicEnabled"
+          type="button"
+          @click="toggleMusic"
+          :aria-label="isMusicPlaying ? 'Pause wedding music' : 'Play wedding music'"
+          :title="isKhmer ? (isMusicPlaying ? 'បិទភ្លេង' : 'បើកភ្លេង') : (isMusicPlaying ? 'Pause music' : 'Play music')"
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/60 shadow-md text-xs font-semibold text-wedding-primary transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          <span v-if="isMusicPlaying" class="flex items-end gap-[2px] h-3 w-3 justify-center">
+            <span class="w-[2px] bg-wedding-secondary rounded-full animate-pulse h-2"></span>
+            <span class="w-[2px] bg-wedding-primary rounded-full animate-pulse h-3" style="animation-delay: 150ms;"></span>
+            <span class="w-[2px] bg-wedding-secondary rounded-full animate-pulse h-1.5" style="animation-delay: 300ms;"></span>
+          </span>
+          <svg v-else class="w-3.5 h-3.5 text-wedding-text/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="18" cy="16" r="3" />
+          </svg>
+          <span class="hidden sm:inline">{{ isKhmer ? (isMusicPlaying ? 'ភ្លេង' : 'បើកភ្លេង') : (isMusicPlaying ? 'Playing' : 'Music') }}</span>
+        </button>
+
+        <!-- Fixed Top-Right Language Switcher -->
+        <button
+          type="button"
+          @click="toggleLocale"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/60 shadow-md text-xs sm:text-sm font-semibold text-wedding-primary transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer"
+          :title="t('common.language')"
+        >
+          <span class="w-2 h-2 rounded-full bg-wedding-secondary animate-pulse"></span>
+          <span>{{ isKhmer ? 'English' : 'ភាសាខ្មែរ' }}</span>
+        </button>
+      </div>
+
+      <!-- Hidden Background Audio Element -->
+      <audio ref="bgAudioRef" :src="musicUrl" loop preload="none" class="hidden"></audio>
 
       <!-- Fixed Bottom-Right Scroll to Top Button -->
       <button
@@ -532,6 +560,7 @@ const onEnvelopeOpening = () => {
   hasOpened.value = true
   nextTick(() => {
     setupScrollReveal()
+    startBackgroundMusic()
   })
 }
 
@@ -540,7 +569,64 @@ const onEnvelopeOpened = () => {
   hasOpened.value = true
   nextTick(() => {
     setupScrollReveal()
+    startBackgroundMusic()
   })
+}
+
+// Background Wedding Music Player state & controls
+const bgAudioRef = ref<HTMLAudioElement | null>(null)
+const isMusicPlaying = ref(false)
+const isMusicMuted = ref(false)
+let wasPlayingBeforeHide = false
+
+const musicEnabled = computed(() => (appearanceConfig.value?.opening_animation_config as any)?.music_enabled !== false)
+const musicUrl = computed(() => (appearanceConfig.value?.opening_animation_config as any)?.music_url || '/audio/wedding-theme.m4a')
+
+const startBackgroundMusic = () => {
+  if (!import.meta.client || !musicEnabled.value || isMusicMuted.value) return
+  const audio = bgAudioRef.value
+  if (!audio || isMusicPlaying.value) return
+
+  audio.volume = 0.35
+  audio.loop = true
+  audio.play()
+    .then(() => {
+      isMusicPlaying.value = true
+    })
+    .catch(() => {
+      // Browser blocked autoplay before user gesture; guest can tap Music button
+      isMusicPlaying.value = false
+    })
+}
+
+const toggleMusic = () => {
+  if (!import.meta.client) return
+  const audio = bgAudioRef.value
+  if (!audio) return
+
+  if (isMusicPlaying.value) {
+    audio.pause()
+    isMusicPlaying.value = false
+    isMusicMuted.value = true
+  } else {
+    isMusicMuted.value = false
+    startBackgroundMusic()
+  }
+}
+
+const handleVisibilityChange = () => {
+  const audio = bgAudioRef.value
+  if (!audio) return
+  if (document.hidden) {
+    wasPlayingBeforeHide = isMusicPlaying.value
+    if (isMusicPlaying.value) {
+      audio.pause()
+      isMusicPlaying.value = false
+    }
+  } else if (wasPlayingBeforeHide && !isMusicMuted.value) {
+    wasPlayingBeforeHide = false
+    startBackgroundMusic()
+  }
 }
 
 const bgImageUrl = computed(() => {
@@ -740,6 +826,7 @@ onMounted(() => {
   if (import.meta.client) {
     window.addEventListener('scroll', handleScroll, { passive: true })
     window.addEventListener('click', onGlobalClick, { passive: true })
+    document.addEventListener('visibilitychange', handleVisibilityChange)
     dampingRafId = requestAnimationFrame(updateSmoothScroll)
   }
 })
@@ -753,6 +840,11 @@ onUnmounted(() => {
     document.body.style.touchAction = ''
     window.removeEventListener('scroll', handleScroll)
     window.removeEventListener('click', onGlobalClick)
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+    if (bgAudioRef.value) {
+      bgAudioRef.value.pause()
+      isMusicPlaying.value = false
+    }
     if (observer) observer.disconnect()
     if (dampingRafId) cancelAnimationFrame(dampingRafId)
   }
