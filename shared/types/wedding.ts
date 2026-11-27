@@ -56,7 +56,8 @@ export interface WeddingSettings {
   our_story?: StoryMilestone[] | null
   gift_info?: WeddingGiftInfo | null
   gallery_config?: GalleryConfig | null
-  telegram_message?: string | null
+  telegram_message_km?: string | null
+  telegram_message_en?: string | null
   created_at?: string
   updated_at?: string
 }

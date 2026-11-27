@@ -53,7 +53,8 @@ export const weddingSettingsUpdateSchema = z.object({
   our_story: z.array(storyMilestoneSchema).optional().nullable(),
   gift_info: weddingGiftInfoSchema.optional().nullable(),
   gallery_config: galleryConfigSchema.optional().nullable(),
-  telegram_message: z.string().max(2000).optional().nullable()
+  telegram_message_km: z.string().max(2000).optional().nullable(),
+  telegram_message_en: z.string().max(2000).optional().nullable()
 })
 
 // ============================================================

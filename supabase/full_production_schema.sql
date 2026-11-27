@@ -55,7 +55,8 @@ create table if not exists public.wedding_settings (
   our_story jsonb default '[]'::jsonb,
   gift_info jsonb default '{"enabled":true,"qr_code_url":"","bank_name":"","account_name_km":"","account_name_en":"","account_number":"","message_km":"","message_en":""}'::jsonb,
   gallery_config jsonb default '{"layout":"grid","columns_mobile":2,"columns_desktop":3,"aspect_ratio":"square","card_style":"gold-frame","gap":"normal","max_display":"all"}'::jsonb,
-  telegram_message text default '',
+  telegram_message_km text default '',
+  telegram_message_en text default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -71,7 +72,9 @@ add column if not exists gift_info jsonb default '{"enabled":true,"qr_code_url":
 alter table public.wedding_settings
 add column if not exists gallery_config jsonb default '{"layout":"grid","columns_mobile":2,"columns_desktop":3,"aspect_ratio":"square","card_style":"gold-frame","gap":"normal","max_display":"all"}'::jsonb;
 alter table public.wedding_settings
-add column if not exists telegram_message text default '';
+add column if not exists telegram_message_km text default '';
+alter table public.wedding_settings
+add column if not exists telegram_message_en text default '';
 -- 2. TABLE: guests
 create table if not exists public.guests (
   id uuid primary key default gen_random_uuid(),

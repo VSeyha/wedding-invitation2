@@ -26,11 +26,14 @@ export default defineEventHandler(async (event) => {
   let result
   let dbPayload: any = { ...payload }
 
-  // Preserve fallback telegram_message inside gallery_config if gallery_config is updated separately
-  if (dbPayload.gallery_config && (existing?.gallery_config as any)?.telegram_message && dbPayload.telegram_message === undefined) {
-    dbPayload.gallery_config = {
-      ...dbPayload.gallery_config,
-      telegram_message: (existing?.gallery_config as any).telegram_message
+  // Preserve fallback telegram messages inside gallery_config if gallery_config is updated separately
+  if (dbPayload.gallery_config) {
+    const existingGc = (existing?.gallery_config as any) || {}
+    if (existingGc.telegram_message_km !== undefined && dbPayload.telegram_message_km === undefined) {
+      dbPayload.gallery_config.telegram_message_km = existingGc.telegram_message_km
+    }
+    if (existingGc.telegram_message_en !== undefined && dbPayload.telegram_message_en === undefined) {
+      dbPayload.gallery_config.telegram_message_en = existingGc.telegram_message_en
     }
   }
 
@@ -42,13 +45,16 @@ export default defineEventHandler(async (event) => {
       .select()
       .single()
 
-    // If telegram_message column does not exist yet in DB, store inside gallery_config JSONB in Supabase
+    // If telegram_message_km / telegram_message_en columns do not exist yet in DB, store inside gallery_config JSONB in Supabase
     if (updateRes.error && updateRes.error.message?.includes('telegram_message')) {
-      const msgValue = dbPayload.telegram_message
-      delete dbPayload.telegram_message
+      const msgKm = dbPayload.telegram_message_km
+      const msgEn = dbPayload.telegram_message_en
+      delete dbPayload.telegram_message_km
+      delete dbPayload.telegram_message_en
       dbPayload.gallery_config = {
         ...(dbPayload.gallery_config || (existing.gallery_config as any) || getStoredGalleryConfig()),
-        telegram_message: msgValue
+        ...(msgKm !== undefined ? { telegram_message_km: msgKm } : {}),
+        ...(msgEn !== undefined ? { telegram_message_en: msgEn } : {})
       }
       updateRes = await supabase
         .from('wedding_settings')
@@ -79,11 +85,14 @@ export default defineEventHandler(async (event) => {
       .single()
 
     if (insertRes.error && insertRes.error.message?.includes('telegram_message')) {
-      const msgValue = dbPayload.telegram_message
-      delete dbPayload.telegram_message
+      const msgKm = dbPayload.telegram_message_km
+      const msgEn = dbPayload.telegram_message_en
+      delete dbPayload.telegram_message_km
+      delete dbPayload.telegram_message_en
       dbPayload.gallery_config = {
         ...(dbPayload.gallery_config || getStoredGalleryConfig()),
-        telegram_message: msgValue
+        ...(msgKm !== undefined ? { telegram_message_km: msgKm } : {}),
+        ...(msgEn !== undefined ? { telegram_message_en: msgEn } : {})
       }
       insertRes = await supabase
         .from('wedding_settings')
@@ -106,13 +115,19 @@ export default defineEventHandler(async (event) => {
   }
 
   const rawGalleryConfig = savedGalleryConfig || result?.gallery_config || getStoredGalleryConfig()
-  const { telegram_message: fallbackTelegramMsg, ...cleanGalleryConfig } = rawGalleryConfig as any
+  const {
+    telegram_message: _legacy,
+    telegram_message_km: fallbackKm,
+    telegram_message_en: fallbackEn,
+    ...cleanGalleryConfig
+  } = rawGalleryConfig as any
 
   return {
     data: {
       ...result,
       gallery_config: cleanGalleryConfig,
-      telegram_message: result?.telegram_message ?? fallbackTelegramMsg ?? payload.telegram_message ?? ''
+      telegram_message_km: result?.telegram_message_km ?? fallbackKm ?? payload.telegram_message_km ?? '',
+      telegram_message_en: result?.telegram_message_en ?? fallbackEn ?? payload.telegram_message_en ?? ''
     }
   }
 })

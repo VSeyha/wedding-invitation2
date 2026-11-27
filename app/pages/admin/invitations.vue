@@ -14,14 +14,33 @@
       </NuxtLink>
     </div>
 
-    <!-- Search & Filter -->
-    <div class="mb-4 flex flex-col sm:flex-row gap-3">
+    <!-- Search, Filter & Share Language -->
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
       <input v-model="search" type="text" placeholder="Search by guest name..." class="input-field max-w-sm" />
       <select v-model="filterStatus" class="input-field max-w-[180px]">
         <option value="">All Statuses</option>
         <option value="active">Active</option>
         <option value="revoked">Revoked</option>
       </select>
+      <div class="flex items-center gap-1.5 sm:ml-auto bg-white px-2.5 py-1.5 rounded-lg border border-[#C9A24A]/30 text-xs">
+        <span class="text-[#3C2925]/70 font-medium">Telegram Msg:</span>
+        <button
+          type="button"
+          @click="shareLang = 'km'"
+          class="px-2 py-0.5 rounded font-semibold transition-colors cursor-pointer"
+          :class="shareLang === 'km' ? 'bg-[#641D2D] text-[#F7F0E3]' : 'text-[#3C2925]/70 hover:bg-[#F7F0E3]'"
+        >
+          ខ្មែរ
+        </button>
+        <button
+          type="button"
+          @click="shareLang = 'en'"
+          class="px-2 py-0.5 rounded font-semibold transition-colors cursor-pointer"
+          :class="shareLang === 'en' ? 'bg-[#641D2D] text-[#F7F0E3]' : 'text-[#3C2925]/70 hover:bg-[#F7F0E3]'"
+        >
+          EN
+        </button>
+      </div>
     </div>
 
     <div class="bg-white rounded-xl border border-[#C9A24A]/20 overflow-hidden shadow-sm">
@@ -121,13 +140,22 @@ const pageSize = ref(15)
 const toast = ref('')
 const submitting = ref(false)
 
-const TELEGRAM_TEMPLATE_STORAGE_KEY = 'wedding_telegram_share_template'
-const DEFAULT_TELEGRAM_TEMPLATE = 'សូមគោរពអញ្ជើញ {guest} ចូលរួមក្នុងពិធីមង្គលការរបស់យើងខ្ញុំ 💐💍 សូមចុចលើតំណភ្ជាប់ខាងក្រោមដើម្បីបើកសំបុត្រអញ្ជើញ៖'
-const telegramTemplate = ref(DEFAULT_TELEGRAM_TEMPLATE)
+const STORAGE_KEY_KM = 'wedding_telegram_share_template_km'
+const STORAGE_KEY_EN = 'wedding_telegram_share_template_en'
+const DEFAULT_KM = 'សូមគោរពអញ្ជើញ {guest} ចូលរួមក្នុងពិធីមង្គលការរបស់យើងខ្ញុំ 💐💍 សូមចុចលើតំណភ្ជាប់ខាងក្រោមដើម្បីបើកសំបុត្រអញ្ជើញ៖'
+const DEFAULT_EN = 'Dear {guest}, we are delighted to invite you to celebrate our wedding day! 💍✨ Please tap the link below to open your personal invitation:'
+
+const shareLang = ref<'km' | 'en'>('km')
+const telegramTemplateKm = ref(DEFAULT_KM)
+const telegramTemplateEn = ref(DEFAULT_EN)
 
 const formatTelegramMessage = (guestName?: string) => {
-  const name = guestName?.trim() || 'ភ្ញៀវកិត្តិយស'
-  return (telegramTemplate.value || DEFAULT_TELEGRAM_TEMPLATE).replaceAll('{guest}', name)
+  const defaultName = shareLang.value === 'km' ? 'ភ្ញៀវកិត្តិយស' : 'Honored Guest'
+  const name = guestName?.trim() || defaultName
+  const tpl = shareLang.value === 'km'
+    ? (telegramTemplateKm.value || DEFAULT_KM)
+    : (telegramTemplateEn.value || DEFAULT_EN)
+  return tpl.replaceAll('{guest}', name)
 }
 
 const filtered = computed(() =>
@@ -161,10 +189,14 @@ const fetch = async () => {
     $fetch<any>(`/api/wedding?t=${Date.now()}`).catch(() => null)
   ])
   invitations.value = invRes?.data || []
-  if (wedRes?.data?.telegram_message) {
-    telegramTemplate.value = wedRes.data.telegram_message
-    if (import.meta.client) {
-      localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, wedRes.data.telegram_message)
+  if (wedRes?.data) {
+    if (wedRes.data.telegram_message_km) {
+      telegramTemplateKm.value = wedRes.data.telegram_message_km
+      if (import.meta.client) localStorage.setItem(STORAGE_KEY_KM, wedRes.data.telegram_message_km)
+    }
+    if (wedRes.data.telegram_message_en) {
+      telegramTemplateEn.value = wedRes.data.telegram_message_en
+      if (import.meta.client) localStorage.setItem(STORAGE_KEY_EN, wedRes.data.telegram_message_en)
     }
   }
   loading.value = false
@@ -204,8 +236,10 @@ const exportCSV = () => {
 
 onMounted(() => {
   if (import.meta.client) {
-    const saved = localStorage.getItem(TELEGRAM_TEMPLATE_STORAGE_KEY)
-    if (saved !== null) telegramTemplate.value = saved
+    const savedKm = localStorage.getItem(STORAGE_KEY_KM)
+    const savedEn = localStorage.getItem(STORAGE_KEY_EN)
+    if (savedKm !== null) telegramTemplateKm.value = savedKm
+    if (savedEn !== null) telegramTemplateEn.value = savedEn
   }
   fetch()
 })

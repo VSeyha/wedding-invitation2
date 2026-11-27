@@ -18,14 +18,19 @@ export default defineEventHandler(async (event) => {
   if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
   const rawGalleryConfig = data?.gallery_config || getStoredGalleryConfig()
-  const { telegram_message: fallbackTelegramMsg, ...cleanGalleryConfig } = rawGalleryConfig as any
-  const telegramMessage = data?.telegram_message || fallbackTelegramMsg || ''
+  const {
+    telegram_message: legacyFallbackMsg,
+    telegram_message_km: fallbackKm,
+    telegram_message_en: fallbackEn,
+    ...cleanGalleryConfig
+  } = rawGalleryConfig as any
 
   return {
     data: {
       ...data,
       gallery_config: cleanGalleryConfig,
-      telegram_message: telegramMessage
+      telegram_message_km: data?.telegram_message_km || fallbackKm || legacyFallbackMsg || '',
+      telegram_message_en: data?.telegram_message_en || fallbackEn || ''
     }
   }
 })
