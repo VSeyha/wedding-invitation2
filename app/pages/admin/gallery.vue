@@ -263,8 +263,20 @@
       <span class="text-xs text-gray-500">Drag or click delete to manage</span>
     </div>
 
-    <!-- Photos Loading State -->
-    <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading gallery...</div>
+    <!-- Photos Loading Skeleton Grid -->
+    <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div
+        v-for="n in 8"
+        :key="`gal-skel-${n}`"
+        class="bg-white rounded-xl border border-[#C9A24A]/20 overflow-hidden shadow-sm"
+      >
+        <div class="aspect-square shimmer-skeleton"></div>
+        <div class="p-2.5 flex items-center justify-between gap-2">
+          <div class="h-3 w-20 rounded shimmer-skeleton"></div>
+          <div class="h-6 w-6 rounded shimmer-skeleton"></div>
+        </div>
+      </div>
+    </div>
     <div v-else-if="!photos.length" class="text-center py-16 text-[#3C2925]/50">
       <div class="mb-2 flex justify-center text-[#C9A24A]/60">
         <Image class="w-12 h-12 stroke-1" />

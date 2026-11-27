@@ -30,7 +30,18 @@
     </div>
 
     <!-- Quick Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div v-if="loadingStats" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      <div
+        v-for="n in 6"
+        :key="`stat-skel-${n}`"
+        class="bg-white p-4 rounded-xl border border-[#C9A24A]/20 shadow-sm space-y-2.5"
+      >
+        <div class="w-8 h-8 rounded-lg shimmer-skeleton"></div>
+        <div class="h-3 w-20 rounded shimmer-skeleton"></div>
+        <div class="h-7 w-12 rounded-md shimmer-skeleton"></div>
+      </div>
+    </div>
+    <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
       <div
         v-for="stat in statCards"
         :key="stat.labelKey"
@@ -164,7 +175,10 @@ const getToken = async () => {
   return data.session?.access_token || ''
 }
 
+const loadingStats = ref(true)
+
 const fetchStats = async () => {
+  loadingStats.value = true
   const token = await getToken()
   try {
     const res = await $fetch<any>('/api/admin/stats', {
@@ -175,6 +189,8 @@ const fetchStats = async () => {
     }
   } catch (err) {
     console.error('Error fetching admin stats:', err)
+  } finally {
+    loadingStats.value = false
   }
 }
 

@@ -11,7 +11,26 @@
       </button>
     </div>
 
-    <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading...</div>
+    <div v-if="loading" class="space-y-3">
+      <div
+        v-for="n in 4"
+        :key="`prog-skel-${n}`"
+        class="bg-white rounded-xl border border-[#C9A24A]/20 p-4 flex items-center justify-between gap-4 shadow-sm"
+      >
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="h-5 w-16 rounded shimmer-skeleton inline-block"></span>
+            <span class="h-4 w-8 rounded shimmer-skeleton inline-block"></span>
+          </div>
+          <div class="h-4 w-48 rounded shimmer-skeleton"></div>
+          <div class="h-3 w-64 rounded shimmer-skeleton"></div>
+        </div>
+        <div class="flex gap-2">
+          <span class="w-8 h-8 rounded-lg shimmer-skeleton inline-block"></span>
+          <span class="w-8 h-8 rounded-lg shimmer-skeleton inline-block"></span>
+        </div>
+      </div>
+    </div>
     <div v-else class="space-y-3">
       <div
         v-for="item in sorted"

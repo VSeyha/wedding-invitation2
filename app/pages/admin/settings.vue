@@ -11,7 +11,21 @@
       </button>
     </div>
 
-    <div v-if="loading" class="text-center py-8 text-[#3C2925]/50">Loading settings...</div>
+    <div v-if="loading" class="space-y-6">
+      <div
+        v-for="n in 3"
+        :key="`set-skel-${n}`"
+        class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm space-y-4"
+      >
+        <div class="h-4 w-40 rounded shimmer-skeleton"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="h-10 rounded-lg shimmer-skeleton"></div>
+          <div class="h-10 rounded-lg shimmer-skeleton"></div>
+          <div class="h-10 rounded-lg shimmer-skeleton"></div>
+          <div class="h-10 rounded-lg shimmer-skeleton"></div>
+        </div>
+      </div>
+    </div>
     <form v-else @submit.prevent="save" class="space-y-6 max-w-3xl">
       <!-- Couple Names & Portraits -->
       <section class="bg-white rounded-xl border border-[#C9A24A]/20 p-5 shadow-sm">

@@ -55,7 +55,9 @@
                 + Insert &#123;guest&#125;
               </button>
             </div>
+            <div v-if="loading" class="h-24 rounded-lg shimmer-skeleton"></div>
             <textarea
+              v-else
               ref="kmTextareaRef"
               v-model="templateKm"
               rows="4"
@@ -78,7 +80,9 @@
                 + Insert &#123;guest&#125;
               </button>
             </div>
+            <div v-if="loading" class="h-24 rounded-lg shimmer-skeleton"></div>
             <textarea
+              v-else
               ref="enTextareaRef"
               v-model="templateEn"
               rows="4"

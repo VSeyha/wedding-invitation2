@@ -14,19 +14,23 @@
     <!-- Summary Cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-xl border border-[#C9A24A]/20 p-4 text-center">
-        <div class="text-2xl font-bold text-[#641D2D]">{{ stats.total }}</div>
+        <div v-if="loading" class="h-8 w-12 mx-auto rounded-lg shimmer-skeleton"></div>
+        <div v-else class="text-2xl font-bold text-[#641D2D]">{{ stats.total }}</div>
         <div class="text-xs text-[#3C2925]/60 mt-1">Total Guests</div>
       </div>
       <div class="bg-green-50 rounded-xl border border-green-200 p-4 text-center">
-        <div class="text-2xl font-bold text-green-700">{{ stats.attending }}</div>
+        <div v-if="loading" class="h-8 w-12 mx-auto rounded-lg shimmer-skeleton"></div>
+        <div v-else class="text-2xl font-bold text-green-700">{{ stats.attending }}</div>
         <div class="text-xs text-green-700/80 mt-1">Attending</div>
       </div>
       <div class="bg-red-50 rounded-xl border border-red-200 p-4 text-center">
-        <div class="text-2xl font-bold text-red-700">{{ stats.not_attending }}</div>
+        <div v-if="loading" class="h-8 w-12 mx-auto rounded-lg shimmer-skeleton"></div>
+        <div v-else class="text-2xl font-bold text-red-700">{{ stats.not_attending }}</div>
         <div class="text-xs text-red-700/80 mt-1">Declined</div>
       </div>
       <div class="bg-amber-50 rounded-xl border border-amber-200 p-4 text-center">
-        <div class="text-2xl font-bold text-amber-700">{{ stats.pending }}</div>
+        <div v-if="loading" class="h-8 w-12 mx-auto rounded-lg shimmer-skeleton"></div>
+        <div v-else class="text-2xl font-bold text-amber-700">{{ stats.pending }}</div>
         <div class="text-xs text-amber-700/80 mt-1">Pending</div>
       </div>
     </div>
@@ -53,7 +57,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-if="loading"><td colspan="3" class="px-4 py-8 text-center text-[#3C2925]/50">Loading...</td></tr>
+            <AdminTableSkeleton
+              v-if="loading"
+              :rows="6"
+              :columns="['text', 'pill', 'muted']"
+            />
             <tr v-else-if="!filtered.length"><td colspan="3" class="px-4 py-8 text-center text-[#3C2925]/50">No responses found.</td></tr>
             <tr v-for="row in paginatedRsvps" :key="row.id || row.guest_name" class="border-b border-[#C9A24A]/10 hover:bg-[#F7F0E3]/50">
               <td class="px-4 py-3 font-medium text-[#3C2925]">{{ row.guest_name }}</td>

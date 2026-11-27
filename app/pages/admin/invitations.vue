@@ -57,7 +57,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-if="loading"><td colspan="6" class="px-4 py-8 text-center text-[#3C2925]/50">Loading...</td></tr>
+            <AdminTableSkeleton
+              v-if="loading"
+              :rows="6"
+              :columns="['text', 'pill', 'pill', 'muted', 'muted', 'actions']"
+            />
             <tr v-else-if="!filtered.length"><td colspan="6" class="px-4 py-8 text-center text-[#3C2925]/50">No invitations found.</td></tr>
             <tr
               v-for="inv in paginatedInvitations"
