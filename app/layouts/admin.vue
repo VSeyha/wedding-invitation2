@@ -8,7 +8,7 @@
         </div>
         <div>
           <h1 class="font-bold text-xs leading-tight tracking-wide text-[#E5C77A]">{{ t('admin.title') }}</h1>
-          <p class="text-[10px] text-[#F7F0E3]/70 font-mono truncate max-w-[150px]">Vet Seyha & Sar Nary</p>
+          <p class="text-[10px] text-[#F7F0E3]/70 font-mono truncate max-w-[150px]">{{ coupleLabel }}</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -72,7 +72,7 @@
               <h2 class="font-bold text-sm leading-tight text-[#E5C77A] truncate font-khmer-heading">
                 {{ t('admin.title') }}
               </h2>
-              <p class="text-[11px] text-[#F7F0E3]/70 truncate font-mono">Vet Seyha & Sar Nary</p>
+              <p class="text-[11px] text-[#F7F0E3]/70 truncate font-mono">{{ coupleLabel }}</p>
             </div>
           </div>
 
@@ -247,6 +247,20 @@ const supabase = useSupabase()
 const mobileDrawerOpen = ref(false)
 const isCollapsed = ref(false)
 const liveInviteUrl = '/invite/b1d98750-a2b9-4a76-8715-85c0c3ad864d'
+const coupleLabel = ref('Vet Seyha & Sar Nary')
+
+onMounted(async () => {
+  try {
+    const res = await $fetch<any>(`/api/wedding?t=${Date.now()}`)
+    const groom = res?.groom_name_en || res?.groom_name_km
+    const bride = res?.bride_name_en || res?.bride_name_km
+    if (groom && bride) {
+      coupleLabel.value = `${groom} & ${bride}`
+    }
+  } catch {
+    // Keep fallback couple label if wedding settings fail to load
+  }
+})
 
 // Helper to determine active route
 const isActive = (path: string) => {

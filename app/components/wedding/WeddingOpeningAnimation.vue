@@ -369,7 +369,7 @@
             <div class="my-1 text-center space-y-0.5 text-[#3C2925]/85">
               <div class="text-[10px] sm:text-[11px] font-bold text-wedding-primary font-khmer-heading leading-relaxed">
                 {{ isKhmer ? formatKhmerDate(wedding?.wedding_date) : formatEnglishDate(wedding?.wedding_date) }}
-                <span class="font-normal text-[9px] text-wedding-secondary ml-1">វេលាម៉ោង ៥:០០ ល្ងាច</span>
+                <span class="font-normal text-[9px] text-wedding-secondary ml-1">{{ isKhmer ? formatKhmerTime(wedding?.wedding_date) : formatEnglishTime(wedding?.wedding_date) }}</span>
               </div>
               <div class="text-[9px] sm:text-[10px] font-khmer-body text-wedding-text/80 leading-normal max-w-[270px] mx-auto truncate">
                 នៅ {{ wedding?.venue_name_km || 'The Premier Centre Sen Sok (អគារ F)' }}
@@ -576,7 +576,7 @@
         <div class="my-1 text-center space-y-0.5 text-[#3C2925]/85">
           <div class="text-[11px] sm:text-xs font-bold text-wedding-primary font-khmer-heading leading-relaxed">
             {{ isKhmer ? formatKhmerDate(wedding?.wedding_date) : formatEnglishDate(wedding?.wedding_date) }}
-            <span class="font-normal text-[10px] text-wedding-secondary ml-1">វេលាម៉ោង ៥:០០ ល្ងាច</span>
+            <span class="font-normal text-[10px] text-wedding-secondary ml-1">{{ isKhmer ? formatKhmerTime(wedding?.wedding_date) : formatEnglishTime(wedding?.wedding_date) }}</span>
           </div>
           <div class="text-[10px] sm:text-[11px] font-khmer-body text-wedding-text/80 leading-normal max-w-[290px] mx-auto truncate">
             នៅ {{ wedding?.venue_name_km || 'The Premier Centre Sen Sok (អគារ F)' }}
@@ -873,7 +873,7 @@ import LotusFlower from './LotusFlower.vue'
 import KhmerKbach from './KhmerKbach.vue'
 import type { WeddingSettings } from '~~/shared/types/wedding'
 import type { OpeningAnimationStyle } from '~~/shared/types/appearance'
-import { formatKhmerDate, formatEnglishDate } from '~~/app/utils/date'
+import { formatKhmerDate, formatEnglishDate, formatKhmerTime, formatEnglishTime } from '~~/app/utils/date'
 
 const props = defineProps<{
   guestName?: string

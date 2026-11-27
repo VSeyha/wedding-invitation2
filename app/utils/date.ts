@@ -74,3 +74,37 @@ export function formatEnglishDate(dateInput: string | Date | null | undefined): 
 export function formatWeddingDate(dateInput: string | Date | null | undefined, isKhmer = true): string {
   return isKhmer ? formatKhmerDate(dateInput) : formatEnglishDate(dateInput)
 }
+
+/**
+ * Format a date/ISO string into Khmer ceremony time
+ * e.g., "វេលាម៉ោង ៥:០០ ល្ងាច"
+ */
+export function formatKhmerTime(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return 'វេលាម៉ោង ៥:០០ ល្ងាច'
+  const d = new Date(dateInput)
+  if (Number.isNaN(d.getTime())) return 'វេលាម៉ោង ៥:០០ ល្ងាច'
+
+  const hours = d.getHours()
+  const minutes = d.getMinutes()
+  const period = hours < 12 ? 'ព្រឹក' : hours < 17 ? 'រសៀល' : hours < 20 ? 'ល្ងាច' : 'យប់'
+  const h12 = hours % 12 || 12
+  const mm = String(minutes).padStart(2, '0')
+
+  return `វេលាម៉ោង ${toKhmerDigits(h12)}:${toKhmerDigits(mm)} ${period}`
+}
+
+/**
+ * Format a date/ISO string into English ceremony time
+ * e.g., "at 5:00 PM"
+ */
+export function formatEnglishTime(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return 'at 5:00 PM'
+  const d = new Date(dateInput)
+  if (Number.isNaN(d.getTime())) return 'at 5:00 PM'
+
+  return 'at ' + d.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })
+}
