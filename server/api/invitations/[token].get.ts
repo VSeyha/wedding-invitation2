@@ -11,8 +11,17 @@ export default defineEventHandler(async (event) => {
 
   const invitation = await validateInvitationToken(token)
 
-  // Mark as opened (async, non-blocking)
-  markInvitationOpened(invitation.id).catch(() => {})
+  // Skip marking as opened for SSR metadata prefetches or social link-preview bots (Telegram, Facebook, etc.)
+  const query = getQuery(event)
+  const userAgent = getHeader(event, 'user-agent') || ''
+  const isPreviewOrBot =
+    query.preview === '1' ||
+    /TelegramBot|facebookexternalhit|WhatsApp|Twitterbot|Slackbot|LinkedInBot|Discordbot|Googlebot|bingbot/i.test(userAgent)
+
+  if (!isPreviewOrBot) {
+    // Mark as opened (async, non-blocking)
+    markInvitationOpened(invitation.id).catch(() => {})
+  }
 
   // Return safe public data only
   return {

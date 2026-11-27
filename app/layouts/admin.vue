@@ -252,8 +252,9 @@ const coupleLabel = ref('Vet Seyha & Sar Nary')
 onMounted(async () => {
   try {
     const res = await $fetch<any>(`/api/wedding?t=${Date.now()}`)
-    const groom = res?.groom_name_en || res?.groom_name_km
-    const bride = res?.bride_name_en || res?.bride_name_km
+    const data = res?.data || res
+    const groom = data?.groom_name_en || data?.groom_name_km
+    const bride = data?.bride_name_en || data?.bride_name_km
     if (groom && bride) {
       coupleLabel.value = `${groom} & ${bride}`
     }

@@ -286,7 +286,7 @@ const WeddingGallery = defineAsyncComponent(() => import('~~/app/components/wedd
 const WeddingGift = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingGift.vue'))
 const WeddingRSVP = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingRSVP.vue'))
 
-import { formatKhmerDate, formatEnglishDate } from '~~/app/utils/date'
+import { formatKhmerDate, formatEnglishDate, formatKhmerTime } from '~~/app/utils/date'
 import { PRESET_BACKGROUNDS } from '~~/shared/types/appearance'
 
 import type { WeddingSettings } from '~~/shared/types/wedding'
@@ -295,6 +295,8 @@ import type { PublicInvitationData } from '~~/shared/types/invitation'
 import type { WeddingAppearance } from '~~/shared/types/appearance'
 
 const route = useRoute()
+const runtimeConfig = useRuntimeConfig()
+const requestUrl = useRequestURL()
 const { isKhmer, toggleLocale, t } = useLocale()
 const { applyThemeColors } = useWeddingAppearance()
 
@@ -305,11 +307,89 @@ const errorState = ref<number | null>(null)
 const isOpening = ref(false)
 const hasOpened = ref(false)
 
-const invitation = ref<PublicInvitationData | null>(null)
-const wedding = ref<WeddingSettings | null>(null)
+// SSR-friendly prefetch so Telegram / Facebook / Messenger link previews receive dynamic guest & wedding metadata
+const { data: ssrMetaData } = await useAsyncData(
+  () => `invite-meta-${token.value}`,
+  async () => {
+    if (!token.value) return { invitation: null, wedding: null }
+    const [invRes, wedRes] = await Promise.all([
+      $fetch<any>(`/api/invitations/${token.value}?preview=1`).catch(() => null),
+      $fetch<any>('/api/wedding').catch(() => null)
+    ])
+    return {
+      invitation: invRes?.data || null,
+      wedding: wedRes?.data || null
+    }
+  }
+)
+
+const invitation = ref<PublicInvitationData | null>(ssrMetaData.value?.invitation || null)
+const wedding = ref<WeddingSettings | null>(ssrMetaData.value?.wedding || null)
 const programmes = ref<ProgrammeType[]>([])
 const photos = ref<WeddingPhoto[]>([])
 const appearanceConfig = ref<WeddingAppearance | null>(null)
+
+const siteOrigin = computed(() => {
+  const configured = ((runtimeConfig.public.siteUrl as string) || '').replace(/\/+$/, '')
+  if (configured && !configured.includes('localhost')) return configured
+  return requestUrl.origin || configured || ''
+})
+
+const seoCoupleEn = computed(() => {
+  const w = wedding.value || ssrMetaData.value?.wedding
+  if (w?.groom_name_en && w?.bride_name_en) return `${w.groom_name_en} & ${w.bride_name_en}`
+  return 'Vet Seyha & Sar Nary'
+})
+
+const seoCoupleKm = computed(() => {
+  const w = wedding.value || ssrMetaData.value?.wedding
+  if (w?.groom_name_km && w?.bride_name_km) return `${w.groom_name_km} & ${w.bride_name_km}`
+  return 'វ៉េត សីហា & ស ណារី'
+})
+
+const seoGuestName = computed(() => invitation.value?.guest_name || ssrMetaData.value?.invitation?.guest_name || '')
+
+const seoTitle = computed(() => {
+  if (seoGuestName.value) {
+    return `សូមគោរពអញ្ជើញ ${seoGuestName.value} | ${seoCoupleEn.value}`
+  }
+  return `សិរីមង្គលអាពាហ៍ពិពាហ៍ — ${seoCoupleEn.value}`
+})
+
+const seoDescription = computed(() => {
+  const w = wedding.value || ssrMetaData.value?.wedding
+  const guest = seoGuestName.value || 'ភ្ញៀវកិត្តិយស'
+  const dateKm = formatKhmerDate(w?.wedding_date)
+  const timeKm = formatKhmerTime(w?.wedding_date)
+  const venue = w?.venue_name_km || w?.venue_name_en || 'The Premier Centre Sen Sok'
+  return `សូមគោរពអញ្ជើញ ${guest} ចូលរួមក្នុងពិធីមង្គលការរបស់ ${seoCoupleKm.value} (${seoCoupleEn.value}) នា${dateKm} ${timeKm} នៅ ${venue}។`
+})
+
+const seoImage = computed(() => {
+  const w = wedding.value || ssrMetaData.value?.wedding
+  const raw = w?.groom_photo_url || w?.bride_photo_url || '/images/backgrounds/royal-floral-arch.jpg'
+  if (/^https?:\/\//i.test(raw)) return raw
+  return siteOrigin.value ? `${siteOrigin.value}${raw.startsWith('/') ? '' : '/'}${raw}` : raw
+})
+
+const seoUrl = computed(() => {
+  return siteOrigin.value ? `${siteOrigin.value}/invite/${token.value}` : `/invite/${token.value}`
+})
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogType: 'website',
+  ogSiteName: 'Khmer Wedding Invitation',
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogImage: seoImage,
+  ogUrl: seoUrl,
+  twitterCard: 'summary_large_image',
+  twitterTitle: seoTitle,
+  twitterDescription: seoDescription,
+  twitterImage: seoImage
+})
 
 // Apply theme CSS variables directly to :root
 watch(
