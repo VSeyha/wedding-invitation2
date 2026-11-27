@@ -125,11 +125,9 @@ const TELEGRAM_TEMPLATE_STORAGE_KEY = 'wedding_telegram_share_template'
 const DEFAULT_TELEGRAM_TEMPLATE = 'សូមគោរពអញ្ជើញ {guest} ចូលរួមក្នុងពិធីមង្គលការរបស់យើងខ្ញុំ 💐💍 សូមចុចលើតំណភ្ជាប់ខាងក្រោមដើម្បីបើកសំបុត្រអញ្ជើញ៖'
 const telegramTemplate = ref(DEFAULT_TELEGRAM_TEMPLATE)
 
-const formatTelegramMessage = (guestName?: string, url?: string) => {
+const formatTelegramMessage = (guestName?: string) => {
   const name = guestName?.trim() || 'ភ្ញៀវកិត្តិយស'
-  return (telegramTemplate.value || DEFAULT_TELEGRAM_TEMPLATE)
-    .replaceAll('{guest}', name)
-    .replaceAll('{link}', url || '')
+  return (telegramTemplate.value || DEFAULT_TELEGRAM_TEMPLATE).replaceAll('{guest}', name)
 }
 
 const filtered = computed(() =>
@@ -177,9 +175,8 @@ const inviteUrl = (inv: any) => `${siteUrl}/invite/${inv.token}`
 
 const copyLink = async (inv: any) => { await navigator.clipboard.writeText(inviteUrl(inv)); showToast('Link copied!') }
 const shareTelegram = (inv: any) => {
-  const rawUrl = inviteUrl(inv)
-  const url = encodeURIComponent(rawUrl)
-  const text = encodeURIComponent(formatTelegramMessage(inv.guests?.name, rawUrl))
+  const url = encodeURIComponent(inviteUrl(inv))
+  const text = encodeURIComponent(formatTelegramMessage(inv.guests?.name))
   window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
 }
 

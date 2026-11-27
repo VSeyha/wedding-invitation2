@@ -42,6 +42,7 @@
           </p>
 
           <textarea
+            ref="templateTextareaRef"
             v-model="template"
             rows="5"
             class="input-field font-khmer-body leading-relaxed"
@@ -53,17 +54,10 @@
             <div class="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                @click="insertPlaceholder('{guest}')"
+                @click="insertGuestPlaceholder"
                 class="px-3 py-1.5 rounded-lg border border-[#C9A24A]/40 text-xs font-medium text-[#641D2D] hover:bg-[#F7F0E3] transition-colors cursor-pointer"
               >
                 + Insert &#123;guest&#125;
-              </button>
-              <button
-                type="button"
-                @click="insertPlaceholder('{link}')"
-                class="px-3 py-1.5 rounded-lg border border-[#C9A24A]/40 text-xs font-medium text-[#641D2D] hover:bg-[#F7F0E3] transition-colors cursor-pointer"
-              >
-                + Insert &#123;link&#125;
               </button>
             </div>
 
@@ -176,6 +170,7 @@ const presets = [
   }
 ]
 
+const templateTextareaRef = ref<HTMLTextAreaElement | null>(null)
 const template = ref(DEFAULT_TELEGRAM_TEMPLATE)
 const sampleGuest = ref('លោក សុខា')
 const sampleLink = `${siteUrl}/invite/sample-invitation`
@@ -194,17 +189,30 @@ const showToast = (msg: string) => {
   setTimeout(() => { toast.value = '' }, 3000)
 }
 
-const formatMessage = (guestName: string, url: string) => {
+const formatMessage = (guestName: string) => {
   const name = guestName?.trim() || 'ភ្ញៀវកិត្តិយស'
-  return (template.value || DEFAULT_TELEGRAM_TEMPLATE)
-    .replaceAll('{guest}', name)
-    .replaceAll('{link}', url)
+  return (template.value || DEFAULT_TELEGRAM_TEMPLATE).replaceAll('{guest}', name)
 }
 
-const renderedPreview = computed(() => formatMessage(sampleGuest.value, sampleLink))
+const renderedPreview = computed(() => formatMessage(sampleGuest.value))
 
-const insertPlaceholder = (token: string) => {
-  template.value = template.value ? `${template.value} ${token}` : token
+const insertGuestPlaceholder = () => {
+  const el = templateTextareaRef.value
+  const token = '{guest}'
+  if (!el) {
+    template.value = template.value ? `${template.value} ${token}` : token
+    return
+  }
+  const start = el.selectionStart ?? template.value.length
+  const end = el.selectionEnd ?? template.value.length
+  const before = template.value.slice(0, start)
+  const after = template.value.slice(end)
+  template.value = `${before}${token}${after}`
+  nextTick(() => {
+    el.focus()
+    const cursor = start + token.length
+    el.setSelectionRange(cursor, cursor)
+  })
 }
 
 const applyPreset = (text: string) => {
@@ -240,7 +248,7 @@ const resetTemplate = async () => {
 
 const testShareTelegram = () => {
   const url = encodeURIComponent(sampleLink)
-  const text = encodeURIComponent(formatMessage(sampleGuest.value, sampleLink))
+  const text = encodeURIComponent(formatMessage(sampleGuest.value))
   window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
 }
 
