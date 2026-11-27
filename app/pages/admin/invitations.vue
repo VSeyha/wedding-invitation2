@@ -1,8 +1,70 @@
 <template>
   <div>
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.invitations') }}</h1>
-      <p class="text-sm text-[#3C2925]/60 mt-1">View, share, revoke and regenerate invitation links.</p>
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold text-[#641D2D] font-en-heading">{{ t('admin.invitations') }}</h1>
+        <p class="text-sm text-[#3C2925]/60 mt-1">View, share via Telegram, revoke and regenerate invitation links.</p>
+      </div>
+      <button
+        type="button"
+        @click="showTelegramConfig = !showTelegramConfig"
+        class="btn-secondary text-xs inline-flex items-center gap-1.5 self-start cursor-pointer"
+      >
+        <Send class="w-3.5 h-3.5 text-sky-600" />
+        <span>{{ showTelegramConfig ? 'Hide Telegram Message' : 'Customize Telegram Message' }}</span>
+      </button>
+    </div>
+
+    <!-- Telegram Message Configuration Card -->
+    <div v-if="showTelegramConfig" class="mb-6 bg-white rounded-xl border border-[#C9A24A]/30 p-5 shadow-sm">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <div>
+          <h2 class="text-sm font-bold uppercase tracking-wider text-[#641D2D] flex items-center gap-2">
+            <Send class="w-4 h-4 text-sky-600" />
+            <span>Telegram Share Message</span>
+          </h2>
+          <p class="text-xs text-[#3C2925]/60 mt-0.5">
+            Customize the invitation message sent when sharing via Telegram. Use <code class="px-1 py-0.5 rounded bg-[#F7F0E3] text-[#641D2D] font-mono">{guest}</code> for the guest's name.
+          </p>
+        </div>
+        <button
+          type="button"
+          @click="resetTelegramTemplate"
+          class="text-xs text-[#641D2D] hover:underline font-medium cursor-pointer flex-shrink-0"
+        >
+          Reset Default
+        </button>
+      </div>
+
+      <textarea
+        v-model="telegramTemplate"
+        rows="3"
+        class="input-field font-khmer-body"
+        placeholder="Enter custom Telegram invitation message..."
+      />
+
+      <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="text-xs text-[#3C2925]/70 bg-[#F7F0E3]/60 border border-[#C9A24A]/20 rounded-lg px-3 py-2 flex-1 font-khmer-body">
+          <span class="font-bold text-[#641D2D] mr-1">Preview:</span>
+          <span>{{ previewTelegramMessage }}</span>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button
+            type="button"
+            @click="insertGuestPlaceholder"
+            class="px-3 py-2 rounded-lg border border-[#C9A24A]/40 text-xs font-medium text-[#641D2D] hover:bg-[#F7F0E3] transition-colors cursor-pointer"
+          >
+            + Insert {guest}
+          </button>
+          <button
+            type="button"
+            @click="saveTelegramTemplate"
+            class="px-4 py-2 rounded-lg bg-[#641D2D] text-[#F7F0E3] text-xs font-medium hover:bg-[#641D2D]/90 transition-colors cursor-pointer"
+          >
+            Save Message
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Search & Filter -->
@@ -56,10 +118,7 @@
                   <button @click="copyLink(inv)" title="Copy link" class="btn-icon text-neutral-600 hover:text-[#641D2D]" :disabled="inv.status === 'revoked'">
                     <Copy class="w-4 h-4" />
                   </button>
-                  <button @click="shareWhatsApp(inv)" title="WhatsApp" class="btn-icon text-emerald-600 hover:text-emerald-700" :disabled="inv.status === 'revoked'">
-                    <Smartphone class="w-4 h-4" />
-                  </button>
-                  <button @click="shareTelegram(inv)" title="Telegram" class="btn-icon text-sky-600 hover:text-sky-700" :disabled="inv.status === 'revoked'">
+                  <button @click="shareTelegram(inv)" title="Share via Telegram" class="btn-icon text-sky-600 hover:text-sky-700" :disabled="inv.status === 'revoked'">
                     <Send class="w-4 h-4" />
                   </button>
                   <button @click="doAction(inv, inv.status === 'revoked' ? 'activate' : 'revoke')" class="btn-icon" :title="inv.status === 'revoked' ? 'Activate' : 'Revoke'">
@@ -98,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { Copy, Smartphone, Send, CheckCircle2, Ban, RefreshCw, Download } from 'lucide-vue-next'
+import { Copy, Send, CheckCircle2, Ban, RefreshCw, Download } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 const { t } = useLocale()
@@ -114,6 +173,37 @@ const currentPage = ref(1)
 const pageSize = ref(15)
 const toast = ref('')
 const submitting = ref(false)
+
+const TELEGRAM_TEMPLATE_STORAGE_KEY = 'wedding_telegram_share_template'
+const DEFAULT_TELEGRAM_TEMPLATE = 'សូមគោរពអញ្ជើញ {guest} ចូលរួមក្នុងពិធីមង្គលការរបស់យើងខ្ញុំ 💐💍 សូមចុចលើតំណភ្ជាប់ខាងក្រោមដើម្បីបើកសំបុត្រអញ្ជើញ៖'
+const showTelegramConfig = ref(false)
+const telegramTemplate = ref(DEFAULT_TELEGRAM_TEMPLATE)
+
+const formatTelegramMessage = (guestName?: string) => {
+  const name = guestName?.trim() || 'ភ្ញៀវកិត្តិយស'
+  return (telegramTemplate.value || DEFAULT_TELEGRAM_TEMPLATE).replaceAll('{guest}', name)
+}
+
+const previewTelegramMessage = computed(() => formatTelegramMessage('លោក សុខា'))
+
+const insertGuestPlaceholder = () => {
+  telegramTemplate.value = telegramTemplate.value ? `${telegramTemplate.value} {guest}` : '{guest}'
+}
+
+const saveTelegramTemplate = () => {
+  if (import.meta.client) {
+    localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, telegramTemplate.value)
+  }
+  showToast('Telegram message template saved!')
+}
+
+const resetTelegramTemplate = () => {
+  telegramTemplate.value = DEFAULT_TELEGRAM_TEMPLATE
+  if (import.meta.client) {
+    localStorage.setItem(TELEGRAM_TEMPLATE_STORAGE_KEY, DEFAULT_TELEGRAM_TEMPLATE)
+  }
+  showToast('Restored default Telegram message.')
+}
 
 const filtered = computed(() =>
   invitations.value.filter(i => {
@@ -150,8 +240,11 @@ const showToast = (msg: string) => { toast.value = msg; setTimeout(() => { toast
 const inviteUrl = (inv: any) => `${siteUrl}/invite/${inv.token}`
 
 const copyLink = async (inv: any) => { await navigator.clipboard.writeText(inviteUrl(inv)); showToast('Link copied!') }
-const shareWhatsApp = (inv: any) => window.open(`https://wa.me/?text=${encodeURIComponent(inviteUrl(inv))}`, '_blank')
-const shareTelegram = (inv: any) => window.open(`https://t.me/share/url?url=${encodeURIComponent(inviteUrl(inv))}`, '_blank')
+const shareTelegram = (inv: any) => {
+  const url = encodeURIComponent(inviteUrl(inv))
+  const text = encodeURIComponent(formatTelegramMessage(inv.guests?.name))
+  window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank')
+}
 
 const doAction = async (inv: any, action: string) => {
   const token = await getToken()
@@ -175,7 +268,13 @@ const exportCSV = () => {
   a.download = 'invitations.csv'; a.click()
 }
 
-onMounted(fetch)
+onMounted(() => {
+  if (import.meta.client) {
+    const saved = localStorage.getItem(TELEGRAM_TEMPLATE_STORAGE_KEY)
+    if (saved !== null) telegramTemplate.value = saved
+  }
+  fetch()
+})
 </script>
 
 <style scoped>

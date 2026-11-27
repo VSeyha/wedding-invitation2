@@ -54,7 +54,7 @@
           <Users class="w-6 h-6" />
         </div>
         <h3 class="font-bold text-sm text-[#641D2D]">Manage Guests</h3>
-        <p class="text-xs text-[#3C2925]/70 mt-1">Add guest names and copy invitation links for sharing on Telegram/WhatsApp.</p>
+        <p class="text-xs text-[#3C2925]/70 mt-1">Add guest names and copy invitation links for sharing on Telegram.</p>
       </NuxtLink>
 
       <NuxtLink
