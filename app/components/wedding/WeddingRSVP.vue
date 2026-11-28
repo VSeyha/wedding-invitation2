@@ -12,7 +12,7 @@
     </div>
 
     <!-- RSVP Card Box -->
-    <div class="khmer-card rounded-3xl p-6 sm:p-8 border-2 border-wedding-secondary/50 shadow-gold-glow text-center interactive-card">
+    <div class="khmer-card rounded-3xl p-6 sm:p-8 border-2 border-wedding-secondary/50 shadow-gold-glow text-center">
       <!-- Guest Name Heading -->
       <div class="mb-6 pb-4 border-b border-wedding-secondary/30">
         <span class="text-xs uppercase tracking-wider text-wedding-secondary font-bold">
@@ -41,15 +41,15 @@
       </div>
 
       <!-- Action Choice Buttons -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 relative z-10">
         <button
           type="button"
           @click="submitRSVP('attending')"
           :disabled="submitting"
-          class="py-3 px-4 rounded-2xl border-2 transition-all duration-300 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 interactive-btn cursor-pointer"
+          class="relative z-10 py-3 px-4 rounded-2xl border-2 transition-all duration-300 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 interactive-btn cursor-pointer opacity-100"
           :class="currentStatus === 'attending'
             ? 'bg-wedding-primary text-wedding-bg border-wedding-primary shadow-md font-bold'
-            : 'bg-white/80 hover:bg-wedding-primary/10 border-wedding-secondary/50 text-wedding-heading'"
+            : 'bg-white hover:bg-wedding-primary/10 border-wedding-secondary/50 text-wedding-heading'"
         >
           <span>🎉</span>
           <span>{{ t('rsvp.attending') }}</span>
@@ -59,10 +59,10 @@
           type="button"
           @click="submitRSVP('not_attending')"
           :disabled="submitting"
-          class="py-3 px-4 rounded-2xl border-2 transition-all duration-300 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 interactive-btn cursor-pointer"
+          class="relative z-10 py-3 px-4 rounded-2xl border-2 transition-all duration-300 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 interactive-btn cursor-pointer opacity-100"
           :class="currentStatus === 'not_attending'
             ? 'bg-[#3C2925] text-[#F7F0E3] border-[#3C2925] shadow-md font-bold'
-            : 'bg-white/80 hover:bg-gray-100 border-gray-300 text-gray-700'"
+            : 'bg-white hover:bg-gray-100 border-gray-300 text-gray-700'"
         >
           <span>🙏</span>
           <span>{{ t('rsvp.not_attending') }}</span>

@@ -149,7 +149,6 @@
   /* Interactive luxury card hover & active click feedback */
   .interactive-card {
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-    will-change: transform, box-shadow;
   }
   .interactive-card:hover {
     transform: translateY(-5px);
@@ -166,32 +165,33 @@
     position: relative;
     overflow: hidden;
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
-    will-change: transform;
   }
-  .interactive-btn:hover {
-    transform: translateY(-2px) scale(1.025);
-    box-shadow: 0 8px 24px -4px rgba(201, 162, 74, 0.4);
-    filter: brightness(1.03);
+  @media (hover: hover) {
+    .interactive-btn:hover {
+      transform: translateY(-2px) scale(1.025);
+      box-shadow: 0 8px 24px -4px rgba(201, 162, 74, 0.4);
+      filter: brightness(1.03);
+    }
+    .interactive-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.75s ease;
+      pointer-events: none;
+    }
+    .interactive-btn:hover::after {
+      left: 140%;
+    }
   }
   .interactive-btn:active {
     transform: translateY(1px) scale(0.96);
     filter: brightness(0.96);
     transition-duration: 0.08s;
-  }
-  .interactive-btn::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.75s ease;
-    pointer-events: none;
-  }
-  .interactive-btn:hover::after {
-    left: 140%;
   }
 
   /* Gentle floating keyframe for royal motifs */

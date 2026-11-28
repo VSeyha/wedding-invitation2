@@ -301,6 +301,7 @@ definePageMeta({
 import WeddingCanvasBackground from '~~/app/components/wedding/WeddingCanvasBackground.vue'
 import WeddingOpeningAnimation from '~~/app/components/wedding/WeddingOpeningAnimation.vue'
 import WeddingHero from '~~/app/components/wedding/WeddingHero.vue'
+import WeddingRSVP from '~~/app/components/wedding/WeddingRSVP.vue'
 import RomdoulFlower from '~~/app/components/wedding/RomdoulFlower.vue'
 import KhmerKbach from '~~/app/components/wedding/KhmerKbach.vue'
 
@@ -312,7 +313,6 @@ const WeddingProgramme = defineAsyncComponent(() => import('~~/app/components/we
 const WeddingLocation = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingLocation.vue'))
 const WeddingGallery = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingGallery.vue'))
 const WeddingGift = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingGift.vue'))
-const WeddingRSVP = defineAsyncComponent(() => import('~~/app/components/wedding/WeddingRSVP.vue'))
 
 import { formatKhmerDate, formatEnglishDate, formatKhmerTime } from '~~/app/utils/date'
 import { PRESET_BACKGROUNDS } from '~~/shared/types/appearance'
