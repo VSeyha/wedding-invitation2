@@ -92,17 +92,54 @@
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
 
-  /* Lively bidirectional scroll-driven fade-in / fade-out animation */
+  /* Smooth luxury scroll-driven reveal animations (reveal once, no flicker) */
   .scroll-reveal {
     opacity: 0;
-    transform: translateY(18px) scale(0.985);
-    transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: opacity, transform;
+    transform: translate3d(0, 24px, 0);
+    transition:
+      opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .scroll-reveal.revealed {
+  .scroll-reveal.reveal-scale {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.965);
+  }
+
+  .scroll-reveal.reveal-fade {
+    opacity: 0;
+    transform: none;
+  }
+
+  .scroll-reveal.reveal-left {
+    opacity: 0;
+    transform: translate3d(-22px, 0, 0);
+  }
+
+  .scroll-reveal.reveal-right {
+    opacity: 0;
+    transform: translate3d(22px, 0, 0);
+  }
+
+  .scroll-reveal.revealed,
+  .scroll-reveal.reveal-scale.revealed,
+  .scroll-reveal.reveal-fade.revealed,
+  .scroll-reveal.reveal-left.revealed,
+  .scroll-reveal.reveal-right.revealed {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-reveal,
+    .scroll-reveal.reveal-scale,
+    .scroll-reveal.reveal-fade,
+    .scroll-reveal.reveal-left,
+    .scroll-reveal.reveal-right {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 
   /* Staggered children entrance */

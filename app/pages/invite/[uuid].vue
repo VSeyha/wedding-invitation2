@@ -158,7 +158,7 @@
           </div>
 
           <!-- Couple Introduction -->
-          <div class="scroll-reveal">
+          <div class="scroll-reveal reveal-scale">
             <WeddingCouple :wedding="wedding" />
           </div>
 
@@ -168,7 +168,7 @@
           </div>
 
           <!-- Warm Invitation Letter -->
-          <div class="scroll-reveal">
+          <div class="scroll-reveal reveal-scale">
             <WeddingMessage :wedding="wedding" />
           </div>
 
@@ -183,12 +183,12 @@
           </div>
 
           <!-- Photo Gallery -->
-          <div class="scroll-reveal">
+          <div class="scroll-reveal reveal-fade">
             <WeddingGallery :photos="photos" :config="wedding?.gallery_config" :loading="galleryLoading" />
           </div>
 
           <!-- Digital Wedding Gift / KHQR -->
-          <div class="scroll-reveal">
+          <div class="scroll-reveal reveal-scale">
             <WeddingGift :gift-info="wedding?.gift_info" />
           </div>
 
@@ -214,11 +214,18 @@
     </div>
     </Transition>
 
-    <!-- Fixed Screen Controls (Music Player, Language Switcher & Scroll-to-Top) -->
+    <!-- Fixed Screen Controls (Scroll Progress, Music Player, Language Switcher & Scroll-to-Top) -->
     <div
       v-if="!loading && !errorState && (hasOpened || isOpening)"
       class="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] pointer-events-none z-40"
     >
+      <!-- Hairline Royal Gold Scroll Progress Bar -->
+      <div class="absolute top-0 inset-x-0 h-[3px] bg-black/5 overflow-hidden">
+        <div
+          class="h-full bg-gradient-to-r from-[#C9A24A] via-[#F2D58B] to-[#C9A24A] origin-left transition-transform duration-150 ease-out shadow-[0_0_8px_rgba(201,162,74,0.75)]"
+          :style="{ transform: `scaleX(${scrollProgress})` }"
+        ></div>
+      </div>
       <!-- Top-Right Controls: Music Toggle + Language Switcher -->
       <div class="pointer-events-auto absolute top-3.5 right-3.5 sm:top-5 sm:right-5 flex items-center gap-2">
         <!-- Background Wedding Music Toggle -->
@@ -456,6 +463,7 @@ watch(
 const ambientBgRef = ref<HTMLElement | null>(null)
 const centerBgRef = ref<HTMLElement | null>(null)
 const targetScrollProgress = ref(0)
+const scrollProgress = ref(0)
 const showScrollTop = ref(false)
 let smoothProgress = 0
 let lastRafTime = 0
@@ -508,13 +516,29 @@ const updateSmoothScroll = (now: number) => {
   dampingRafId = requestAnimationFrame(updateSmoothScroll)
 }
 
+const revealVisibleSections = () => {
+  if (!import.meta.client) return
+  const triggerBottom = window.innerHeight * 0.96
+  document.querySelectorAll('.scroll-reveal:not(.revealed)').forEach((el) => {
+    const rect = el.getBoundingClientRect()
+    if (rect.top <= triggerBottom) {
+      el.classList.add('revealed')
+      observer?.unobserve(el)
+    }
+  })
+}
+
 const handleScroll = () => {
   if (!import.meta.client) return
 
   const y = window.scrollY || document.documentElement.scrollTop
   showScrollTop.value = y > 280
   const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
-  targetScrollProgress.value = Math.min(Math.max(y / max, 0), 1)
+  const progress = Math.min(Math.max(y / max, 0), 1)
+  targetScrollProgress.value = progress
+  scrollProgress.value = progress
+
+  revealVisibleSections()
 
   if (!dampingRafId) {
     lastRafTime = performance.now()
@@ -537,19 +561,19 @@ const setupScrollReveal = () => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('revealed')
-        } else {
-          entry.target.classList.remove('revealed')
+          observer?.unobserve(entry.target)
         }
       })
     },
     {
-      threshold: 0.02,
-      rootMargin: '0px 0px -15px 0px'
+      threshold: 0.04,
+      rootMargin: '0px 0px -24px 0px'
     }
   )
 
   nextTick(() => {
-    document.querySelectorAll('.scroll-reveal').forEach((el) => {
+    revealVisibleSections()
+    document.querySelectorAll('.scroll-reveal:not(.revealed)').forEach((el) => {
       observer?.observe(el)
     })
   })
