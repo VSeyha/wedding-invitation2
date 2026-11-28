@@ -686,7 +686,7 @@ const isMusicMuted = ref(false)
 let wasPlayingBeforeHide = false
 
 const musicEnabled = computed(() => (appearanceConfig.value?.opening_animation_config as any)?.music_enabled !== false)
-const musicUrl = computed(() => (appearanceConfig.value?.opening_animation_config as any)?.music_url || '/audio/wedding-theme.m4a')
+const musicUrl = computed(() => (appearanceConfig.value?.opening_animation_config as any)?.music_url || '/audio/wedding-theme.m4a?v=2')
 
 const startBackgroundMusic = () => {
   if (!import.meta.client || !musicEnabled.value || isMusicMuted.value) return
