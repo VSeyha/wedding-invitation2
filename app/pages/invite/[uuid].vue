@@ -146,54 +146,54 @@
       >
         <!-- 2. Main Invitation Content (Unveiled seamlessly behind animation) -->
         <main
-          class="pb-20 relative will-change-transform transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+          class="pb-28 relative will-change-transform transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           :class="{
             'opacity-100 translate-y-0 scale-100': isOpening || hasOpened,
             'opacity-0 translate-y-3 scale-[0.985] pointer-events-none': !isOpening && !hasOpened
           }"
         >
           <!-- Hero Section -->
-          <div class="scroll-reveal revealed">
+          <div id="sec-hero" class="scroll-reveal revealed scroll-mt-12">
             <WeddingHero :wedding="wedding" />
           </div>
 
           <!-- Couple Introduction -->
-          <div class="scroll-reveal reveal-scale">
+          <div id="sec-couple" class="scroll-reveal reveal-scale scroll-mt-12">
             <WeddingCouple :wedding="wedding" />
           </div>
 
           <!-- Our Story Timeline -->
-          <div class="scroll-reveal">
+          <div id="sec-story" class="scroll-reveal scroll-mt-12">
             <WeddingOurStory :story="wedding?.our_story" />
           </div>
 
           <!-- Warm Invitation Letter -->
-          <div class="scroll-reveal reveal-scale">
+          <div id="sec-message" class="scroll-reveal reveal-scale scroll-mt-12">
             <WeddingMessage :wedding="wedding" />
           </div>
 
           <!-- Ceremony Programme Timeline -->
-          <div class="scroll-reveal">
+          <div id="sec-programme" class="scroll-reveal scroll-mt-12">
             <WeddingProgramme :programmes="programmes" />
           </div>
 
           <!-- Venue Location & Map -->
-          <div class="scroll-reveal">
+          <div id="sec-location" class="scroll-reveal scroll-mt-12">
             <WeddingLocation :wedding="wedding" />
           </div>
 
           <!-- Photo Gallery -->
-          <div class="scroll-reveal reveal-fade">
+          <div id="sec-gallery" class="scroll-reveal reveal-fade scroll-mt-12">
             <WeddingGallery :photos="photos" :config="wedding?.gallery_config" :loading="galleryLoading" />
           </div>
 
           <!-- Digital Wedding Gift / KHQR -->
-          <div class="scroll-reveal reveal-scale">
+          <div id="sec-gift" class="scroll-reveal reveal-scale scroll-mt-12">
             <WeddingGift :gift-info="wedding?.gift_info" />
           </div>
 
           <!-- RSVP Attendance Form -->
-          <div class="scroll-reveal">
+          <div id="sec-rsvp" class="scroll-reveal scroll-mt-12">
             <WeddingRSVP
               :token="token"
               :guest-name="invitation?.guest_name || ''"
@@ -265,18 +265,51 @@
       <!-- Hidden Background Audio Element -->
       <audio ref="bgAudioRef" :src="musicUrl" loop preload="none" class="hidden"></audio>
 
-      <!-- Fixed Bottom-Right Scroll to Top Button -->
+      <!-- Fixed Bottom-Right Scroll to Top Button (above floating nav bar) -->
       <button
         type="button"
         @click="scrollToTop"
         aria-label="Scroll to top"
-        class="absolute bottom-5 right-3.5 sm:bottom-6 sm:right-5 w-11 h-11 rounded-full bg-[#FFFDF9]/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/70 shadow-[0_8px_24px_rgba(100,29,45,0.22)] text-wedding-primary flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] interactive-btn cursor-pointer"
+        class="absolute bottom-20 right-3.5 sm:bottom-20 sm:right-5 w-10 h-10 rounded-full bg-[#FFFDF9]/95 hover:bg-white backdrop-blur-md border border-wedding-secondary/70 shadow-[0_8px_24px_rgba(100,29,45,0.22)] text-wedding-primary flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] interactive-btn cursor-pointer"
         :class="showScrollTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-4 scale-90 pointer-events-none'"
       >
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 15l-6-6-6 6" />
         </svg>
       </button>
+
+      <!-- Floating Bottom Invitation Map Navigation Bar -->
+      <nav
+        aria-label="Invitation sections"
+        class="pointer-events-auto absolute bottom-3.5 sm:bottom-5 left-1/2 -translate-x-1/2 max-w-[calc(100%-1.5rem)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        :class="hasOpened ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none'"
+      >
+        <div class="flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-[#FFFDF9]/95 backdrop-blur-md border border-wedding-secondary/60 shadow-[0_10px_30px_rgba(100,29,45,0.22)] overflow-x-auto scrollbar-none">
+          <button
+            v-for="item in navSections"
+            :key="item.id"
+            type="button"
+            @click="scrollToSection(item.id)"
+            :aria-label="isKhmer ? item.labelKm : item.labelEn"
+            :title="isKhmer ? item.labelKm : item.labelEn"
+            class="flex items-center gap-1.5 rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer shrink-0"
+            :class="activeSection === item.id
+              ? 'bg-wedding-primary text-wedding-bg px-3 py-1.5 shadow-sm font-semibold'
+              : 'text-wedding-primary/75 hover:text-wedding-primary hover:bg-wedding-secondary/15 px-2.5 py-1.5'"
+          >
+            <component :is="item.icon" class="w-3.5 h-3.5 shrink-0" />
+            <span
+              class="text-[11px] whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              :class="[
+                isKhmer ? 'font-khmer-body' : 'font-en-body',
+                activeSection === item.id ? 'max-w-[90px] opacity-100' : 'max-w-0 opacity-0'
+              ]"
+            >
+              {{ isKhmer ? item.labelKm : item.labelEn }}
+            </span>
+          </button>
+        </div>
+      </nav>
     </div>
 
     <!-- Tactile Royal Click / Tap Golden Sparkle Particles -->
@@ -323,6 +356,7 @@ const WeddingGift = defineAsyncComponent(() => import('~~/app/components/wedding
 
 import { formatKhmerDate, formatEnglishDate, formatKhmerTime } from '~~/app/utils/date'
 import { PRESET_BACKGROUNDS } from '~~/shared/types/appearance'
+import { Home, Heart, CalendarClock, MapPin, Images, Gift, MailCheck } from 'lucide-vue-next'
 
 import type { WeddingSettings } from '~~/shared/types/wedding'
 import type { WeddingProgramme as ProgrammeType, WeddingPhoto } from '~~/shared/types/programme'
@@ -465,6 +499,52 @@ const centerBgRef = ref<HTMLElement | null>(null)
 const targetScrollProgress = ref(0)
 const scrollProgress = ref(0)
 const showScrollTop = ref(false)
+const activeSection = ref('sec-hero')
+let lockScrollSpyUntil = 0
+
+const navSections = computed(() => {
+  const items = [
+    { id: 'sec-hero', labelKm: 'ដើម', labelEn: 'Top', icon: Home },
+    { id: 'sec-couple', labelKm: 'គូស្វាមី', labelEn: 'Couple', icon: Heart }
+  ]
+  if (programmes.value.length > 0) {
+    items.push({ id: 'sec-programme', labelKm: 'កម្មវិធី', labelEn: 'Schedule', icon: CalendarClock })
+  }
+  items.push({ id: 'sec-location', labelKm: 'ទីតាំង', labelEn: 'Map', icon: MapPin })
+  if (photos.value.length > 0) {
+    items.push({ id: 'sec-gallery', labelKm: 'រូបភាព', labelEn: 'Gallery', icon: Images })
+  }
+  if (wedding.value?.gift_info?.enabled !== false) {
+    items.push({ id: 'sec-gift', labelKm: 'ចំណងដៃ', labelEn: 'Gift', icon: Gift })
+  }
+  items.push({ id: 'sec-rsvp', labelKm: 'បញ្ជាក់', labelEn: 'RSVP', icon: MailCheck })
+  return items
+})
+
+const scrollToSection = (id: string) => {
+  if (!import.meta.client) return
+  const el = document.getElementById(id)
+  if (!el) return
+  activeSection.value = id
+  lockScrollSpyUntil = performance.now() + 700
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  setTimeout(() => revealVisibleSections(), 350)
+}
+
+const updateActiveSection = () => {
+  if (!import.meta.client || performance.now() < lockScrollSpyUntil) return
+  const anchorY = window.innerHeight * 0.35
+  let current = navSections.value[0]?.id || 'sec-hero'
+  for (const item of navSections.value) {
+    const el = document.getElementById(item.id)
+    if (!el) continue
+    const rect = el.getBoundingClientRect()
+    if (rect.top <= anchorY) {
+      current = item.id
+    }
+  }
+  activeSection.value = current
+}
 let smoothProgress = 0
 let lastRafTime = 0
 let dampingRafId: number | null = null
@@ -539,6 +619,7 @@ const handleScroll = () => {
   scrollProgress.value = progress
 
   revealVisibleSections()
+  updateActiveSection()
 
   if (!dampingRafId) {
     lastRafTime = performance.now()
