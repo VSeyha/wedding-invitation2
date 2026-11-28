@@ -36,13 +36,13 @@
   [lang="km"],
   .font-khmer-body,
   .font-khmer-heading,
-  .font-khmer-body *,
-  .font-khmer-heading * {
+  .font-khmer-body *:not(.font-en-heading):not(.font-en-body):not([class*="tracking-"]),
+  .font-khmer-heading *:not(.font-en-heading):not(.font-en-body):not([class*="tracking-"]) {
     letter-spacing: normal !important;
     word-break: break-word;
     overflow-wrap: break-word;
     text-rendering: optimizeLegibility;
-    font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1, "ccmp" 1, "mark" 1, "mkmk" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -51,16 +51,32 @@
     font-family: 'Moul', 'Khmer OS Muol Light', 'Khmer OS Muol', 'Noto Sans Khmer', 'Khmer MN', 'Khmer Sangam MN', 'Khmer UI', 'DaunPenh', serif !important;
     font-weight: 400 !important;
     font-synthesis: none;
-    line-height: 2 !important;
-    padding-top: 0.3em;
-    padding-bottom: 0.2em;
+    line-height: 1.75 !important;
+    padding-top: 0.12em;
+    padding-bottom: 0.1em;
     letter-spacing: normal !important;
   }
 
   .font-khmer-body {
     font-family: 'Kantumruy Pro', 'Noto Sans Khmer', 'Khmer OS Battambang', 'Khmer OS', 'Khmer Sangam MN', 'Khmer MN', 'Khmer UI', 'Leelawadee UI', 'DaunPenh', sans-serif !important;
-    line-height: 1.85 !important;
+    line-height: 1.75 !important;
     letter-spacing: normal !important;
+  }
+
+  /* Refined Editorial English Wedding Typography */
+  .font-en-heading {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-optical-sizing: auto;
+    line-height: 1.25;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-en-body {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 

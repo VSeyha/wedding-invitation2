@@ -57,7 +57,7 @@ export default {
           'sans-serif'
         ],
         'en-heading': ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        'en-body': ['Inter', 'sans-serif']
+        'en-body': ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
       },
       boxShadow: {
         'gold-glow': '0 0 25px rgba(201, 162, 74, 0.35)',

@@ -1,6 +1,7 @@
 <template>
   <div
-    class="relative flex justify-center selection:bg-wedding-secondary/30 selection:text-wedding-primary font-khmer-body overflow-x-hidden min-h-screen bg-[#140D0A]"
+    class="relative flex justify-center selection:bg-wedding-secondary/30 selection:text-wedding-primary overflow-x-hidden min-h-screen bg-[#140D0A]"
+    :class="isKhmer ? 'font-khmer-body' : 'font-en-body'"
   >
     <!-- Unified Dynamic Scenic Backdrop (Edge-to-edge for Desktop & Mobile) -->
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
