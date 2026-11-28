@@ -9,11 +9,12 @@
     </div>
 
     <!-- Timeline Wrapper -->
-    <div class="relative border-l-2 border-wedding-secondary/40 ml-4 sm:ml-6 space-y-6 pl-6 sm:pl-7">
+    <div ref="timelineRef" class="relative border-l-2 border-wedding-secondary/40 ml-4 sm:ml-6 space-y-6 pl-6 sm:pl-7">
       <div
         v-for="prog in sorted"
         :key="prog.id"
-        class="relative group"
+        data-scroll-fade
+        class="relative group scroll-fade-item"
       >
         <!-- Dot Indicator on line -->
         <span class="absolute -left-[31px] sm:-left-[35px] top-3.5 w-3.5 h-3.5 rounded-full bg-wedding-secondary border-2 border-wedding-bg shadow-sm transition-transform duration-300 group-hover:scale-125 group-hover:bg-wedding-primary"></span>
@@ -46,8 +47,10 @@ const props = defineProps<{
 }>()
 
 const { isKhmer, t } = useLocale()
+const timelineRef = ref<HTMLElement | null>(null)
 
 const sorted = computed(() => [...props.programmes].sort((a, b) => a.display_order - b.display_order))
+useScrollFade(timelineRef, () => sorted.value.length)
 
 const formatTime = (timeStr: string) => {
   if (!timeStr) return ''

@@ -33,11 +33,12 @@
         </div>
 
         <!-- Vertical Timeline Track with Clean Item-to-Item Connection -->
-        <div class="relative ml-5 sm:ml-6 space-y-8 sm:space-y-9 pl-6 sm:pl-7 py-2">
+        <div ref="storyTrackRef" class="relative ml-5 sm:ml-6 space-y-8 sm:space-y-9 pl-6 sm:pl-7 py-2">
           <div
             v-for="(item, index) in activeStoryItems"
             :key="index"
-            class="relative group cursor-pointer p-2 sm:p-2.5 rounded-2xl transition-all duration-300 hover:bg-white/70 hover:shadow-sm"
+            data-scroll-fade
+            class="relative group cursor-pointer p-2 sm:p-2.5 rounded-2xl transition-all duration-300 hover:bg-white/70 hover:shadow-sm scroll-fade-item"
           >
             <!-- Vertical Line Segment that connects ONLY to next milestone (No dangling tail after last item) -->
             <div
@@ -96,6 +97,7 @@ const props = defineProps<{
 }>()
 
 const { isKhmer } = useLocale()
+const storyTrackRef = ref<HTMLElement | null>(null)
 
 const DEFAULT_STORY_ITEMS: StoryMilestone[] = [
   {
@@ -134,4 +136,6 @@ const activeStoryItems = computed(() => {
   }
   return DEFAULT_STORY_ITEMS
 })
+
+useScrollFade(storyTrackRef, () => activeStoryItems.value.length)
 </script>
